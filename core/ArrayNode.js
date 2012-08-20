@@ -1,14 +1,15 @@
-Cube.core.ArrayNode = function (attributes) {
-
-    this.nodes = [];
-
+Cube.core.ArrayNode = function(attributes) {
     Cube.core.Node.call(this, attributes);
+    
+    this.checkNodes(attributes.nodes);
+
+    this.nodes = attributes.nodes || [];
 };
 
-Cube.core.ArrayNode.prototype = new Cube.core.Node();
+Cube.core.ArrayNode.prototype = new Cube.core.Node({});
 Cube.core.ArrayNode.prototype.constructor = Cube.core.ArrayNode;
 
-Cube.core.ArrayNode.prototype.accept = function (visitor) {
+Cube.core.ArrayNode.prototype.accept = function(visitor) {
     visitor.visitArrayBegin(this.nodes.length);
     var i;
     for (i = 0; i < this.nodes.length; ++i) {
@@ -18,24 +19,31 @@ Cube.core.ArrayNode.prototype.accept = function (visitor) {
     visitor.visitArrayEnd();
 };
 
-Cube.core.ArrayNode.prototype.checkProperty = function (name, value) {
-    var funcs = {
-	nodes: Cube.core.ArrayNode.prototype.setNodes
-    };
-    return funcs[name].call(this, value);
+Cube.core.ArrayNode.prototype.push = function(node) {
+    this.checkNode(node);
+    this.nodes.push(node);
 };
 
-Cube.core.ArrayNode.prototype.setNodes = function(nodes) {
-    if (!nodes || !(nodes instanceof Array)) {
-	throw "Must be a non null reference on a Array of Core.core.Node like objects"; // <== 
+Cube.core.ArrayNode.prototype.clear = function(fromIdx) {
+    this.nodes.splice(fromIdx);
+    return this;
+}
+
+Cube.core.ArrayNode.prototype.checkNode = function(node) {
+    Cube.core.Utilities.checkReference(node, "node");
+    Cube.core.Utilities.checkType(node, Cube.core.Node, "node should be Cube.core.Node");
+};
+
+Cube.core.ArrayNode.prototype.checkNodes = function(nodes) {
+    if (!nodes) {
+	return; // <== 
     }
+    
+    Cube.core.Utilities.checkType(nodes, Array, "nodes shoud be Array");
     
     var i;
     for (i = 0; i < nodes.length; ++i) {
-	if (!nodes[i] || !(nodes[i] instanceof Cube.core.Node)) {
-	    throw "Invalid element. Must be a valid reference to a Core.core.Node like object"; // <== 
-	}
+	Cube.core.Utilities.checkReference(nodes[i], "nodes[i]");
+	Cube.core.Utilities.checkType(nodes[i], Cube.core.Node, "nodes["+i+"] should be Cube.core.Node");
     }
-
-    return nodes; // <== 
 };

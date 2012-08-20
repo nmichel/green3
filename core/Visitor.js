@@ -3,7 +3,7 @@ Cube.core.Visitor = function () {
     this.prefix = "";
 };
 
-Cube.core.Visitor.prototype = new Object();
+Cube.core.Visitor.prototype = {};
 Cube.core.Visitor.prototype.constructor = Cube.core.Visitor;
 
 Cube.core.Visitor.prototype.visitArrayBegin = function (length) {
@@ -22,4 +22,19 @@ Cube.core.Visitor.prototype.visitStatePush = function () {
 
 Cube.core.Visitor.prototype.visitStatePop = function () {
     print(this.prefix, "POP");
+};
+
+Cube.core.Visitor.prototype.visitGeometry = function (geometryNode) {
+    print(this.prefix, "Geometry");
+};
+
+Cube.core.Visitor.prototype.visitMaterial = function (materialNode) {
+    print(this.prefix, "Material");
+};
+
+Cube.core.Visitor.prototype.visitTransform = function (transformation) {
+    print(this.prefix, "Transform");
+};
+Cube.core.Visitor.prototype.visitTransformStack = function (transformation) {
+    print(this.prefix, "TransformStack");
 };

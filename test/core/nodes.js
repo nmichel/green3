@@ -32,6 +32,14 @@ var tests = [
 					    nodes: [new Cube.core.StatePushNode(),
 						    new Cube.core.StatePopNode()]});
 	node.accept(visitor);
+    },
+
+    function (parameters) {
+	var visitor = new Cube.core.Visitor();
+	var node = new Cube.core.MeshNode({name: "mesh",
+					   geometry: new Cube.core.GeometryNode(),
+					   material: new Cube.core.MaterialNode()});
+	node.accept(visitor);
     }
 ];
 

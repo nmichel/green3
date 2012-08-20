@@ -1,0 +1,90 @@
+<html lang="en">
+	<head>
+		<title>Cube</title>
+		<meta charset="utf-8" />
+		<script src="../common/webgl-debug.js"></script>
+		<script src="../common/RequestAnimationFrame.js"></script>
+		<script src="../common/base.js"></script>
+		<script src="../../cube.js"></script>
+		<script src="../../core/core.js"></script>
+		<script src="../../core/math/math.js"></script>
+		<script src="../../core/math/Vector3.js"></script>
+		<script src="../../core/math/Matrix4.js"></script>
+		<script src="../../core/Utilities.js"></script>
+		<script src="../../core/Visitor.js"></script>
+		<script src="../../core/Node.js"></script>
+		<script src="../../core/ArrayNode.js"></script>
+		<script src="../../core/Tree.js"></script>
+		<script src="../../core/BufferSetNode.js"></script>
+		<script src="../../core/OutputToBufferSet.js"></script>
+		<script src="../../core/GeometryNode.js"></script>
+		<script src="../../core/MaterialNode.js"></script>
+		<script src="../../core/MeshNode.js"></script>
+		<script src="../../core/OpticNode.js"></script>
+		<script src="../../core/TransformNode.js"></script>
+		<script src="../../core/RotationXYZNode.js"></script>
+		<script src="../../core/ScalingNode.js"></script>
+		<script src="../../core/TranslationNode.js"></script>
+		<script src="../../core/TransformStackNode.js"></script>
+		<script src="../../core/StatePopNode.js"></script>
+		<script src="../../core/StatePushNode.js"></script>
+		<script src="../../core/GeometryHelpers.js"></script>
+		<script src="../../core/Renderer.js"></script>
+		
+		<script id="3d-vertex-shader" type="x-shader/x-vertex">
+		  attribute vec4 aVertexColor;
+		  attribute vec3 aPosition;
+		  attribute vec3 aNormal;
+		  
+		  uniform mat4 u_normalMatrix;
+		  uniform mat4 u_matrix;
+		  uniform mat4 u_view;
+		  uniform mat4 u_projection;
+		  
+		  varying vec4 v_color;
+		  
+		  void main() {
+		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
+		    gl_PointSize = 4.0;
+
+		    vec4 aVertEyeNormal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+
+		    // Shading
+		    // 
+		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), aVertEyeNormal);
+		    //v_color = vec4(ratio, ratio, ratio, 1.0);
+
+
+		    // Color ball
+		    //
+/*
+		    v_color = vec4((aNormal.x + 1.0) * 0.5,
+		                   (aNormal.y + 1.0) * 0.5,
+                                   (aNormal.z + 1.0) * 0.5,
+		                   1.0);
+*/
+
+		    // Raw color
+		    // 
+		    v_color = vec4(aVertexColor.r * ratio, aVertexColor.g * ratio, aVertexColor.b * ratio, aVertexColor.a);
+		  }
+		</script>
+
+		<script id="3d-fragment-shader" type="x-shader/x-fragment">
+		  precision mediump float;
+		  
+		  // Passed in from the vertex shader.
+		  varying lowp vec4 v_color;
+		  
+		  void main() {
+		    gl_FragColor = v_color;
+		    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		  }
+		</script>
+	</head>
+
+	<body>
+	  
+	  <script src="./sandbox.js"></script>
+	</body>
+</html>

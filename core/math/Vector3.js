@@ -1,11 +1,36 @@
 Cube.core.math.Vector3 = function(x, y, z) {
-
     this.set(x, y, z);
 };
 
 Cube.core.math.Vector3.prototype = {
+    constructor: Cube.core.math.Vector3,
 
-    constructor: Cube.math.Vector3,
+    getX: function() {
+	return this.x;
+    },
+
+    getY: function() {
+	return this.y;
+    },
+
+    getZ: function() {
+	return this.z;
+    },
+
+    setX: function(v) {
+	this.x = v;
+	return this;
+    },
+
+    setY: function(v) {
+	this.y = v;
+	return this;
+    },
+
+    setZ: function(v) {
+	this.z = v;
+	return this;
+    },
 
     set: function(x, y, z) {
 	this.x = x || 0;
@@ -53,6 +78,5 @@ Cube.core.math.Vector3.prototype = {
     normalizeSelf: function() {
 	return this.scaleSelf(this.length());
     }
-
 };
 
