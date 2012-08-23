@@ -12,6 +12,7 @@
 		<script src="../../core/math/Matrix4.js"></script>
 		<script src="../../core/Utilities.js"></script>
 		<script src="../../core/Visitor.js"></script>
+		<script src="../../core/RenderVisitor.js"></script>
 		<script src="../../core/Node.js"></script>
 		<script src="../../core/ArrayNode.js"></script>
 		<script src="../../core/Tree.js"></script>
@@ -28,6 +29,8 @@
 		<script src="../../core/TransformStackNode.js"></script>
 		<script src="../../core/StatePopNode.js"></script>
 		<script src="../../core/StatePushNode.js"></script>
+		<script src="../../core/ViewNode.js"></script>
+		<script src="../../core/ViewportNode.js"></script>
 		<script src="../../core/GeometryHelpers.js"></script>
 		<script src="../../core/Renderer.js"></script>
 		
@@ -54,19 +57,18 @@
 		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), aVertEyeNormal);
 		    //v_color = vec4(ratio, ratio, ratio, 1.0);
 
-
-		    // Color ball
+		    // Normal vector based color ball
 		    //
-/*
 		    v_color = vec4((aNormal.x + 1.0) * 0.5,
 		                   (aNormal.y + 1.0) * 0.5,
                                    (aNormal.z + 1.0) * 0.5,
 		                   1.0);
-*/
 
 		    // Raw color
 		    // 
+/*
 		    v_color = vec4(aVertexColor.r * ratio, aVertexColor.g * ratio, aVertexColor.b * ratio, aVertexColor.a);
+*/
 		  }
 		</script>
 

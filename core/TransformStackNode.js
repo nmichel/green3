@@ -7,10 +7,6 @@ Cube.core.TransformStackNode = function (attributes) {
 Cube.core.TransformStackNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TransformStackNode.prototype.constructor = Cube.core.TransformStackNode;
 
-Cube.core.TransformStackNode.prototype.accept = function(visitor) {
-    visitor.visitTransformStack(this);
-};
-
 Cube.core.TransformStackNode.prototype.push = function(transfo) {
     Cube.core.Utilities.checkReference(transfo, "transfo");
     Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");

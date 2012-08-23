@@ -14,7 +14,7 @@ Cube.core.TransformNode.prototype = new Cube.core.Node({});
 Cube.core.TransformNode.prototype.constructor = Cube.core.TransformNode;
 
 Cube.core.TransformNode.prototype.accept = function(visitor) {
-    visitor.visitTransformNode(this);
+    visitor.visitTransform(this);
 };
 
 Cube.core.TransformNode.prototype.getMatrix = function() {

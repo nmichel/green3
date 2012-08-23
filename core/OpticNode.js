@@ -9,6 +9,10 @@ Cube.core.OpticNode = function(attributes) {
 Cube.core.OpticNode.prototype = new Cube.core.Node({});
 Cube.core.OpticNode.prototype.constructor = Cube.core.OpticNode;
 
+Cube.core.OpticNode.prototype.accept = function(visitor) {
+    visitor.visitOptic(this);
+};
+
 Cube.core.OpticNode.prototype.setup = function(attributes) {
     Cube.core.Utilities.checkReference(attributes);
 
