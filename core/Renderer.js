@@ -1,13 +1,11 @@
 Cube.core.Renderer = function(attributes) {
     
-    this.canvas = null;
-    this.gl = null;
+    this.gl = attributes.gl;
     this.defaultClearFlags = 0;
-    this.mappings = {};
-
+    this.mappings = null;
     this.bufferFactoryFunc = null;
 
-    this.setup(attributes);
+    this.setup();
 };
 
 Cube.core.Renderer.prototype = {};
@@ -18,13 +16,17 @@ Cube.core.Renderer.prototype.mode = {
 };
 
 Cube.core.Renderer.prototype.shaderParameters = {
-    matrixProjection: "matrixProjection",
-    matrixModel: "matrixModel",
-    matrixNormal: "matrixNormal",
-    matrixView: "matrixView",
-    vertex: "vertex",
-    normal: "normal",
-    color: "color"
+    uniforms: {
+	matrixProjection: "matrixProjection",
+	matrixModel: "matrixModel",
+	matrixNormal: "matrixNormal",
+	matrixView: "matrixView"
+    },
+    attributes: {
+	vertex: "vertex",
+	normal: "normal",
+	color: "color"
+    }
 };
 
 Cube.core.Renderer.prototype.constructor = Cube.core.Renderer;
@@ -33,21 +35,8 @@ Cube.core.Renderer.prototype.getBufferFactory = function() {
     return this.bufferFactoryFunc;
 };
 
-Cube.core.Renderer.prototype.setup = function(attributes) {
-    var canvas = attributes.canvas;
-    var gl = canvas.getContext('experimental-webgl',
-			       {
-				   // alpha: true
-					// , antialias: true
-				   // , stencil: true
-			       });
-    if (!gl) {
-	throw "failed to created WebGL context"; // <== 
-    }
-    
-    this.canvas = attributes.canvas;
-    this.gl = gl;
-    this.bufferFactoryFunc = (function () {
+Cube.core.Renderer.prototype.setup = function() {
+    this.bufferFactoryFunc = (function (gl) {
 	return function (isIndex, data) {
 	    var buffer = gl.createBuffer();
 	    var type = isIndex ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
@@ -55,13 +44,14 @@ Cube.core.Renderer.prototype.setup = function(attributes) {
 	    gl.bufferData(type, data, gl.STATIC_DRAW);
 	    return buffer; // <== 
 	};
-    })();
+    })(this.gl);
 
     this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT
 
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
+    // this.gl.frontFace(this.gl.CCW); // Default
 };
 
 Cube.core.Renderer.prototype.clear = function(buffers) {
@@ -88,30 +78,28 @@ Cube.core.Renderer.prototype.setViewport = function(x, y, w, h) {
 };
 
 Cube.core.Renderer.prototype.loadMappings = function(mappings) {
-    for (k in mappings) {
-	this.mappings[k] = mappings[k];
-    }
+    this.mappings = mappings;
     return this;
 };
 
 Cube.core.Renderer.prototype.loadProjectionTransformation = function(transfo) {
     var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings[this.shaderParameters.matrixProjection], false, rawMatrix);
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.loadViewTransformation = function(transfo) {
     var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings[this.shaderParameters.matrixView], false, rawMatrix);
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.loadNormalTransformation = function(transfo) {
     var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings[this.shaderParameters.matrixNormal], false, rawMatrix);
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixNormal], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
     var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings[this.shaderParameters.matrixModel], false, rawMatrix);
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixModel], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
@@ -125,20 +113,20 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     }
 
     if (!!bufferSet.normalBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings[this.shaderParameters.normal]);
+	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings[this.shaderParameters.normal], 3, gl.FLOAT, false, 0, 0);
+	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
     }
 
     if (!!bufferSet.colorBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings[this.shaderParameters.color]);
+	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings[this.shaderParameters.color], 4, gl.FLOAT, false, 0, 0);
+	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
     }
 
-    this.gl.enableVertexAttribArray(this.mappings[this.shaderParameters.vertex]);
+    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
-    this.gl.vertexAttribPointer(this.mappings[this.shaderParameters.vertex], 3, gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
 
     if (mode == this.mode.ELEMENT) {
 	this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
@@ -147,4 +135,9 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     else {
 	this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
     }
+};
+
+Cube.core.Renderer.prototype.useShader = function(shader) {
+    this.gl.useProgram(shader.getProgram());
+    this.loadMappings(shader.getBindings());
 };

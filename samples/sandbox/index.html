@@ -4,7 +4,6 @@
 		<meta charset="utf-8" />
 		<script src="../common/webgl-debug.js"></script>
 		<script src="../common/RequestAnimationFrame.js"></script>
-		<script src="../common/base.js"></script>
 		<script src="../../cube.js"></script>
 		<script src="../../core/core.js"></script>
 		<script src="../../core/math/math.js"></script>
@@ -32,11 +31,15 @@
 		<script src="../../core/ViewNode.js"></script>
 		<script src="../../core/ViewportNode.js"></script>
 		<script src="../../core/GeometryHelpers.js"></script>
+		<script src="../../core/ShaderNode.js"></script>
+		<script src="../../core/ResourceLoader.js"></script>
+		<script src="../../core/ShaderManager.js"></script>
+		<script src="../../core/Engine.js"></script>
 		<script src="../../core/Renderer.js"></script>
 		
 		<script id="3d-vertex-shader" type="x-shader/x-vertex">
-		  attribute vec4 aVertexColor;
 		  attribute vec3 aPosition;
+		  attribute vec4 aColor;
 		  attribute vec3 aNormal;
 		  
 		  uniform mat4 u_normalMatrix;
@@ -59,16 +62,17 @@
 
 		    // Normal vector based color ball
 		    //
+
 		    v_color = vec4((aNormal.x + 1.0) * 0.5,
 		                   (aNormal.y + 1.0) * 0.5,
                                    (aNormal.z + 1.0) * 0.5,
 		                   1.0);
 
+
 		    // Raw color
 		    // 
-/*
-		    v_color = vec4(aVertexColor.r * ratio, aVertexColor.g * ratio, aVertexColor.b * ratio, aVertexColor.a);
-*/
+
+//		    v_color = vec4(aColor.r * ratio, aColor.g * ratio, aColor.b * ratio, aColor.a);
 		  }
 		</script>
 

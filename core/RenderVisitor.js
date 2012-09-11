@@ -35,3 +35,7 @@ Cube.core.RenderVisitor.prototype.visitBufferSet = function(bufferSetNode) {
     // 
     this.renderer.renderBufferSet(this.renderer.mode.ELEMENT, bufferSetNode);
 };
+
+Cube.core.RenderVisitor.prototype.visitShader = function(shaderNode) {
+    this.renderer.useShader(shaderNode);
+}
