@@ -3,6 +3,8 @@ Cube.core.Renderer = function(attributes) {
     this.gl = attributes.gl;
     this.defaultClearFlags = 0;
     this.mappings = null;
+    this.projectionTransfo = null;
+    this.viewTransfo = null;
     this.bufferFactoryFunc = null;
 
     this.setup();
@@ -83,13 +85,11 @@ Cube.core.Renderer.prototype.loadMappings = function(mappings) {
 };
 
 Cube.core.Renderer.prototype.loadProjectionTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, rawMatrix);
+    this.projectionTransfo = transfo;
 };
 
 Cube.core.Renderer.prototype.loadViewTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, rawMatrix);
+    this.viewTransfo = transfo;
 };
 
 Cube.core.Renderer.prototype.loadNormalTransformation = function(transfo) {
@@ -137,7 +137,14 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     }
 };
 
+Cube.core.Renderer.prototype.loadPerFrameData = function() {
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+    
+};
+
 Cube.core.Renderer.prototype.useShader = function(shader) {
     this.gl.useProgram(shader.getProgram());
     this.loadMappings(shader.getBindings());
+    this.loadPerFrameData();
 };

@@ -51,14 +51,9 @@
 		  
 		  void main() {
 		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
-		    gl_PointSize = 4.0;
+		    //gl_PointSize = 4.0;
 
 		    vec4 aVertEyeNormal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
-
-		    // Shading
-		    // 
-		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), aVertEyeNormal);
-		    //v_color = vec4(ratio, ratio, ratio, 1.0);
 
 		    // Normal vector based color ball
 		    //
@@ -67,12 +62,29 @@
 		                   (aNormal.y + 1.0) * 0.5,
                                    (aNormal.z + 1.0) * 0.5,
 		                   1.0);
+		  }
+		</script>
 
+		<script id="flat-vertex-shader" type="x-shader/x-vertex">
+		  attribute vec3 aPosition;
+		  attribute vec4 aColor;
+		  attribute vec3 aNormal;
+		  
+		  uniform mat4 u_normalMatrix;
+		  uniform mat4 u_matrix;
+		  uniform mat4 u_view;
+		  uniform mat4 u_projection;
+		  
+		  varying vec4 v_color;
+		  
+		  void main() {
+		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
+		    gl_PointSize = 4.0;
 
-		    // Raw color
-		    // 
-
-//		    v_color = vec4(aColor.r * ratio, aColor.g * ratio, aColor.b * ratio, aColor.a);
+		    vec4 aVertEyeNormal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), aVertEyeNormal);
+		    vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
+		    v_color = vec4(color.r * ratio, color.g * ratio, color.b * ratio, color.a);
 		  }
 		</script>
 

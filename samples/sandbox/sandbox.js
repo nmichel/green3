@@ -16,23 +16,24 @@ function mapFromPairList(pairs) {
 
 var engine = new Cube.core.Engine({canvas: canvas});
 var renderer = engine.getRenderer();
+var mappings = {uniforms: mapFromPairList([[renderer.shaderParameters.uniforms.matrixProjection, "u_projection"],
+					   [renderer.shaderParameters.uniforms.matrixView,       "u_view"],
+					   [renderer.shaderParameters.uniforms.matrixModel,      "u_matrix"],
+					   [renderer.shaderParameters.uniforms.matrixNormal,     "u_normalMatrix"]]),
+		attributes: mapFromPairList([[renderer.shaderParameters.attributes.vertex,       "aPosition"],
+					     [renderer.shaderParameters.attributes.normal,       "aNormal"],
+					     [renderer.shaderParameters.attributes.color,        "aColor"]])};
 var shaderManager = new Cube.core.ShaderManager({engine: engine,
 						 loader: new Cube.core.ResourceLoader({}),
 						 shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
-									// preload: true, SUPPRIMER cette feature 
-									mappings: {uniforms: mapFromPairList([[renderer.shaderParameters.uniforms.matrixProjection, "u_projection"],
-													      [renderer.shaderParameters.uniforms.matrixView,       "u_view"],
-													      [renderer.shaderParameters.uniforms.matrixModel,      "u_matrix"],
-													      [renderer.shaderParameters.uniforms.matrixNormal,     "u_normalMatrix"]]),
-										   attributes: mapFromPairList([[renderer.shaderParameters.attributes.vertex,       "aPosition"],
-														[renderer.shaderParameters.attributes.normal,       "aNormal"],
-														[renderer.shaderParameters.attributes.color,        "aColor"]])}}/*,
-							   other: {src: [...],
-							   preload: true|false}*/}});
+									preload: true,
+									mappings: mappings},
+							   flat: {src: ["flat-vertex-shader", "3d-fragment-shader"],
+								  preload: true,
+								  mappings: mappings}}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
-var shaderColorCube = shaderManager.getShader("colorspace");
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
 var optic = new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000});
 var camera = new Cube.core.ViewNode({parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
@@ -72,12 +73,13 @@ var cubeGeoBufferSet =
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
-scene.push(shaderColorCube); // Pour l'instant ici, car les mappings doivent etre charges avant de visiter les noeuds de transformation. Prochaine etape : revoir ca.
 scene.push(viewport);
 scene.push(optic);
 scene.push(camera);
+scene.push(shaderManager.getShader("colorspace"));
 scene.push(modelTransfoCommonNode);
 scene.push(geoBufferSet);
+scene.push(shaderManager.getShader("flat"));
 scene.push(modelTransfoCommonNode2);
 scene.push(cubeGeoBufferSet);
 
