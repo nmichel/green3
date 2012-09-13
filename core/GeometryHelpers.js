@@ -63,6 +63,13 @@ Cube.core.GeometryHelpers = {
 		      -1,-1,-1,   1,-1,-1,   1,-1, 1,  -1,-1, 1,   // v7,v4,v3,v2 (bottom)
 		       1,-1,-1,  -1,-1,-1,  -1, 1,-1,   1, 1,-1 ]; // v4,v7,v6,v5 (back)
 
+	var uvs = [  1, 1,   0, 1,   0, 0,   1, 0,   // v0,v1,v2,v3 (front)
+		     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v3,v4,v5 (right)
+		     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v5,v6,v1 (top)
+		     1, 1,   0, 1,   0, 0,   1, 0,   // v1,v6,v7,v2 (left)
+		     1, 1,   0, 1,   0, 0,   1, 0,   // v7,v4,v3,v2 (bottom)
+		     1, 1,   0, 1,   0, 0,   1, 0 ]; // v4,v7,v6,v5 (back)
+
 	var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1,   // v0,v1,v2,v3 (front)
 			 1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0,   // v0,v3,v4,v5 (right)
 			 0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   // v0,v5,v6,v1 (top)
@@ -89,9 +96,11 @@ Cube.core.GeometryHelpers = {
 	var iterVert;
 	for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
 	    var offset = iterVert * 3;
+	    var uvOffset = iterVert * 2;
 	    output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
 	    output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
 	    output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
+	    output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
 	}
 
 	for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {

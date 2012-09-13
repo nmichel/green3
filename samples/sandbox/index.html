@@ -32,8 +32,10 @@
 		<script src="../../core/ViewportNode.js"></script>
 		<script src="../../core/GeometryHelpers.js"></script>
 		<script src="../../core/ShaderNode.js"></script>
+		<script src="../../core/TextureNode.js"></script>
 		<script src="../../core/ResourceLoader.js"></script>
 		<script src="../../core/ShaderManager.js"></script>
+		<script src="../../core/TextureManager.js"></script>
 		<script src="../../core/Engine.js"></script>
 		<script src="../../core/Renderer.js"></script>
 		
@@ -69,14 +71,16 @@
 		  attribute vec3 aPosition;
 		  attribute vec4 aColor;
 		  attribute vec3 aNormal;
-		  
+		  attribute vec2 aUV;
+
 		  uniform mat4 u_normalMatrix;
 		  uniform mat4 u_matrix;
 		  uniform mat4 u_view;
 		  uniform mat4 u_projection;
 		  
 		  varying vec4 v_color;
-		  
+		  varying vec2 v_TextureCoord;
+
 		  void main() {
 		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
 		    gl_PointSize = 4.0;
@@ -85,17 +89,34 @@
 		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), aVertEyeNormal);
 		    vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
 		    v_color = vec4(color.r * ratio, color.g * ratio, color.b * ratio, color.a);
+		    v_TextureCoord = aUV;
 		  }
 		</script>
 
 		<script id="3d-fragment-shader" type="x-shader/x-fragment">
 		  precision mediump float;
-		  
+
 		  // Passed in from the vertex shader.
 		  varying lowp vec4 v_color;
-		  
+
 		  void main() {
 		    gl_FragColor = v_color;
+		    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		  }
+		</script>
+
+		<script id="flat-fragment-shader" type="x-shader/x-fragment">
+		  precision mediump float;
+		  
+		  uniform sampler2D texture0;
+
+		  // Passed in from the vertex shader.
+		  varying lowp vec4 v_color;
+		  varying vec2 v_TextureCoord;
+
+		  void main() {
+		    gl_FragColor = texture2D(texture0, vec2(v_TextureCoord.s, v_TextureCoord.t));
+		    // gl_FragColor = v_color;
 		    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		  }
 		</script>

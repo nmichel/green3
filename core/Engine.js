@@ -3,9 +3,9 @@ Cube.core.Engine = function(attributes) {
     var canvas = attributes.canvas;
     var gl = canvas.getContext('experimental-webgl',
 			       {
-				   // alpha: true
-				   // , antialias: true
-				   // , stencil: true
+				   alpha: true,
+				   antialias: true,
+				   stencil: true
 			       });
     if (!gl) {
 	throw "failed to created WebGL context"; // <== 

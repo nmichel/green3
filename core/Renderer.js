@@ -20,14 +20,16 @@ Cube.core.Renderer.prototype.mode = {
 Cube.core.Renderer.prototype.shaderParameters = {
     uniforms: {
 	matrixProjection: "matrixProjection",
-	matrixModel: "matrixModel",
-	matrixNormal: "matrixNormal",
-	matrixView: "matrixView"
+	matrixModel:      "matrixModel",
+	matrixNormal:     "matrixNormal",
+	matrixView:       "matrixView",
+	texture0:         "texture0"
     },
     attributes: {
 	vertex: "vertex",
 	normal: "normal",
-	color: "color"
+	color:  "color",
+	uv:     "uv"
     }
 };
 
@@ -53,6 +55,8 @@ Cube.core.Renderer.prototype.setup = function() {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     // this.gl.frontFace(this.gl.CCW); // Default
 };
 
@@ -124,6 +128,12 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
 	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
     }
 
+    if (!!bufferSet.uvBuffer) {
+	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
+	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+    }
+
     this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
     this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
@@ -137,14 +147,24 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     }
 };
 
-Cube.core.Renderer.prototype.loadPerFrameData = function() {
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
-    
-};
-
 Cube.core.Renderer.prototype.useShader = function(shader) {
     this.gl.useProgram(shader.getProgram());
     this.loadMappings(shader.getBindings());
     this.loadPerFrameData();
+};
+
+Cube.core.Renderer.prototype.useTexture = function(texture) {
+    if (this.mappings.uniforms[this.shaderParameters.uniforms.texture0]) {
+	this.gl.activeTexture(this.gl.TEXTURE0);
+	this.gl.bindTexture(this.gl.TEXTURE_2D, texture.getTexture());
+    }
+};
+
+Cube.core.Renderer.prototype.loadPerFrameData = function() {
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+    
+    if (this.mappings.uniforms[this.shaderParameters.uniforms.texture0]) {
+	this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.texture0], 0);
+    }
 };

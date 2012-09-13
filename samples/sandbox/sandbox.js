@@ -22,15 +22,20 @@ var mappings = {uniforms: mapFromPairList([[renderer.shaderParameters.uniforms.m
 					   [renderer.shaderParameters.uniforms.matrixNormal,     "u_normalMatrix"]]),
 		attributes: mapFromPairList([[renderer.shaderParameters.attributes.vertex,       "aPosition"],
 					     [renderer.shaderParameters.attributes.normal,       "aNormal"],
-					     [renderer.shaderParameters.attributes.color,        "aColor"]])};
+					     [renderer.shaderParameters.attributes.color,        "aColor"],
+					     [renderer.shaderParameters.attributes.uv,           "aUV"]])};
 var shaderManager = new Cube.core.ShaderManager({engine: engine,
 						 loader: new Cube.core.ResourceLoader({}),
 						 shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
 									preload: true,
 									mappings: mappings},
-							   flat: {src: ["flat-vertex-shader", "3d-fragment-shader"],
+							   flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
 								  preload: true,
 								  mappings: mappings}}});
+var textureManager = new Cube.core.TextureManager({engine: engine,
+						   mappings: {
+						       logo: "logo.png",
+						       caisse: "caisse.jpg"}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
@@ -44,13 +49,19 @@ var aY = new Cube.core.math.Vector3(0, 0, 0);
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({}))
 //    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(2, 0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(3, 0, 0)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({}))
 //    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-2, 0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-3, 0, 0)}))
+    .push(new Cube.core.RotationXYZNode({vector: aY}));
+
+
+var modelTransfoCommonNode3 = 
+    (new Cube.core.TransformStackNode({}))
+//    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 var geoBufferSet =
@@ -70,6 +81,7 @@ var cubeGeoBufferSet =
 	    hasVertex: true,
 	    hasNormal: true,
 	    hasColor: true,
+	    hasUV: true,
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
@@ -80,7 +92,11 @@ scene.push(shaderManager.getShader("colorspace"));
 scene.push(modelTransfoCommonNode);
 scene.push(geoBufferSet);
 scene.push(shaderManager.getShader("flat"));
+scene.push(textureManager.getTexture("caisse"));
 scene.push(modelTransfoCommonNode2);
+scene.push(cubeGeoBufferSet);
+scene.push(textureManager.getTexture("logo"));
+scene.push(modelTransfoCommonNode3);
 scene.push(cubeGeoBufferSet);
 
 var a = 0;
@@ -93,6 +109,7 @@ function render() {
     aY.setX(a);
     modelTransfoCommonNode.update();
     modelTransfoCommonNode2.update();
+    modelTransfoCommonNode3.update();
 
     renderer.clear();
     scene.accept(visitor);

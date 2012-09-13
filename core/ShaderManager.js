@@ -110,9 +110,9 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
 	if (!binding && progDesc.mappings) {
 	    var mapping = progDesc.mappings.uniforms[name];
 	    binding = this.gl.getUniformLocation(program, mapping);
-	    if (binding) {
-		varMapping.uniforms[name] = binding;
-	    }
+	}
+	if (binding) {
+	    varMapping.uniforms[name] = binding;
 	}
     }
 
@@ -121,9 +121,9 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
 	if (binding < 0 && progDesc.mappings) {
 	    var mapping = progDesc.mappings.attributes[name];
 	    binding = this.gl.getAttribLocation(program, mapping);
-	    if (binding >= 0) {
-		varMapping.attributes[name] = binding;
-	    }
+	}
+	if (binding >= 0) {
+	    varMapping.attributes[name] = binding;
 	}
     }
     progDesc.bindings = varMapping;

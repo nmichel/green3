@@ -39,3 +39,7 @@ Cube.core.RenderVisitor.prototype.visitBufferSet = function(bufferSetNode) {
 Cube.core.RenderVisitor.prototype.visitShader = function(shaderNode) {
     this.renderer.useShader(shaderNode);
 }
+
+Cube.core.RenderVisitor.prototype.visitTexture = function(textureNode) {
+    this.renderer.useTexture(textureNode);
+}
