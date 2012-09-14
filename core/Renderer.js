@@ -17,6 +17,12 @@ Cube.core.Renderer.prototype.mode = {
     ELEMENT: "element"
 };
 
+Cube.core.Renderer.prototype.textureQuality = {
+    POOR: "poor",
+    GOOD: "good",
+    BEST: "best"
+};
+
 Cube.core.Renderer.prototype.shaderParameters = {
     uniforms: {
 	matrixProjection: "matrixProjection",
@@ -51,7 +57,6 @@ Cube.core.Renderer.prototype.setup = function() {
     })(this.gl);
 
     this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT
-
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);

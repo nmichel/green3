@@ -33,9 +33,11 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
 								  preload: true,
 								  mappings: mappings}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
-						   mappings: {
-						       logo: "logo.png",
-						       caisse: "caisse.jpg"}});
+						   desc: {
+						       logo: {res: "logo.png",
+							      quality: Cube.core.Renderer.prototype.textureQuality.BEST},
+						       caisse: {res: "caisse.jpg",
+								quality: Cube.core.Renderer.prototype.textureQuality.GOOD}}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
@@ -44,24 +46,28 @@ var optic = new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canva
 var camera = new Cube.core.ViewNode({parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
 camera.update();
 
-
 var aY = new Cube.core.math.Vector3(0, 0, 0);
-var modelTransfoCommonNode = 
+var modelTransfoCommonBaseNode =
     (new Cube.core.TransformStackNode({}))
-//    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(3, 0, 0)}))
+    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    
+var modelTransfoCommonNode = 
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, Math.PI*2/3.0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 var modelTransfoCommonNode2 = 
-    (new Cube.core.TransformStackNode({}))
-//    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-3, 0, 0)}))
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 2*Math.PI*2/3.01, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 
 var modelTransfoCommonNode3 = 
-    (new Cube.core.TransformStackNode({}))
-//    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3( 1, 0.5, 1)}))
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 var geoBufferSet =
@@ -85,6 +91,16 @@ var cubeGeoBufferSet =
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
+/* Next feature to implement :)
+var materialNodeColor = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+						    bindings: {
+							color: [1.0, 0, 0, 1.0]}});
+
+var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
+						     bindings: {
+							 texture0: textureManager.getTexture("logo")}});
+*/
+
 scene.push(viewport);
 scene.push(optic);
 scene.push(camera);
@@ -95,7 +111,7 @@ scene.push(shaderManager.getShader("flat"));
 scene.push(textureManager.getTexture("caisse"));
 scene.push(modelTransfoCommonNode2);
 scene.push(cubeGeoBufferSet);
-scene.push(textureManager.getTexture("logo"));
+scene.push(textureManager.getTexture("logo")); // Logo has a channel alpha. Must be drawn AFTER opaque objects.
 scene.push(modelTransfoCommonNode3);
 scene.push(cubeGeoBufferSet);
 
@@ -107,6 +123,7 @@ function render() {
     a %= Math.PI * 2;
     aY.setY(a);
     aY.setX(a);
+    modelTransfoCommonBaseNode.update();
     modelTransfoCommonNode.update();
     modelTransfoCommonNode2.update();
     modelTransfoCommonNode3.update();
