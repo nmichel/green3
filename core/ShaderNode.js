@@ -23,6 +23,10 @@ Cube.core.ShaderNode.prototype.getBindings = function() {
     return this.manager.getBindings(this.name);
 };
 
+Cube.core.ShaderNode.prototype.getParamTypes = function() {
+    return this.manager.getParamTypes(this.name);
+};
+
 Cube.core.ShaderNode.prototype.accept = function(visitor) {
     visitor.visitShader(this);
 };

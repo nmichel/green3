@@ -21,11 +21,15 @@ Cube.core.ShaderManager.prototype.getBindings = function(name) {
     return this.programs[name].bindings;
 };
 
+Cube.core.ShaderManager.prototype.getParamTypes = function(name) {
+    return this.programs[name].params;
+};
+
 Cube.core.ShaderManager.prototype.createShaders = function(shaderDescs) {
     var res = {};
     for (shaderName in shaderDescs) {
 	var desc = shaderDescs[shaderName];
-	var progDesc = {verts: [], frags: [], mappings: desc.mappings};
+	var progDesc = {verts: [], frags: [], params: desc.params, mappings: desc.mappings};
 	this.programs[shaderName] = progDesc;
 	for (var i = 0; i < desc.src.length; ++i) {
 	    var subShadName = desc.src[i];
@@ -98,7 +102,7 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
     
     this.gl.useProgram(program);
 
-    // Load bindings 
+    // Load standard bindings 
     // 
     // Note : resolving an uniform or attrib can fail, even if it is declared. The shader compiler strips off unused 
     // symbols, and so one will be unable to resolve such objects.
@@ -126,6 +130,16 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
 	    varMapping.attributes[name] = binding;
 	}
     }
+
+    // Load shader specific bindings
+    // 
+    for (var n in progDesc.params.uniforms) {
+	var binding = this.gl.getUniformLocation(program, n);
+	if (binding) {
+	    varMapping.uniforms[n] = binding;
+	}
+    }
+
     progDesc.bindings = varMapping;
 
     return program;

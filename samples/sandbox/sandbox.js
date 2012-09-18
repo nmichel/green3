@@ -27,11 +27,17 @@ var mappings = {uniforms: mapFromPairList([[renderer.shaderParameters.uniforms.m
 var shaderManager = new Cube.core.ShaderManager({engine: engine,
 						 loader: new Cube.core.ResourceLoader({}),
 						 shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
-									preload: true,
-									mappings: mappings},
+									params: {
+									    uniforms: {
+										u_color: renderer.shaderParameterTypes.vec4
+									    }
+									},
+									mappings: mappings,
+									preload: true},
 							   flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
-								  preload: true,
-								  mappings: mappings}}});
+								  params: {uniforms: {}},
+								  mappings: mappings,
+								  preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
 						   desc: {
 						       logo: {res: "logo.png",
@@ -53,22 +59,28 @@ var modelTransfoCommonBaseNode =
     
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, Math.PI*2/3.0, 0)}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, Math.PI*2/4.0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 2*Math.PI*2/3.01, 0)}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 2*Math.PI*2/4.0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
-
 
 var modelTransfoCommonNode3 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
     .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(new Cube.core.RotationXYZNode({vector: aY}));
+
+var modelTransfoCommonNode4 = 
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 3*Math.PI*2/4.0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
+    .push(new Cube.core.RotationXYZNode({vector: aY}));
+
 
 var geoBufferSet =
     Cube.core.GeometryHelpers.buildSphere(
@@ -91,27 +103,40 @@ var cubeGeoBufferSet =
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
-/* Next feature to implement :)
-var materialNodeColor = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+var materialNodeColor = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						    bindings: {
-							color: [1.0, 0, 0, 1.0]}});
+							u_color: [1.0, 0.5, 0.0, 1.0]}});
 
-var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
+var materialNodeColor2 = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						     bindings: {
-							 texture0: textureManager.getTexture("logo")}});
-*/
+							 u_color: [0.0, 0.5, 1.0, 1.0]}});
+
+var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+						     bindings: {
+							 texture0: textureManager.getTexture("caisse")}});
+
+var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+						   transparent: true,
+						   bindings: {
+						       texture0: textureManager.getTexture("logo")}});
 
 scene.push(viewport);
 scene.push(optic);
 scene.push(camera);
-scene.push(shaderManager.getShader("colorspace"));
+
+scene.push(materialNodeColor);
 scene.push(modelTransfoCommonNode);
 scene.push(geoBufferSet);
-scene.push(shaderManager.getShader("flat"));
-scene.push(textureManager.getTexture("caisse"));
+
+scene.push(materialNodeCaisse);
 scene.push(modelTransfoCommonNode2);
 scene.push(cubeGeoBufferSet);
-scene.push(textureManager.getTexture("logo")); // Logo has a channel alpha. Must be drawn AFTER opaque objects.
+
+scene.push(materialNodeColor2);
+scene.push(modelTransfoCommonNode4);
+scene.push(geoBufferSet);
+
+scene.push(materialNodeLogo);
 scene.push(modelTransfoCommonNode3);
 scene.push(cubeGeoBufferSet);
 
@@ -127,6 +152,7 @@ function render() {
     modelTransfoCommonNode.update();
     modelTransfoCommonNode2.update();
     modelTransfoCommonNode3.update();
+    modelTransfoCommonNode4.update();
 
     renderer.clear();
     scene.accept(visitor);

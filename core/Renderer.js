@@ -6,6 +6,7 @@ Cube.core.Renderer = function(attributes) {
     this.projectionTransfo = null;
     this.viewTransfo = null;
     this.bufferFactoryFunc = null;
+    this.nextTextureUnit = 0;
 
     this.setup();
 };
@@ -39,6 +40,15 @@ Cube.core.Renderer.prototype.shaderParameters = {
     }
 };
 
+Cube.core.Renderer.prototype.shaderParameterTypes = {
+    vec4: "vec4",
+    texture2D: "texture2D"
+};
+
+Cube.core.Renderer.prototype.shaderDefaultParameterTypes = {
+    texture0: Cube.core.Renderer.prototype.shaderParameterTypes.texture2D
+};
+
 Cube.core.Renderer.prototype.constructor = Cube.core.Renderer;
 
 Cube.core.Renderer.prototype.getBufferFactory = function() {
@@ -60,9 +70,13 @@ Cube.core.Renderer.prototype.setup = function() {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
-    this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    // this.gl.enable(this.gl.BLEND);
+    // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     // this.gl.frontFace(this.gl.CCW); // Default
+};
+
+Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
+    this.transparentMode = !!toggle;
 };
 
 Cube.core.Renderer.prototype.clear = function(buffers) {
@@ -82,6 +96,14 @@ Cube.core.Renderer.prototype.clear = function(buffers) {
 	bits = this.defaultClearFlags;
     }
     this.gl.clear(bits);
+
+    // [TODO : move this code somewhere else]
+    // 
+    for (var i = 0; i < this.nextTextureUnit; ++i) {
+	this.gl.activeTexture(this.gl.TEXTURE0 + i);
+	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    }
+    this.nextTextureUnit = 0;
 };
 
 Cube.core.Renderer.prototype.setViewport = function(x, y, w, h) {
@@ -143,6 +165,24 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
     this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
 
+    if (this.transparentMode) {
+	this.gl.enable(this.gl.BLEND);
+	this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+	this.gl.depthMask(false);
+    }
+
+    if (this.transparentMode) {
+	this.gl.frontFace(this.gl.CW);
+	if (mode == this.mode.ELEMENT) {
+	    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+	    this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+	}
+	else {
+	    this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+	}
+	this.gl.frontFace(this.gl.CCW);
+    }
+
     if (mode == this.mode.ELEMENT) {
 	this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
 	this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
@@ -150,6 +190,9 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     else {
 	this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
     }
+
+    this.gl.disable(this.gl.BLEND);
+    this.gl.depthMask(true);
 };
 
 Cube.core.Renderer.prototype.useShader = function(shader) {
@@ -165,11 +208,22 @@ Cube.core.Renderer.prototype.useTexture = function(texture) {
     }
 };
 
+Cube.core.Renderer.prototype.bindShaderParamWithValue = function(param, type, value) {
+    if (type == this.shaderParameterTypes.vec4) {
+	this.gl.uniform4fv(param, value);
+    }
+    else if (type == this.shaderParameterTypes.texture2D) {
+	this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
+	this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
+	this.gl.uniform1i(param, this.nextTextureUnit);
+	this.nextTextureUnit = this.nextTextureUnit + 1;
+    }
+    else {
+	// unsupported data type :)
+    }
+};
+
 Cube.core.Renderer.prototype.loadPerFrameData = function() {
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
-    
-    if (this.mappings.uniforms[this.shaderParameters.uniforms.texture0]) {
-	this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.texture0], 0);
-    }
 };

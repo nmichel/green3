@@ -36,6 +36,7 @@
 		<script src="../../core/ResourceLoader.js"></script>
 		<script src="../../core/ShaderManager.js"></script>
 		<script src="../../core/TextureManager.js"></script>
+		<script src="../../core/MaterialNode.js"></script>
 		<script src="../../core/Engine.js"></script>
 		<script src="../../core/Renderer.js"></script>
 		
@@ -50,12 +51,13 @@
 		  uniform mat4 u_projection;
 		  
 		  varying vec4 v_color;
-		  
+		  varying vec4 v_normal;
+
 		  void main() {
 		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
 		    //gl_PointSize = 4.0;
 
-		    vec4 aVertEyeNormal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
 
 		    // Normal vector based color ball
 		    //
@@ -96,12 +98,14 @@
 		<script id="3d-fragment-shader" type="x-shader/x-fragment">
 		  precision mediump float;
 
-		  // Passed in from the vertex shader.
+		  uniform vec4 u_color;
+
 		  varying lowp vec4 v_color;
+		  varying vec4 v_normal;
 
 		  void main() {
-		    gl_FragColor = v_color;
-		    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), v_normal);
+		    gl_FragColor = vec4(u_color.r * ratio, u_color.g * ratio, u_color.b * ratio, u_color.a);
 		  }
 		</script>
 
