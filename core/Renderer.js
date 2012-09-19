@@ -29,8 +29,7 @@ Cube.core.Renderer.prototype.shaderParameters = {
 	matrixProjection: "matrixProjection",
 	matrixModel:      "matrixModel",
 	matrixNormal:     "matrixNormal",
-	matrixView:       "matrixView",
-	texture0:         "texture0"
+	matrixView:       "matrixView"
     },
     attributes: {
 	vertex: "vertex",
@@ -41,6 +40,7 @@ Cube.core.Renderer.prototype.shaderParameters = {
 };
 
 Cube.core.Renderer.prototype.shaderParameterTypes = {
+    float: "float",
     vec4: "vec4",
     texture2D: "texture2D"
 };
@@ -208,8 +208,16 @@ Cube.core.Renderer.prototype.useTexture = function(texture) {
     }
 };
 
-Cube.core.Renderer.prototype.bindShaderParamWithValue = function(param, type, value) {
-    if (type == this.shaderParameterTypes.vec4) {
+Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, value) {
+    var param = this.mappings.uniforms[name];
+    if (! param) {
+	return; // <== 
+    }
+
+    if (type == this.shaderParameterTypes.float) {
+	this.gl.uniform1f(param, value);
+    }
+    else if (type == this.shaderParameterTypes.vec4) {
 	this.gl.uniform4fv(param, value);
     }
     else if (type == this.shaderParameterTypes.texture2D) {

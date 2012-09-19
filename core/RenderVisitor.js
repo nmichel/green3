@@ -38,37 +38,19 @@ Cube.core.RenderVisitor.prototype.visitBufferSet = function(bufferSetNode) {
 
 Cube.core.RenderVisitor.prototype.visitShader = function(shaderNode) {
     this.renderer.useShader(shaderNode);
-}
+};
 
 Cube.core.RenderVisitor.prototype.visitTexture = function(textureNode) {
     this.renderer.useTexture(textureNode);
-}
+};
 
 Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
-    var shader = materialNode.getShader();
-    var shaderBindings = shader.getBindings();
-    var materialBindings = materialNode.getBindings();
-    var shaderParams = shader.getParamTypes();
-    var defaultShaderParams = this.renderer.shaderDefaultParameterTypes;
-
     this.renderer.setTransparentMode(materialNode.isTransparent());
+};
 
-    shader.accept(this);
-
-    for (var name in materialBindings) {
-	var paramObject = shaderBindings.uniforms[name];
-	if (! paramObject) {
-	    continue; // ignored !
-	}
-
-	var paramValue = materialBindings[name];
-	var paramType = shaderParams.uniforms[name];
-	if (! paramType) {
-	    paramType = defaultShaderParams[name];
-	}
-	if (! paramType) {
-	    continue; // <== ignored 
-	}
-	this.renderer.bindShaderParamWithValue(paramObject, paramType, paramValue);
-    }
-}
+Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindingNode) {
+    var paramName = materialBindingNode.getParameterName();
+    var paramType = materialBindingNode.getParameterType();
+    var paramValue = materialBindingNode.getParameterValue();
+    this.renderer.bindShaderParamWithValue(paramName, paramType, paramValue);
+};

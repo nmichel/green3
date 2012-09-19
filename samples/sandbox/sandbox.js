@@ -30,12 +30,16 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
 									params: {
 									    uniforms: {
 										u_color: renderer.shaderParameterTypes.vec4
-									    }
-									},
+									    }},
 									mappings: mappings,
 									preload: true},
 							   flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
-								  params: {uniforms: {}},
+								  params: {
+								      uniforms: {
+									  mixRatio: renderer.shaderParameterTypes.float,
+									  texture0: renderer.shaderParameterTypes.texture2D,
+									  texture1: renderer.shaderParameterTypes.texture2D,
+								      }},
 								  mappings: mappings,
 								  preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
@@ -118,7 +122,9 @@ var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getSh
 var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
 						   transparent: true,
 						   bindings: {
-						       texture0: textureManager.getTexture("logo")}});
+						       mixRatio: 0.8,
+						       texture0: textureManager.getTexture("logo"),
+						       texture1: textureManager.getTexture("caisse")}});
 
 scene.push(viewport);
 scene.push(optic);
