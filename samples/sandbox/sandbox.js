@@ -57,33 +57,35 @@ var camera = new Cube.core.ViewNode({parent: new Cube.core.TranslationNode({vect
 camera.update();
 
 var aY = new Cube.core.math.Vector3(0, 0, 0);
+var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: aY});
+
 var modelTransfoCommonBaseNode =
     (new Cube.core.TransformStackNode({}))
-    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    .push(shaderedTransformationRotationNode);
     
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
     .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, Math.PI*2/4.0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
-    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
     .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 2*Math.PI*2/4.0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
-    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode3 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
     .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
-    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode4 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
     .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 3*Math.PI*2/4.0, 0)}))
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
-    .push(new Cube.core.RotationXYZNode({vector: aY}));
+    .push(shaderedTransformationRotationNode);
 
 
 var geoBufferSet =
@@ -152,8 +154,8 @@ animate();
 function render() {
     a += Math.PI / 200;
     a %= Math.PI * 2;
-    aY.setY(a);
-    aY.setX(a);
+    shaderedTransformationRotationNode.set(a, a, null);
+    shaderedTransformationRotationNode.update();
     modelTransfoCommonBaseNode.update();
     modelTransfoCommonNode.update();
     modelTransfoCommonNode2.update();

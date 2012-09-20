@@ -9,6 +9,18 @@ Cube.core.RotationXYZNode = function(attributes) {
 Cube.core.RotationXYZNode.prototype = new Cube.core.TransformNode({});
 Cube.core.RotationXYZNode.prototype.constructor = Cube.core.RotationXYZNode;
 
+Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
+    if (!!x) {
+	this.vector.setX(x);
+    }
+    if (!!y) {
+	this.vector.setY(y);
+    }
+    if (!!z) {
+	this.vector.setZ(z);
+    }
+};
+
 Cube.core.RotationXYZNode.prototype.update = function() {
     // -----
     // "general rotation"

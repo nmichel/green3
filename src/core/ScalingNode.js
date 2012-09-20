@@ -9,6 +9,18 @@ Cube.core.ScalingNode = function(attributes) {
 Cube.core.ScalingNode.prototype = new Cube.core.TransformNode({});
 Cube.core.ScalingNode.prototype.constructor = Cube.core.ScalingNode;
 
+Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
+    if (!!x) {
+	this.vector.setX(x);
+    }
+    if (!!y) {
+	this.vector.setY(y);
+    }
+    if (!!z) {
+	this.vector.setZ(z);
+    }
+};
+
 Cube.core.ScalingNode.prototype.update = function() {
     var v = this.vector;
     var matrix = this.getMatrix();
