@@ -29,16 +29,16 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
 						 shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
 									params: {
 									    uniforms: {
-										u_color: renderer.shaderParameterTypes.vec4
+										u_color: renderer.shaderParameterTypes.VEC4
 									    }},
 									mappings: mappings,
 									preload: true},
 							   flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
 								  params: {
 								      uniforms: {
-									  mixRatio: renderer.shaderParameterTypes.float,
-									  texture0: renderer.shaderParameterTypes.texture2D,
-									  texture1: renderer.shaderParameterTypes.texture2D,
+									  mixRatio: renderer.shaderParameterTypes.FLOAT,
+									  texture0: renderer.shaderParameterTypes.TEXTURE2D,
+									  texture1: renderer.shaderParameterTypes.TEXTURE2D,
 								      }},
 								  mappings: mappings,
 								  preload: true}}});

@@ -1,1 +1,1 @@
-Cube.core.math = {}
+Cube.core.math = {};

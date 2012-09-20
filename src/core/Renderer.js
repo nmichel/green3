@@ -40,9 +40,9 @@ Cube.core.Renderer.prototype.shaderParameters = {
 };
 
 Cube.core.Renderer.prototype.shaderParameterTypes = {
-    float: "float",
-    vec4: "vec4",
-    texture2D: "texture2D"
+    FLOAT: "float",
+    VEC4: "vec4",
+    TEXTURE2D: "texture2D"
 };
 
 Cube.core.Renderer.prototype.shaderDefaultParameterTypes = {
@@ -214,13 +214,13 @@ Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, val
 	return; // <== 
     }
 
-    if (type == this.shaderParameterTypes.float) {
+    if (type == this.shaderParameterTypes.FLOAT) {
 	this.gl.uniform1f(param, value);
     }
-    else if (type == this.shaderParameterTypes.vec4) {
+    else if (type == this.shaderParameterTypes.VEC4) {
 	this.gl.uniform4fv(param, value);
     }
-    else if (type == this.shaderParameterTypes.texture2D) {
+    else if (type == this.shaderParameterTypes.TEXTURE2D) {
 	this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
 	this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
 	this.gl.uniform1i(param, this.nextTextureUnit);
