@@ -52,9 +52,8 @@ var textureManager = new Cube.core.TextureManager({engine: engine,
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
-var optic = new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000});
-var camera = new Cube.core.ViewNode({parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
-camera.update();
+var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
+				       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
 
 var aY = new Cube.core.math.Vector3(0, 0, 0);
 var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: aY});
@@ -129,7 +128,6 @@ var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShad
 						       texture1: textureManager.getTexture("caisse")}});
 
 scene.push(viewport);
-scene.push(optic);
 scene.push(camera);
 
 scene.push(materialNodeColor);

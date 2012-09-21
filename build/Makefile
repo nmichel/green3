@@ -13,7 +13,6 @@ FILELIST = \
 	./core/RenderVisitor.js \
 	./core/Node.js \
 	./core/ArrayNode.js \
-	./core/Tree.js \
 	./core/BufferSetNode.js \
 	./core/OutputToBufferSet.js \
 	./core/GeometryNode.js \
@@ -36,6 +35,8 @@ FILELIST = \
 	./core/TextureManager.js \
 	./core/MaterialBindingNode.js \
 	./core/MaterialNode.js \
+	./core/CameraNode.js \
+	./core/Scene.js \
 	./core/Engine.js \
 	./core/Renderer.js
 
@@ -49,7 +50,9 @@ concat:
 	@echo "* Concating files"
 	@mkdir -p $(DEPLOYDIR)
 	@mkdir -p $(DEPLOYDIRJS)
-	@echo > $(DEPLOYDIRJS)/green3.js
+	@echo -n "/* Generated on " > $(DEPLOYDIRJS)/green3.js
+	@date -R >> $(DEPLOYDIRJS)/green3.js
+	@echo "*/ " >> $(DEPLOYDIRJS)/green3.js
 	@for file in $(FILELIST); \
 	do \
 		cat $(SRCDIR)/$$file >> $(DEPLOYDIRJS)/green3.js; \

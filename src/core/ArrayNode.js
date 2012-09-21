@@ -27,7 +27,7 @@ Cube.core.ArrayNode.prototype.push = function(node) {
 Cube.core.ArrayNode.prototype.clear = function(fromIdx) {
     this.nodes.splice(fromIdx);
     return this;
-}
+};
 
 Cube.core.ArrayNode.prototype.checkNode = function(node) {
     Cube.core.Utilities.checkReference(node, "node");
