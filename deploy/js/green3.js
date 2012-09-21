@@ -1,4 +1,4 @@
-/* Generated on Fri, 21 Sep 2012 14:50:43 +0200
+/* Generated on Fri, 21 Sep 2012 17:43:55 +0200
 */ 
 var Cube = {};
 
@@ -259,51 +259,6 @@ Cube.core.math.Matrix4.prototype.rawdata_identity = [1, 0, 0, 0,
 	    throw "unexpected type " + (msg || "");
 	}
     }
-};
-Cube.core.Visitor = function () {
-    this.depth = 0;
-    this.prefix = "";
-};
-
-Cube.core.Visitor.prototype = {};
-Cube.core.Visitor.prototype.constructor = Cube.core.Visitor;
-
-Cube.core.Visitor.prototype.visitArrayBegin = function(length) {
-    this.depth += 1;
-    this.prefix = this.prefix.concat(" ");
-};
-
-Cube.core.Visitor.prototype.visitArrayEnd = function() {
-    this.depth -= 1;
-    this.prefix = this.prefix.substr(0, this.depth);
-};
-
-Cube.core.Visitor.prototype.visitStatePush = function() {
-    print(this.prefix, "PUSH");
-};
-
-Cube.core.Visitor.prototype.visitStatePop = function() {
-    print(this.prefix, "POP");
-};
-
-Cube.core.Visitor.prototype.visitGeometry = function(geometryNode) {
-    print(this.prefix, "Geometry");
-};
-
-Cube.core.Visitor.prototype.visitMaterial = function(materialNode) {
-    print(this.prefix, "Material");
-};
-
-Cube.core.Visitor.prototype.visitTransform = function(transformation) {
-    print(this.prefix, "Transform");
-};
-
-Cube.core.Visitor.prototype.visitTransformStack = function(transformation) {
-    print(this.prefix, "TransformStack");
-};
-
-Cube.core.Visitor.prototype.visitOptic = function(transformation) {
-    print(this.prefix, "Optic");
 };
 Cube.core.RenderVisitor = function (attributes) {
     Cube.core.Utilities.checkType(attributes.renderer, Cube.core.Renderer, "attribute.renderer should be of type Cube.core.Renderer");
@@ -915,26 +870,6 @@ Cube.core.TransformStackNode.prototype.compact = function(fromIdx) {
 	.push(new Cube.core.TransformNode({matrix: compactedMatrix}));
 
     return this;
-};
-Cube.core.StatePopNode = function (attributes) {
-    Cube.core.Node.call(this, attributes);
-};
-
-Cube.core.StatePopNode.prototype = new Cube.core.Node({});
-Cube.core.StatePopNode.prototype.constructor = Cube.core.StatePopNode;
-
-Cube.core.StatePopNode.prototype.accept = function (visitor) {
-    visitor.visitStatePop();
-};
-Cube.core.StatePushNode = function (attributes) {
-    Cube.core.Node.call(this, attributes);
-};
-
-Cube.core.StatePushNode.prototype = new Cube.core.Node({});
-Cube.core.StatePushNode.prototype.constructor = Cube.core.StatePushNode;
-
-Cube.core.StatePushNode.prototype.accept = function (visitor) {
-    visitor.visitStatePush();
 };
 Cube.core.ViewNode = function (attributes) {
     Cube.core.TransformNode.call(this, attributes);

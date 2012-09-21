@@ -9,7 +9,6 @@ FILELIST = \
 	./core/math/Vector3.js \
 	./core/math/Matrix4.js \
 	./core/Utilities.js \
-	./core/Visitor.js \
 	./core/RenderVisitor.js \
 	./core/Node.js \
 	./core/ArrayNode.js \
@@ -23,8 +22,6 @@ FILELIST = \
 	./core/ScalingNode.js \
 	./core/TranslationNode.js \
 	./core/TransformStackNode.js \
-	./core/StatePopNode.js \
-	./core/StatePushNode.js \
 	./core/ViewNode.js \
 	./core/ViewportNode.js \
 	./core/GeometryHelpers.js \
