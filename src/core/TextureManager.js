@@ -1,3 +1,4 @@
+
 Cube.core.TextureManager = function(attributes) {
     this.engine = attributes.engine;
     this.gl = attributes.engine.gl;
@@ -31,7 +32,7 @@ Cube.core.TextureManager.prototype.loadTexture = function(texture) {
 	var minFilter = desc.quality == Cube.core.Renderer.prototype.textureQuality.POOR ? gl.NEAREST : (desc.quality == Cube.core.Renderer.prototype.textureQuality.GOOD ? gl.LINEAR : gl.LINEAR_MIPMAP_NEAREST);
 	var textureObject = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, textureObject);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, (desc.flip == true));
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);

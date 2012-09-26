@@ -46,34 +46,6 @@
 		<!--
                 <script src="../../deploy/js/green3.js"></script>
 		-->
-		<script id="3d-vertex-shader" type="x-shader/x-vertex">
-		  attribute vec3 aPosition;
-		  attribute vec4 aColor;
-		  attribute vec3 aNormal;
-		  
-		  uniform mat4 u_normalMatrix;
-		  uniform mat4 u_matrix;
-		  uniform mat4 u_view;
-		  uniform mat4 u_projection;
-		  
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-
-		  void main() {
-		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
-		    //gl_PointSize = 4.0;
-
-		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
-
-		    // Normal vector based color ball
-		    //
-
-		    v_color = vec4((aNormal.x + 1.0) * 0.5,
-		                   (aNormal.y + 1.0) * 0.5,
-		                   (aNormal.z + 1.0) * 0.5,
-		                   1.0);
-		  }
-		</script>
 
 		<script id="flat-vertex-shader" type="x-shader/x-vertex">
 		  attribute vec3 aPosition;
@@ -95,25 +67,8 @@
 		    gl_PointSize = 4.0;
 
 		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
-		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), v_normal);
-		    vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
-		    v_color = vec4(color.r * ratio, color.g * ratio, color.b * ratio, color.a);
+		    v_color = aColor;
 		    v_TextureCoord = aUV;
-		  }
-		</script>
-
-		<script id="3d-fragment-shader" type="x-shader/x-fragment">
-		  precision mediump float;
-
-		  uniform vec4 u_color;
-
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-
-		  void main() {
-		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), v_normal);
-		    gl_FragColor = vec4(v_color.r * ratio, v_color.g * ratio, v_color.b * ratio, v_color.a);
-		    // gl_FragColor = vec4(u_color.r * ratio, u_color.g * ratio, u_color.b * ratio, u_color.a);
 		  }
 		</script>
 
@@ -122,7 +77,6 @@
 		  
 		  uniform sampler2D texture0;
 		  uniform sampler2D texture1;
-		  uniform float mixRatio;
 
 		  // Passed in from the vertex shader.
 		  varying vec4 v_color;
@@ -132,15 +86,13 @@
 		  void main() {
 		    vec4 f1 = texture2D(texture0, vec2(v_TextureCoord.s, v_TextureCoord.t));
 		    vec4 f2 = texture2D(texture1, vec2(v_TextureCoord.s, v_TextureCoord.t));
-		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), v_normal);
+		    float ratio = dot(normalize(vec4(1, 0.7, 0, 0)), v_normal);
 		    gl_FragColor = mix(f1, f2, ratio);
-		    // gl_FragColor = v_color;
-		    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		  }
 		</script>
 	</head>
 
 	<body>
-	  <script src="./sandbox.js"></script>
+	  <script src="./earth.js"></script>
 	</body>
 </html>

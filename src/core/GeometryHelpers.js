@@ -32,6 +32,7 @@ Cube.core.GeometryHelpers = {
 		output.addVertex(x*radius, y*radius, z*radius);
 		output.addNormal(x, y, z);
 		output.addColor(x, y, z, 1.0);
+		output.addUV(u, v);
             }
         }
 

@@ -44,10 +44,14 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
 								  preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
 						   desc: {
-						       logo: {res: "logo.png",
+						       logo: {res: "../common/img/logo.png",
 							      quality: Cube.core.Renderer.prototype.textureQuality.BEST},
-						       caisse: {res: "caisse.jpg",
-								quality: Cube.core.Renderer.prototype.textureQuality.GOOD}}});
+						       caisse: {res: "../common/img/caisse.jpg",
+								quality: Cube.core.Renderer.prototype.textureQuality.GOOD},
+						       earth: {res: "../common/img/earth.jpg",
+							       quality: Cube.core.Renderer.prototype.textureQuality.BEST},
+						       earthbynight: {res: "../common/img/earth_night_1.png",
+								      quality: Cube.core.Renderer.prototype.textureQuality.BEST}}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
@@ -94,6 +98,7 @@ var geoBufferSet =
 	    hasVertex: true,
 	    hasNormal: true,
 	    hasColor: true,
+	    hasUV: true,
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
@@ -127,10 +132,17 @@ var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShad
 						       texture0: textureManager.getTexture("logo"),
 						       texture1: textureManager.getTexture("caisse")}});
 
+var materialNodeEarth = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+						    bindings: {
+							mixRatio: 0.8,
+							texture0: textureManager.getTexture("earthbynight"),
+							texture1: textureManager.getTexture("earth")}});
+
 scene.push(viewport);
 scene.push(camera);
 
-scene.push(materialNodeColor);
+//scene.push(materialNodeColor);
+scene.push(materialNodeEarth);
 scene.push(modelTransfoCommonNode);
 scene.push(geoBufferSet);
 
@@ -152,7 +164,7 @@ animate();
 function render() {
     a += Math.PI / 200;
     a %= Math.PI * 2;
-    shaderedTransformationRotationNode.set(a, a, null);
+    shaderedTransformationRotationNode.set(null, a, null);
     shaderedTransformationRotationNode.update();
     modelTransfoCommonBaseNode.update();
     modelTransfoCommonNode.update();

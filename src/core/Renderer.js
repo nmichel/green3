@@ -96,9 +96,10 @@ Cube.core.Renderer.prototype.clear = function(buffers) {
 	bits = this.defaultClearFlags;
     }
     this.gl.clear(bits);
+    this.deactivateAllTextureUnits();
+};
 
-    // [TODO : move this code somewhere else]
-    // 
+Cube.core.Renderer.prototype.deactivateAllTextureUnits = function() {
     for (var i = 0; i < this.nextTextureUnit; ++i) {
 	this.gl.activeTexture(this.gl.TEXTURE0 + i);
 	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
@@ -144,21 +145,27 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     }
 
     if (!!bufferSet.normalBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
+	if (this.mappings.attributes[this.shaderParameters.attributes.normal] != undefined) {
+	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
+	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
+	}
     }
-
+    
     if (!!bufferSet.colorBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
+	if (this.mappings.attributes[this.shaderParameters.attributes.color] != undefined) {
+	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
+	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
+	}
     }
 
     if (!!bufferSet.uvBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+	if (this.mappings.attributes[this.shaderParameters.attributes.uv] != undefined) {
+	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
+	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+	}
     }
 
     this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);

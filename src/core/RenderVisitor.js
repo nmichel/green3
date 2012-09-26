@@ -45,6 +45,7 @@ Cube.core.RenderVisitor.prototype.visitTexture = function(textureNode) {
 };
 
 Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
+    this.renderer.deactivateAllTextureUnits();
     this.renderer.setTransparentMode(materialNode.isTransparent());
 };
 
