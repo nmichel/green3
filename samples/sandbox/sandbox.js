@@ -50,11 +50,11 @@ var textureManager = new Cube.core.TextureManager({engine: engine,
 								quality: Cube.core.Renderer.prototype.textureQuality.GOOD},
 						       earth: {res: "../common/img/earth.jpg",
 							       quality: Cube.core.Renderer.prototype.textureQuality.BEST},
-						       earthbynight: {res: "../common/img/earth_night_1.png",
+						       earthbynight: {res: "../common/img/earth_night_1.jpg",
 								      quality: Cube.core.Renderer.prototype.textureQuality.BEST}}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
-var scene = new Cube.core.ArrayNode({});
+var scene = new Cube.core.Scene({});
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
 				       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
@@ -138,25 +138,12 @@ var materialNodeEarth = new Cube.core.MaterialNode({shader: shaderManager.getSha
 							texture0: textureManager.getTexture("earthbynight"),
 							texture1: textureManager.getTexture("earth")}});
 
-scene.push(viewport);
-scene.push(camera);
-
-//scene.push(materialNodeColor);
-scene.push(materialNodeEarth);
-scene.push(modelTransfoCommonNode);
-scene.push(geoBufferSet);
-
-scene.push(materialNodeCaisse);
-scene.push(modelTransfoCommonNode2);
-scene.push(cubeGeoBufferSet);
-
-scene.push(materialNodeColor2);
-scene.push(modelTransfoCommonNode4);
-scene.push(geoBufferSet);
-
-scene.push(materialNodeLogo);
-scene.push(modelTransfoCommonNode3);
-scene.push(cubeGeoBufferSet);
+scene.setViewport(viewport);
+scene.setCamera(camera);
+scene.addObject(new Cube.core.Object({material: materialNodeEarth, transformation: modelTransfoCommonNode, geometry: geoBufferSet}));
+scene.addObject(new Cube.core.Object({material: materialNodeCaisse, transformation: modelTransfoCommonNode2, geometry: cubeGeoBufferSet}));
+scene.addObject(new Cube.core.Object({material: materialNodeColor2, transformation: modelTransfoCommonNode4, geometry: geoBufferSet}));
+scene.addObject(new Cube.core.Object({material: materialNodeLogo, transformation: modelTransfoCommonNode3, geometry: cubeGeoBufferSet}));
 
 var a = 0;
 animate();
@@ -173,7 +160,7 @@ function render() {
     modelTransfoCommonNode4.update();
 
     renderer.clear();
-    scene.accept(visitor);
+    scene.visit(visitor);
 }
 
 function animate() {

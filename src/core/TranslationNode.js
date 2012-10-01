@@ -23,7 +23,7 @@ Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
 
 Cube.core.TranslationNode.prototype.update = function() {
     var v = this.vector;
-    var matrix = this.getMatrix();
+    var matrix = this.getLocalMatrix();
 
     matrix.setElement(0, 3, v.getX());
     matrix.setElement(1, 3, v.getY());

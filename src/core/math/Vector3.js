@@ -6,77 +6,77 @@ Cube.core.math.Vector3.prototype = {
     constructor: Cube.core.math.Vector3,
 
     getX: function() {
-	return this.x;
+        return this.x;
     },
 
     getY: function() {
-	return this.y;
+        return this.y;
     },
 
     getZ: function() {
-	return this.z;
+        return this.z;
     },
 
     setX: function(v) {
-	this.x = v;
-	return this;
+        this.x = v;
+        return this;
     },
 
     setY: function(v) {
-	this.y = v;
-	return this;
+        this.y = v;
+        return this;
     },
 
     setZ: function(v) {
-	this.z = v;
-	return this;
+        this.z = v;
+        return this;
     },
 
     set: function(x, y, z) {
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	return this;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+        return this;
     },
 
     setFrom: function(other) {
-	this.x = other.x;
-	this.y = other.y;
-	this.z = other.z;
-	return this;
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+        return this;
     },
 
     addSelf: function(other) {
-	this.x += other.x;
-	this.y += other.y;
-	this.z += other.z;
-	return this;
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
     },
 
     subSelf: function(other) {
-	this.x -= other.x;
-	this.y -= other.y;
-	this.z -= other.z;
-	return this;
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
     },
 
     scaleSelf: function(factor) {
-	this.x *= factor;
-	this.y *= factor;
-	this.z *= factor;
-	return this;
+        this.x *= factor;
+        this.y *= factor;
+        this.z *= factor;
+        return this;
     },
 
     dot: function(other) {
-	return this.x * other.y + this.y * other.y + this.z * other.z;
+        return this.x * other.y + this.y * other.y + this.z * other.z;
     },
     
     length: function() {
-	return this.dot(this);
+        return this.dot(this);
     },
 
     normalizeSelf: function() {
-	return this.scaleSelf(this.length());
+        return this.scaleSelf(this.length());
     }
 };
 

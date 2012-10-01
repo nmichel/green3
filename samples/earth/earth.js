@@ -1,7 +1,7 @@
 var container = document.createElement('div');
 var canvas = document.createElement('canvas');
 document.body.appendChild(container);
-canvas.width = window.innerWidth;
+canvas.width =  window.innerWidth;
 canvas.height = window.innerHeight;
 container.appendChild(canvas);
 
@@ -34,13 +34,17 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
 									  texture1: renderer.shaderParameterTypes.TEXTURE2D,
 								      }},
 								  mappings: mappings,
+								  preload: true},
+							   halo: {src: ["halo-vertex-shader", "halo-fragment-shader"],
+								  params: {uniforms: {}},
+								  mappings: mappings,
 								  preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
 						   desc: {
 						       earth: {res: "../common/img/earth.jpg",
 							       flip: false,
 							       quality: Cube.core.Renderer.prototype.textureQuality.BEST},
-						       earthviolet: {res: "../common/img/earth_night_1.png",
+						       earthviolet: {res: "../common/img/earth_night_1.jpg",
 								     flip: false,
 								     quality: Cube.core.Renderer.prototype.textureQuality.BEST},
 						       earthbynight1: {res: "../common/img/earth_night_2.png",
@@ -52,27 +56,40 @@ var textureManager = new Cube.core.TextureManager({engine: engine,
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.ArrayNode({});
+
+// Viewport
+
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
+
+scene.push(viewport);
+
+// Camera 
+
+var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
+var cameraTransform =
+    new Cube.core.TransformStackNode({})
+    .push(cameraRotation)
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2.5)}));
+cameraRotation.update();
+cameraTransform.update();
+
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
-				       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
+				       parent: cameraTransform});
 
-var aY = new Cube.core.math.Vector3(0, 0, 0);
-var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: aY});
+scene.push(camera);
 
-var modelTransfoCommonBaseNode =
-    (new Cube.core.TransformStackNode({}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-2.5, 0, 0)}))
-    .push(shaderedTransformationRotationNode);
+// Earth
 
-var modelTransfoCommonBaseNode2 =
-    (new Cube.core.TransformStackNode({}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(2.5, 0, 0)}))
-    .push(shaderedTransformationRotationNode);
+var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
 
 var modelTransfoCommonBaseNode3 =
     (new Cube.core.TransformStackNode({}))
     .push(shaderedTransformationRotationNode);
 
+var materialNodeEarth3 = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
+						     bindings: {
+							 texture0: textureManager.getTexture("earthbynight1"),
+							 texture1: textureManager.getTexture("earth")}});
 
 var geoBufferSet =
     Cube.core.GeometryHelpers.buildSphere(
@@ -85,47 +102,56 @@ var geoBufferSet =
 	    hasIndex: true,
 	    factory: renderer.getBufferFactory()}));
 
-var materialNodeEarth = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
-						    bindings: {
-							texture0: textureManager.getTexture("earthviolet"),
-							texture1: textureManager.getTexture("earth")}});
-
-var materialNodeEarth2 = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
-						     bindings: {
-							 texture0: textureManager.getTexture("earthbynight"),
-							 texture1: textureManager.getTexture("earth")}});
-
-var materialNodeEarth3 = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
-						     bindings: {
-							 texture0: textureManager.getTexture("earthbynight1"),
-							 texture1: textureManager.getTexture("earth")}});
-
-scene.push(viewport);
-scene.push(camera);
-
-scene.push(materialNodeEarth);
-scene.push(modelTransfoCommonBaseNode);
-scene.push(geoBufferSet);
-
-scene.push(materialNodeEarth2);
-scene.push(modelTransfoCommonBaseNode2);
-scene.push(geoBufferSet);
-
 scene.push(materialNodeEarth3);
 scene.push(modelTransfoCommonBaseNode3);
 scene.push(geoBufferSet);
 
+// Halo
+
+var materialNodeHalo = new Cube.core.MaterialNode({shader: shaderManager.getShader("halo"),
+						   transparent: true,
+						   bindings: {}});
+
+var transfoHalo =
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode3}))
+    .push(new Cube.core.FaceObjectNode({reference: modelTransfoCommonBaseNode3}))
+    .push(new Cube.core.FaceCameraNode({reference: camera.getTransform()}));
+
+var geoPlaneBufferSet =
+    Cube.core.GeometryHelpers.buildPlane(
+	1.25,
+	new Cube.core.OutputToBufferSet({
+	    hasVertex: true,
+	    hasNormal: true,
+	    hasColor: true,
+	    hasUV: true,
+	    hasIndex: true,
+	    factory: renderer.getBufferFactory()}));
+
+scene.push(materialNodeHalo);
+scene.push(transfoHalo);
+scene.push(geoPlaneBufferSet);
+
+// Animate
+
+var earthRot = 0;
 var a = 0;
 animate();
 
 function render() {
     a += Math.PI / 200;
     a %= Math.PI * 2;
-    shaderedTransformationRotationNode.set(null, a, null);
+    earthRot += Math.PI / 300;
+    earthRot %= Math.PI * 2;
+
+    cameraRotation.set(null, a, null);
+    cameraRotation.update();
+    cameraTransform.update();
+    camera.update();
+    shaderedTransformationRotationNode.set(null, earthRot, null);
     shaderedTransformationRotationNode.update();
-    modelTransfoCommonBaseNode.update();
-    modelTransfoCommonBaseNode2.update();
     modelTransfoCommonBaseNode3.update();
+    transfoHalo.update();
 
     renderer.clear();
     scene.accept(visitor);

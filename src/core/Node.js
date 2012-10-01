@@ -6,3 +6,7 @@ Cube.core.Node.prototype = {};
 Cube.core.Node.prototype.constructor = Cube.core.Node;
 
 Cube.core.Node.prototype.accept = null;
+
+Cube.core.Node.prototype.getName = function() {
+    return this.name;
+}

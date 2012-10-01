@@ -1,7 +1,10 @@
 <html lang="en">
 	<head>
-		<title>Cube</title>
+		<title>Earth</title>
 		<meta charset="utf-8" />
+
+		<link href="earth.css" rel="stylesheet">
+
 		<script src="../common/webgl-debug.js"></script>
 		<script src="../common/RequestAnimationFrame.js"></script>
 
@@ -24,6 +27,8 @@
 		<script src="../../src/core/RotationXYZNode.js"></script>
 		<script src="../../src/core/ScalingNode.js"></script>
 		<script src="../../src/core/TranslationNode.js"></script>
+		<script src="../../src/core/FaceCameraNode.js"></script>
+		<script src="../../src/core/FaceObjectNode.js"></script>
 		<script src="../../src/core/TransformStackNode.js"></script>
 		<script src="../../src/core/ViewNode.js"></script>
 		<script src="../../src/core/ViewportNode.js"></script>
@@ -36,6 +41,7 @@
 		<script src="../../src/core/MaterialBindingNode.js"></script>
 		<script src="../../src/core/MaterialNode.js"></script>
 		<script src="../../src/core/CameraNode.js"></script>
+		<script src="../../src/core/Object.js"></script>
 		<script src="../../src/core/Scene.js"></script>
 		<script src="../../src/core/Engine.js"></script>
 		<script src="../../src/core/Renderer.js"></script>
@@ -90,9 +96,60 @@
 		    gl_FragColor = mix(f1, f2, ratio);
 		  }
 		</script>
+
+		<script id="halo-vertex-shader" type="x-shader/x-vertex">
+		  attribute vec3 aPosition;
+		  attribute vec4 aColor;
+		  attribute vec3 aNormal;
+		  attribute vec2 aUV;
+
+		  uniform mat4 u_normalMatrix;
+		  uniform mat4 u_matrix;
+		  uniform mat4 u_view;
+		  uniform mat4 u_projection;
+		  
+		  varying vec4 v_color;
+		  varying vec4 v_normal;
+		  varying vec2 v_TextureCoord;
+
+		  void main() {
+		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
+
+		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+		    v_color = aColor;
+		    v_TextureCoord = aUV;
+		  }
+		</script>
+
+		<script id="halo-fragment-shader" type="x-shader/x-fragment">
+		  precision mediump float;
+
+		  float radius = 1.0;
+		  float halo = 2.0;
+		  float ratio = radius/halo;
+		  float complInvRatio = 1.0/(1.0 - ratio);
+
+		  varying vec4 v_color;
+		  varying vec4 v_normal;
+		  varying vec2 v_TextureCoord;
+
+		  void main() {
+		    vec2 center = vec2(0.5, 0.5);
+		    float dist = distance(center, v_TextureCoord)/0.5;
+		    if (dist <= ratio) {
+                      discard; // drop fragment if hidden
+                    }
+                    dist = (dist - ratio) * complInvRatio;
+		    gl_FragColor = vec4(0.0, 0.1, 1.0, 1.0-dist);
+		  }
+		</script>
+
 	</head>
 
 	<body>
+	  <div id="title">
+	    <h1>- EARTH -</h1>
+	  </div>
 	  <script src="./earth.js"></script>
 	</body>
 </html>

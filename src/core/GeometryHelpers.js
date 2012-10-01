@@ -56,6 +56,34 @@ Cube.core.GeometryHelpers = {
 	return output.end();
     },
 
+    buildPlane: function(halfSide, output) {
+	var verts = [  1, 1, 0,  -1, 1, 0,  -1,-1, 0,   1,-1, 0 ];
+	var uvs = [  1, 1,   0, 1,   0, 0,   1, 0 ];
+	var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1 ];
+	var colors = [ 1, 1, 1,   1, 1, 0,   1, 0, 0,   1, 0, 1 ];
+	var indices = [ 0, 1, 2,   2, 3, 0 ];
+
+	output.begin(verts.length/3, indices.length);
+
+	var iterVert;
+	for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
+	    var offset = iterVert * 3;
+	    var uvOffset = iterVert * 2;
+	    output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
+	    output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
+	    output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
+	    output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
+	}
+
+	for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {
+	    var offset = iterInd*6;
+	    output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
+	    output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
+	}
+
+	return output.end();
+    },
+
     buildCube: function(halfSide, output) {
 	var verts = [  1, 1, 1,  -1, 1, 1,  -1,-1, 1,   1,-1, 1,   // v0,v1,v2,v3 (front)
 		       1, 1, 1,   1,-1, 1,   1,-1,-1,   1, 1,-1,   // v0,v3,v4,v5 (right)

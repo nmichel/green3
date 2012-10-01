@@ -21,6 +21,8 @@ FILELIST = \
 	./core/RotationXYZNode.js \
 	./core/ScalingNode.js \
 	./core/TranslationNode.js \
+	./core/FaceCameraNode.js \
+	./core/FaceObjectNode.js \
 	./core/TransformStackNode.js \
 	./core/ViewNode.js \
 	./core/ViewportNode.js \
@@ -33,6 +35,7 @@ FILELIST = \
 	./core/MaterialBindingNode.js \
 	./core/MaterialNode.js \
 	./core/CameraNode.js \
+	./core/Object.js \
 	./core/Scene.js \
 	./core/Engine.js \
 	./core/Renderer.js

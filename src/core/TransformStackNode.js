@@ -21,7 +21,7 @@ Cube.core.TransformStackNode.prototype.update = function() {
 	    current.update();
 	    return prev.multiplyToSelf(current.getMatrix())
 	}, 
-	this.matrix.initToIdentity());
+	this.localMatrix.initToIdentity());
 
     return Cube.core.TransformNode.prototype.update.call(this);
 };

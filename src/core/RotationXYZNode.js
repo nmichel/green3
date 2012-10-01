@@ -31,7 +31,7 @@ Cube.core.RotationXYZNode.prototype.update = function() {
     // -----
 
     var v = this.vector;
-    var matrix = this.getMatrix();
+    var matrix = this.getLocalMatrix();
 
     var x = v.x, y = v.y, z = v.z;
     var cosX = Math.cos(x), sinX = Math.sin(x);
