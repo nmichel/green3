@@ -17,6 +17,7 @@ FILELIST = \
 	./core/GeometryNode.js \
 	./core/MeshNode.js \
 	./core/OpticNode.js \
+	./core/OrthographicOpticNode.js \
 	./core/TransformNode.js \
 	./core/RotationXYZNode.js \
 	./core/ScalingNode.js \
