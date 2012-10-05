@@ -158,9 +158,7 @@ Cube.core.math.Matrix4.prototype = {
         td[3*4+3] = 1;
 
         return res;
-    },
-
-
+    }
 };
 
 Cube.core.math.Matrix4.prototype.rawdata_identity = [1, 0, 0, 0,

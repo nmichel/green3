@@ -1,4 +1,4 @@
-/* Generated on Fri, 21 Sep 2012 17:43:55 +0200
+/* Generated on Fri, 05 Oct 2012 17:39:16 +0200
 */ 
 var Cube = {};
 
@@ -12,77 +12,77 @@ Cube.core.math.Vector3.prototype = {
     constructor: Cube.core.math.Vector3,
 
     getX: function() {
-	return this.x;
+        return this.x;
     },
 
     getY: function() {
-	return this.y;
+        return this.y;
     },
 
     getZ: function() {
-	return this.z;
+        return this.z;
     },
 
     setX: function(v) {
-	this.x = v;
-	return this;
+        this.x = v;
+        return this;
     },
 
     setY: function(v) {
-	this.y = v;
-	return this;
+        this.y = v;
+        return this;
     },
 
     setZ: function(v) {
-	this.z = v;
-	return this;
+        this.z = v;
+        return this;
     },
 
     set: function(x, y, z) {
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	return this;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+        return this;
     },
 
     setFrom: function(other) {
-	this.x = other.x;
-	this.y = other.y;
-	this.z = other.z;
-	return this;
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+        return this;
     },
 
     addSelf: function(other) {
-	this.x += other.x;
-	this.y += other.y;
-	this.z += other.z;
-	return this;
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
     },
 
     subSelf: function(other) {
-	this.x -= other.x;
-	this.y -= other.y;
-	this.z -= other.z;
-	return this;
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
     },
 
     scaleSelf: function(factor) {
-	this.x *= factor;
-	this.y *= factor;
-	this.z *= factor;
-	return this;
+        this.x *= factor;
+        this.y *= factor;
+        this.z *= factor;
+        return this;
     },
 
     dot: function(other) {
-	return this.x * other.y + this.y * other.y + this.z * other.z;
+        return this.x * other.y + this.y * other.y + this.z * other.z;
     },
     
     length: function() {
-	return this.dot(this);
+        return this.dot(this);
     },
 
     normalizeSelf: function() {
-	return this.scaleSelf(this.length());
+        return this.scaleSelf(this.length());
     }
 };
 
@@ -94,153 +94,166 @@ Cube.core.math.Matrix4.prototype = {
     constructor: Cube.core.math.Matrix4,
 
     clone: function() {
-	return (new Cube.core.math.Matrix4()).initFromRawData(this.data);
+        return (new Cube.core.math.Matrix4()).initFromRawData(this.data);
     },
 
     initToIdentity: function() {
-	return this.initFromRawData(this.rawdata_identity);
+        return this.initFromRawData(this.rawdata_identity);
     },
 
     initFromRawData: function(data) {
-	var i;
-	for (i = 0; i < 16; ++i) {
-	    this.data[i] = data[i];
-	}
-	return this;
+        var i;
+        for (i = 0; i < 16; ++i) {
+            this.data[i] = data[i];
+        }
+        return this;
     },
 
     getRawData: function() {
-	return this.data;
+        return this.data;
     },
 
     setElement: function(x, y, v) {
-	this.data[y*4+x] = v;
-	return this;
+        this.data[y*4+x] = v;
+        return this;
     },
 
     multiply: function(other) {
-	var res = this.clone();
-	return res.multiplyToSelf(other);
+        var res = this.clone();
+        return res.multiplyToSelf(other);
     },
 
     invertToSelf: function() {
-	// -----
-	// http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-	// -----
+        // -----
+        // http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+        // -----
 
-	var td = this.data;
+        var td = this.data;
 
-	var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
-	var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
-	var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
-	var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
+        var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
+        var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
+        var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
+        var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
+        
+        var det = this.determinant();
 
-	var det = this.determinant();
+        td[0*4+0] = m12*m23*m31 - m13*m22*m31 + m13*m21*m32 - m11*m23*m32 - m12*m21*m33 + m11*m22*m33;
+        td[1*4+0] = m03*m22*m31 - m02*m23*m31 - m03*m21*m32 + m01*m23*m32 + m02*m21*m33 - m01*m22*m33;
+        td[2*4+0] = m02*m13*m31 - m03*m12*m31 + m03*m11*m32 - m01*m13*m32 - m02*m11*m33 + m01*m12*m33;
+        td[3*4+0] = m03*m12*m21 - m02*m13*m21 - m03*m11*m22 + m01*m13*m22 + m02*m11*m23 - m01*m12*m23;
 
-	td[0*4+0] = m12*m23*m31 - m13*m22*m31 + m13*m21*m32 - m11*m23*m32 - m12*m21*m33 + m11*m22*m33;
-	td[1*4+0] = m03*m22*m31 - m02*m23*m31 - m03*m21*m32 + m01*m23*m32 + m02*m21*m33 - m01*m22*m33;
-	td[2*4+0] = m02*m13*m31 - m03*m12*m31 + m03*m11*m32 - m01*m13*m32 - m02*m11*m33 + m01*m12*m33;
-	td[3*4+0] = m03*m12*m21 - m02*m13*m21 - m03*m11*m22 + m01*m13*m22 + m02*m11*m23 - m01*m12*m23;
+        td[0*4+1] = m13*m22*m30 - m12*m23*m30 - m13*m20*m32 + m10*m23*m32 + m12*m20*m33 - m10*m22*m33;
+        td[1*4+1] = m02*m23*m30 - m03*m22*m30 + m03*m20*m32 - m00*m23*m32 - m02*m20*m33 + m00*m22*m33;
+        td[2*4+1] = m03*m12*m30 - m02*m13*m30 - m03*m10*m32 + m00*m13*m32 + m02*m10*m33 - m00*m12*m33;
+        td[3*4+1] = m02*m13*m20 - m03*m12*m20 + m03*m10*m22 - m00*m13*m22 - m02*m10*m23 + m00*m12*m23;
+        
+        td[0*4+2] = m11*m23*m30 - m13*m21*m30 + m13*m20*m31 - m10*m23*m31 - m11*m20*m33 + m10*m21*m33;
+        td[1*4+2] = m03*m21*m30 - m01*m23*m30 - m03*m20*m31 + m00*m23*m31 + m01*m20*m33 - m00*m21*m33;
+        td[2*4+2] = m01*m13*m30 - m03*m11*m30 + m03*m10*m31 - m00*m13*m31 - m01*m10*m33 + m00*m11*m33;
+        td[3*4+2] = m03*m11*m20 - m01*m13*m20 - m03*m10*m21 + m00*m13*m21 + m01*m10*m23 - m00*m11*m23;
 
-	td[0*4+1] = m13*m22*m30 - m12*m23*m30 - m13*m20*m32 + m10*m23*m32 + m12*m20*m33 - m10*m22*m33;
-	td[1*4+1] = m02*m23*m30 - m03*m22*m30 + m03*m20*m32 - m00*m23*m32 - m02*m20*m33 + m00*m22*m33;
-	td[2*4+1] = m03*m12*m30 - m02*m13*m30 - m03*m10*m32 + m00*m13*m32 + m02*m10*m33 - m00*m12*m33;
-	td[3*4+1] = m02*m13*m20 - m03*m12*m20 + m03*m10*m22 - m00*m13*m22 - m02*m10*m23 + m00*m12*m23;
-	
-	td[0*4+2] = m11*m23*m30 - m13*m21*m30 + m13*m20*m31 - m10*m23*m31 - m11*m20*m33 + m10*m21*m33;
-	td[1*4+2] = m03*m21*m30 - m01*m23*m30 - m03*m20*m31 + m00*m23*m31 + m01*m20*m33 - m00*m21*m33;
-	td[2*4+2] = m01*m13*m30 - m03*m11*m30 + m03*m10*m31 - m00*m13*m31 - m01*m10*m33 + m00*m11*m33;
-	td[3*4+2] = m03*m11*m20 - m01*m13*m20 - m03*m10*m21 + m00*m13*m21 + m01*m10*m23 - m00*m11*m23;
+        td[0*4+3] = m12*m21*m30 - m11*m22*m30 - m12*m20*m31 + m10*m22*m31 + m11*m20*m32 - m10*m21*m32;
+        td[1*4+3] = m01*m22*m30 - m02*m21*m30 + m02*m20*m31 - m00*m22*m31 - m01*m20*m32 + m00*m21*m32;
+        td[2*4+3] = m02*m11*m30 - m01*m12*m30 - m02*m10*m31 + m00*m12*m31 + m01*m10*m32 - m00*m11*m32;
+        td[3*4+3] = m01*m12*m20 - m02*m11*m20 + m02*m10*m21 - m00*m12*m21 - m01*m10*m22 + m00*m11*m22;
 
-	td[0*4+3] = m12*m21*m30 - m11*m22*m30 - m12*m20*m31 + m10*m22*m31 + m11*m20*m32 - m10*m21*m32;
-	td[1*4+3] = m01*m22*m30 - m02*m21*m30 + m02*m20*m31 - m00*m22*m31 - m01*m20*m32 + m00*m21*m32;
-	td[2*4+3] = m02*m11*m30 - m01*m12*m30 - m02*m10*m31 + m00*m12*m31 + m01*m10*m32 - m00*m11*m32;
-	td[3*4+3] = m01*m12*m20 - m02*m11*m20 + m02*m10*m21 - m00*m12*m21 - m01*m10*m22 + m00*m11*m22;
-
-	return this.scaleToSelf(1/det);
+        return this.scaleToSelf(1/det);
     },
 
     determinant: function() {
-	var td = this.data;
-	var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
-	var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
-	var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
-	var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
-	var value =
-	    m03*m12*m21*m30 - m02*m13*m21*m30 - m03*m11*m22*m30 + m01*m13*m22*m30+
-	    m02*m11*m23*m30 - m01*m12*m23*m30 - m03*m12*m20*m31 + m02*m13*m20*m31+
-	    m03*m10*m22*m31 - m00*m13*m22*m31 - m02*m10*m23*m31 + m00*m12*m23*m31+
-	    m03*m11*m20*m32 - m01*m13*m20*m32 - m03*m10*m21*m32 + m00*m13*m21*m32+
-	    m01*m10*m23*m32 - m00*m11*m23*m32 - m02*m11*m20*m33 + m01*m12*m20*m33+
-	    m02*m10*m21*m33 - m00*m12*m21*m33 - m01*m10*m22*m33 + m00*m11*m22*m33;
-	return value;
+        var td = this.data;
+        var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
+        var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
+        var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
+        var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
+        var value =
+            m03*m12*m21*m30 - m02*m13*m21*m30 - m03*m11*m22*m30 + m01*m13*m22*m30+
+            m02*m11*m23*m30 - m01*m12*m23*m30 - m03*m12*m20*m31 + m02*m13*m20*m31+
+            m03*m10*m22*m31 - m00*m13*m22*m31 - m02*m10*m23*m31 + m00*m12*m23*m31+
+            m03*m11*m20*m32 - m01*m13*m20*m32 - m03*m10*m21*m32 + m00*m13*m21*m32+
+            m01*m10*m23*m32 - m00*m11*m23*m32 - m02*m11*m20*m33 + m01*m12*m20*m33+
+            m02*m10*m21*m33 - m00*m12*m21*m33 - m01*m10*m22*m33 + m00*m11*m22*m33;
+        return value;
     },
     
     multiplyToSelf: function(other) {
-	var td = this.data;
-	var od = other.data;
+        var td = this.data;
+        var od = other.data;
 
-	var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
-	var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
-	var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
-	var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
+        var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
+        var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
+        var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
+        var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
 
-	var o00 = od[0*4+0], o01 = od[1*4+0], o02 = od[2*4+0], o03 = od[3*4+0];
-	var o10 = od[0*4+1], o11 = od[1*4+1], o12 = od[2*4+1], o13 = od[3*4+1];
-	var o20 = od[0*4+2], o21 = od[1*4+2], o22 = od[2*4+2], o23 = od[3*4+2];
-	var o30 = od[0*4+3], o31 = od[1*4+3], o32 = od[2*4+3], o33 = od[3*4+3];
+        var o00 = od[0*4+0], o01 = od[1*4+0], o02 = od[2*4+0], o03 = od[3*4+0];
+        var o10 = od[0*4+1], o11 = od[1*4+1], o12 = od[2*4+1], o13 = od[3*4+1];
+        var o20 = od[0*4+2], o21 = od[1*4+2], o22 = od[2*4+2], o23 = od[3*4+2];
+        var o30 = od[0*4+3], o31 = od[1*4+3], o32 = od[2*4+3], o33 = od[3*4+3];
 
-	td[0*4+0] = m00 * o00 + m01 * o10 + m02 * o20 + m03 * o30;
-	td[1*4+0] = m00 * o01 + m01 * o11 + m02 * o21 + m03 * o31;
-	td[2*4+0] = m00 * o02 + m01 * o12 + m02 * o22 + m03 * o32;
-	td[3*4+0] = m00 * o03 + m01 * o13 + m02 * o23 + m03 * o33;
+        td[0*4+0] = m00 * o00 + m01 * o10 + m02 * o20 + m03 * o30;
+        td[1*4+0] = m00 * o01 + m01 * o11 + m02 * o21 + m03 * o31;
+        td[2*4+0] = m00 * o02 + m01 * o12 + m02 * o22 + m03 * o32;
+        td[3*4+0] = m00 * o03 + m01 * o13 + m02 * o23 + m03 * o33;
 
-	td[0*4+1] = m10 * o00 + m11 * o10 + m12 * o20 + m13 * o30;
-	td[1*4+1] = m10 * o01 + m11 * o11 + m12 * o21 + m13 * o31;
-	td[2*4+1] = m10 * o02 + m11 * o12 + m12 * o22 + m13 * o32;
-	td[3*4+1] = m10 * o03 + m11 * o13 + m12 * o23 + m13 * o33;
+        td[0*4+1] = m10 * o00 + m11 * o10 + m12 * o20 + m13 * o30;
+        td[1*4+1] = m10 * o01 + m11 * o11 + m12 * o21 + m13 * o31;
+        td[2*4+1] = m10 * o02 + m11 * o12 + m12 * o22 + m13 * o32;
+        td[3*4+1] = m10 * o03 + m11 * o13 + m12 * o23 + m13 * o33;
 
-	td[0*4+2] = m20 * o00 + m21 * o10 + m22 * o20 + m23 * o30;
-	td[1*4+2] = m20 * o01 + m21 * o11 + m22 * o21 + m23 * o31;
-	td[2*4+2] = m20 * o02 + m21 * o12 + m22 * o22 + m23 * o32;
-	td[3*4+2] = m20 * o03 + m21 * o13 + m22 * o23 + m23 * o33;
+        td[0*4+2] = m20 * o00 + m21 * o10 + m22 * o20 + m23 * o30;
+        td[1*4+2] = m20 * o01 + m21 * o11 + m22 * o21 + m23 * o31;
+        td[2*4+2] = m20 * o02 + m21 * o12 + m22 * o22 + m23 * o32;
+        td[3*4+2] = m20 * o03 + m21 * o13 + m22 * o23 + m23 * o33;
 
-	td[0*4+3] = m30 * o00 + m31 * o10 + m32 * o20 + m33 * o30;
-	td[1*4+3] = m30 * o01 + m31 * o11 + m32 * o21 + m33 * o31;
-	td[2*4+3] = m30 * o02 + m31 * o12 + m32 * o22 + m33 * o32;
-	td[3*4+3] = m30 * o03 + m31 * o13 + m32 * o23 + m33 * o33;
+        td[0*4+3] = m30 * o00 + m31 * o10 + m32 * o20 + m33 * o30;
+        td[1*4+3] = m30 * o01 + m31 * o11 + m32 * o21 + m33 * o31;
+        td[2*4+3] = m30 * o02 + m31 * o12 + m32 * o22 + m33 * o32;
+        td[3*4+3] = m30 * o03 + m31 * o13 + m32 * o23 + m33 * o33;
 
-	return this;
+        return this;
     },
 
     scaleToSelf: function(factor) {
-	var i;
-	var td = this.data;
-	for (i = 0; i < 4*4; ++i) {
-	    td[i] *= factor;
-	}
-	return this;
+        var i;
+        var td = this.data;
+        for (i = 0; i < 4*4; ++i) {
+            td[i] *= factor;
+        }
+        return this;
     },
     
     transposeToSelf: function() {
-	var td = this.data;
-	var tmp;
-	
-	tmp = td[ 1]; td[ 1] = td[ 4]; td[ 4] = tmp;
-	tmp = td[ 2]; td[ 2] = td[ 8]; td[ 8] = tmp;
-	tmp = td[ 6]; td[ 6] = td[ 9]; td[ 9] = tmp;
-	tmp = td[ 3]; td[ 3] = td[12]; td[12] = tmp;
-	tmp = td[ 7]; td[ 7] = td[13]; td[13] = tmp;
-	tmp = td[11]; td[11] = td[14]; td[14] = tmp;
-	
-	return this;
+        var td = this.data;
+        var tmp;
+
+        tmp = td[ 1]; td[ 1] = td[ 4]; td[ 4] = tmp;
+        tmp = td[ 2]; td[ 2] = td[ 8]; td[ 8] = tmp;
+        tmp = td[ 6]; td[ 6] = td[ 9]; td[ 9] = tmp;
+        tmp = td[ 3]; td[ 3] = td[12]; td[12] = tmp;
+        tmp = td[ 7]; td[ 7] = td[13]; td[13] = tmp;
+        tmp = td[11]; td[11] = td[14]; td[14] = tmp;
+        
+        return this;
+    },
+
+    cloneWithoutTranslation: function() {
+        var res = this.clone(),
+            td = res.data;
+
+        td[3*4+0] = 0;
+        td[3*4+1] = 0;
+        td[3*4+2] = 0;
+        td[3*4+3] = 1;
+
+        return res;
     }
 };
 
 Cube.core.math.Matrix4.prototype.rawdata_identity = [1, 0, 0, 0,
-						     0, 1, 0, 0,
-						     0, 0, 1, 0,
-						     0, 0, 0, 1];Cube.core.Utilities = {
+                                                     0, 1, 0, 0,
+                                                     0, 0, 1, 0,
+                                                     0, 0, 0, 1];
+Cube.core.Utilities = {
     buildName: (function() {
 	var id = 0;
 	return function() {
@@ -307,6 +320,8 @@ Cube.core.RenderVisitor.prototype.visitTexture = function(textureNode) {
 };
 
 Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
+    this.renderer.deactivateAllTextureUnits();
+    this.renderer.deactivateAllLights();
     this.renderer.setTransparentMode(materialNode.isTransparent());
 };
 
@@ -316,6 +331,18 @@ Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindin
     var paramValue = materialBindingNode.getParameterValue();
     this.renderer.bindShaderParamWithValue(paramName, paramType, paramValue);
 };
+
+Cube.core.RenderVisitor.prototype.visitLightAmbiant = function(lightAmbiantNode) {
+    this.renderer.addAmbiantLight(lightAmbiantNode);
+};
+
+Cube.core.RenderVisitor.prototype.visitLightDirectional = function(lightDirectionalNode) {
+    this.renderer.addDirectionalLight(lightDirectionalNode);
+};
+
+Cube.core.RenderVisitor.prototype.visitLightPositional = function(lightPositionalNode) {
+    this.renderer.addPositionalLight(lightPositionalNode);
+};
 Cube.core.Node = function(attributes) {
     this.name = attributes.name || Cube.core.Utilities.buildName();
 };
@@ -324,11 +351,13 @@ Cube.core.Node.prototype = {};
 Cube.core.Node.prototype.constructor = Cube.core.Node;
 
 Cube.core.Node.prototype.accept = null;
+
+Cube.core.Node.prototype.getName = function() {
+    return this.name;
+}
 Cube.core.ArrayNode = function(attributes) {
     Cube.core.Node.call(this, attributes);
     
-    this.checkNodes(attributes.nodes);
-
     this.nodes = attributes.nodes || [];
 };
 
@@ -339,39 +368,19 @@ Cube.core.ArrayNode.prototype.accept = function(visitor) {
     visitor.visitArrayBegin(this.nodes.length);
     var i;
     for (i = 0; i < this.nodes.length; ++i) {
-	var node = this.nodes[i];
-	node.accept(visitor);
+        var node = this.nodes[i];
+        node.accept(visitor);
     }
     visitor.visitArrayEnd();
 };
 
 Cube.core.ArrayNode.prototype.push = function(node) {
-    this.checkNode(node);
     this.nodes.push(node);
 };
 
 Cube.core.ArrayNode.prototype.clear = function(fromIdx) {
     this.nodes.splice(fromIdx);
     return this;
-};
-
-Cube.core.ArrayNode.prototype.checkNode = function(node) {
-    Cube.core.Utilities.checkReference(node, "node");
-    Cube.core.Utilities.checkType(node, Cube.core.Node, "node should be Cube.core.Node");
-};
-
-Cube.core.ArrayNode.prototype.checkNodes = function(nodes) {
-    if (!nodes) {
-	return; // <== 
-    }
-    
-    Cube.core.Utilities.checkType(nodes, Array, "nodes shoud be Array");
-    
-    var i;
-    for (i = 0; i < nodes.length; ++i) {
-	Cube.core.Utilities.checkReference(nodes[i], "nodes[i]");
-	Cube.core.Utilities.checkType(nodes[i], Cube.core.Node, "nodes["+i+"] should be Cube.core.Node");
-    }
 };
 Cube.core.BufferSetNode = function (attributes) {
 
@@ -654,16 +663,68 @@ Cube.core.OpticNode.prototype.default_fov = Math.PI / 2.0;
 Cube.core.OpticNode.prototype.default_ratio = 1.0;
 Cube.core.OpticNode.prototype.default_near = 1.0;
 Cube.core.OpticNode.prototype.default_far = 1000.0;
+Cube.core.OrthographicOpticNode = function(attributes) {
+    Cube.core.Node.call(this, attributes);
+
+    this.matrix = (new Cube.core.math.Matrix4()).initToIdentity();
+
+    this.setup(attributes);
+};
+
+Cube.core.OrthographicOpticNode.prototype = new Cube.core.Node({});
+Cube.core.OrthographicOpticNode.prototype.constructor = Cube.core.OrthographicOpticNode;
+
+Cube.core.OrthographicOpticNode.prototype.accept = function(visitor) {
+    visitor.visitOptic(this);
+};
+
+Cube.core.OrthographicOpticNode.prototype.setup = function(attributes) {
+    Cube.core.Utilities.checkReference(attributes);
+
+    this.fov  = attributes.fov || this.default_fov;
+    this.ratio  = attributes.ratio || this.default_ratio;
+    this.near  = attributes.near || this.default_near;
+    this.far  = attributes.far || this.default_far;
+
+    this.updateMatrix();
+};
+
+Cube.core.OrthographicOpticNode.prototype.updateMatrix = function() {
+
+    var top = this.near * Math.tan(this.fov * 0.5);
+    var bottom = -top;
+
+    var right = top * this.ratio;
+    var left = -right;
+
+    var m11 = 2 / (right - left);
+    var m22 = 2 / (top - bottom);
+    var m33 = -2 / (this.far - this.near);
+    var m14 = - (right + left) / (right - left);
+    var m24 = - (top + bottom) / (top - bottom);
+    var m34 = - (this.far + this.near) / (this.far - this.near);
+    
+    this.matrix.initFromRawData([m11, 0.0, 0.0, 0.0,
+                                 0.0, m22, 0.0, 0.0,
+                                 0.0, 0.0, m33, 0.0,
+                                 m14, m24, m34, 1.0]);
+};
+
+Cube.core.OrthographicOpticNode.prototype.getMatrix = function() {
+    return this.matrix;
+};
+
+Cube.core.OrthographicOpticNode.prototype.default_fov = Math.PI / 2.0;
+Cube.core.OrthographicOpticNode.prototype.default_ratio = 1.0;
+Cube.core.OrthographicOpticNode.prototype.default_near = 1.0;
+Cube.core.OrthographicOpticNode.prototype.default_far = 1000.0;
 Cube.core.TransformNode = function (attributes) {
     Cube.core.Node.call(this, attributes);
 
-    this.checkParent(attributes.parent);
-    this.checkMatrix(attributes.matrix);
-
-    this.matrix = attributes.matrix || (new Cube.core.math.Matrix4()).initToIdentity();
-    this.invert = this.matrix.clone().invertToSelf();
-    this.normal = this.invert.clone().transposeToSelf();
+    this.localMatrix = attributes.matrix || (new Cube.core.math.Matrix4()).initToIdentity();
     this.parent = attributes.parent || null;
+
+    Cube.core.TransformNode.prototype.update.call(this);
 };
 
 Cube.core.TransformNode.prototype = new Cube.core.Node({});
@@ -671,6 +732,10 @@ Cube.core.TransformNode.prototype.constructor = Cube.core.TransformNode;
 
 Cube.core.TransformNode.prototype.accept = function(visitor) {
     visitor.visitTransform(this);
+};
+
+Cube.core.TransformNode.prototype.getLocalMatrix = function() {
+    return this.localMatrix;
 };
 
 Cube.core.TransformNode.prototype.getMatrix = function() {
@@ -687,23 +752,15 @@ Cube.core.TransformNode.prototype.getNormal = function() {
 
 Cube.core.TransformNode.prototype.update = function() {
     if (this.parent) {
-	this.matrix = this.parent.getMatrix().multiply(this.matrix);
+	this.matrix = this.parent.getMatrix().multiply(this.localMatrix);
     }
+    else {
+	this.matrix = this.localMatrix.clone();
+    }
+
     this.invert = this.matrix.clone().invertToSelf();
     this.normal = this.invert.clone().transposeToSelf();
     return this;
-};
-
-Cube.core.TransformNode.prototype.checkMatrix = function(matrix) {
-    if (matrix) {
-	Cube.core.Utilities.checkType(matrix, Cube.core.math.Matrix4, "matrix should be Cube.core.math.Matrix4");
-    }
-};
-
-Cube.core.TransformNode.prototype.checkParent = function(parent) {
-    if (parent) {
-	Cube.core.Utilities.checkType(parent, Cube.core.TransformNode, "parent should be Cube.core.TransformNode");
-    }
 };
 Cube.core.RotationXYZNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
@@ -738,7 +795,7 @@ Cube.core.RotationXYZNode.prototype.update = function() {
     // -----
 
     var v = this.vector;
-    var matrix = this.getMatrix();
+    var matrix = this.getLocalMatrix();
 
     var x = v.x, y = v.y, z = v.z;
     var cosX = Math.cos(x), sinX = Math.sin(x);
@@ -786,7 +843,7 @@ Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
 
 Cube.core.ScalingNode.prototype.update = function() {
     var v = this.vector;
-    var matrix = this.getMatrix();
+    var matrix = this.getLocalMatrix();
 
     matrix.setElement(0, 0, v.x);
     matrix.setElement(1, 1, v.y);
@@ -819,12 +876,38 @@ Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
 
 Cube.core.TranslationNode.prototype.update = function() {
     var v = this.vector;
-    var matrix = this.getMatrix();
+    var matrix = this.getLocalMatrix();
 
     matrix.setElement(0, 3, v.getX());
     matrix.setElement(1, 3, v.getY());
     matrix.setElement(2, 3, v.getZ());
 
+    return Cube.core.TransformNode.prototype.update.call(this);
+};
+Cube.core.FaceCameraNode = function(attributes) {
+    Cube.core.TransformNode.call(this, attributes);
+
+    this.reference = attributes.reference;
+};
+
+Cube.core.FaceCameraNode.prototype = new Cube.core.TransformNode({});
+Cube.core.FaceCameraNode.prototype.constructor = Cube.core.FaceCameraNode;
+
+Cube.core.FaceCameraNode.prototype.update = function() {
+    this.localMatrix = this.reference.getMatrix().cloneWithoutTranslation();
+    return Cube.core.TransformNode.prototype.update.call(this);
+};
+Cube.core.FaceObjectNode = function(attributes) {
+    Cube.core.TransformNode.call(this, attributes);
+
+    this.reference = attributes.reference;
+};
+
+Cube.core.FaceObjectNode.prototype = new Cube.core.TransformNode({});
+Cube.core.FaceObjectNode.prototype.constructor = Cube.core.FaceObjectNode;
+
+Cube.core.FaceObjectNode.prototype.update = function() {
+    this.localMatrix = this.reference.getInvert().cloneWithoutTranslation();
     return Cube.core.TransformNode.prototype.update.call(this);
 };
 Cube.core.TransformStackNode = function (attributes) {
@@ -850,7 +933,7 @@ Cube.core.TransformStackNode.prototype.update = function() {
 	    current.update();
 	    return prev.multiplyToSelf(current.getMatrix())
 	}, 
-	this.matrix.initToIdentity());
+	this.localMatrix.initToIdentity());
 
     return Cube.core.TransformNode.prototype.update.call(this);
 };
@@ -947,6 +1030,7 @@ Cube.core.GeometryHelpers = {
 		output.addVertex(x*radius, y*radius, z*radius);
 		output.addNormal(x, y, z);
 		output.addColor(x, y, z, 1.0);
+		output.addUV(u, v);
             }
         }
 
@@ -966,6 +1050,34 @@ Cube.core.GeometryHelpers = {
 		output.addTriplet(p2, p3, p4);
             }
         }
+
+	return output.end();
+    },
+
+    buildPlane: function(halfSide, output) {
+	var verts = [  1, 1, 0,  -1, 1, 0,  -1,-1, 0,   1,-1, 0 ];
+	var uvs = [  1, 1,   0, 1,   0, 0,   1, 0 ];
+	var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1 ];
+	var colors = [ 1, 1, 1,   1, 1, 0,   1, 0, 0,   1, 0, 1 ];
+	var indices = [ 0, 1, 2,   2, 3, 0 ];
+
+	output.begin(verts.length/3, indices.length);
+
+	var iterVert;
+	for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
+	    var offset = iterVert * 3;
+	    var uvOffset = iterVert * 2;
+	    output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
+	    output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
+	    output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
+	    output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
+	}
+
+	for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {
+	    var offset = iterInd*6;
+	    output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
+	    output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
+	}
 
 	return output.end();
     },
@@ -1126,25 +1238,25 @@ Cube.core.ShaderManager.prototype.getParamTypes = function(name) {
 Cube.core.ShaderManager.prototype.createShaders = function(shaderDescs) {
     var res = {};
     for (shaderName in shaderDescs) {
-	var desc = shaderDescs[shaderName];
-	var progDesc = {verts: [], frags: [], params: desc.params, mappings: desc.mappings};
-	this.programs[shaderName] = progDesc;
-	for (var i = 0; i < desc.src.length; ++i) {
-	    var subShadName = desc.src[i];
-	    if (subShadName.toLowerCase().indexOf("vertex") != -1) {
-		progDesc.verts.push(subShadName);
-	    }
-	    else if (subShadName.toLowerCase().indexOf("fragment") != -1) {
-		progDesc.frags.push(subShadName);
-	    }
-	    else {
-		// 
-	    }
-	}
-	res[shaderName] = new Cube.core.ShaderNode({manager: this, name: shaderName});
-	if (desc.preload) {
-	    res[shaderName].getProgram();
-	}
+        var desc = shaderDescs[shaderName];
+        var progDesc = {verts: [], frags: [], params: desc.params, mappings: desc.mappings};
+        this.programs[shaderName] = progDesc;
+        for (var i = 0; i < desc.src.length; ++i) {
+            var subShadName = desc.src[i];
+            if (subShadName.toLowerCase().indexOf("vertex") != -1) {
+                progDesc.verts.push(subShadName);
+            }
+            else if (subShadName.toLowerCase().indexOf("fragment") != -1) {
+                progDesc.frags.push(subShadName);
+            }
+            else {
+                // 
+            }
+        }
+        res[shaderName] = new Cube.core.ShaderNode({manager: this, name: shaderName});
+        if (desc.preload) {
+            res[shaderName].getProgram();
+        }
     }
     return res;
 };
@@ -1164,8 +1276,8 @@ Cube.core.ShaderManager.prototype.createShader = function(text, kind) {
     this.gl.shaderSource(shader, text);
     this.gl.compileShader(shader);
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-	var lastError = this.gl.getShaderInfoLog(shader);
-	this.gl.deleteShader(shader); // Don't know if we need this.
+	    var lastError = this.gl.getShaderInfoLog(shader);
+	    this.gl.deleteShader(shader); // Don't know if we need this.
         throw "Failed to compile shader [" + lastError + "]"; // <== 
     }
     return shader;
@@ -1177,71 +1289,72 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
     var progDesc = this.programs[name];
     var program = this.gl.createProgram();
     for (var i = 0; i < progDesc.verts.length; ++i) {
-	var subShadName = progDesc.verts[i];
-	if (this.vertexs[subShadName] == null) {
-	    this.vertexs[subShadName] = this.createVertexShader(this.loader.getResource(subShadName));
-	}
-	this.gl.attachShader(program, this.vertexs[subShadName]);
+	    var subShadName = progDesc.verts[i];
+	    if (this.vertexs[subShadName] == null) {
+	        this.vertexs[subShadName] = this.createVertexShader(this.loader.getResource(subShadName));
+	    }
+	    this.gl.attachShader(program, this.vertexs[subShadName]);
     }
     for (var i = 0; i < progDesc.frags.length; ++i) {
-	var subShadName = progDesc.frags[i];
-	if (this.fragments[subShadName] == null) {
-	    this.fragments[subShadName] = this.createFragmentShader(this.loader.getResource(subShadName));
-	}
-	this.gl.attachShader(program, this.fragments[subShadName]);
+	    var subShadName = progDesc.frags[i];
+	    if (this.fragments[subShadName] == null) {
+	        this.fragments[subShadName] = this.createFragmentShader(this.loader.getResource(subShadName));
+	    }
+	    this.gl.attachShader(program, this.fragments[subShadName]);
     }
     this.gl.linkProgram(program);
     var linked = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
     if (!linked) {
-	var lastError = this.gl.getProgramInfoLog(program);
-	this.gl.deleteProgram(program);
-	throw "Error in program linking [" + lastError + "]"; // <==
+	    var lastError = this.gl.getProgramInfoLog(program);
+	    this.gl.deleteProgram(program);
+	    throw "Error in program linking [" + lastError + "]"; // <==
     }
     
     this.gl.useProgram(program);
-
+    
     // Load standard bindings 
     // 
     // Note : resolving an uniform or attrib can fail, even if it is declared. The shader compiler strips off unused 
     // symbols, and so one will be unable to resolve such objects.
     // 
     var varMapping = {uniforms: {},
-		      attributes: {}};
+		              attributes: {}};
     for (var name in this.engine.getRenderer().shaderParameters.uniforms) {
-	var binding = this.gl.getUniformLocation(program, name);
-	if (!binding && progDesc.mappings) {
-	    var mapping = progDesc.mappings.uniforms[name];
-	    binding = this.gl.getUniformLocation(program, mapping);
-	}
-	if (binding) {
-	    varMapping.uniforms[name] = binding;
-	}
+        var binding = this.gl.getUniformLocation(program, name);
+        if (!binding && progDesc.mappings) {
+            var mapping = progDesc.mappings.uniforms[name];
+            binding = this.gl.getUniformLocation(program, mapping);
+        }
+        if (binding) {
+            varMapping.uniforms[name] = binding;
+        }
     }
-
+    
     for (var name in this.engine.getRenderer().shaderParameters.attributes) {
-	var binding = this.gl.getAttribLocation(program, name);
-	if (binding < 0 && progDesc.mappings) {
-	    var mapping = progDesc.mappings.attributes[name];
-	    binding = this.gl.getAttribLocation(program, mapping);
-	}
-	if (binding >= 0) {
-	    varMapping.attributes[name] = binding;
-	}
+        var binding = this.gl.getAttribLocation(program, name);
+        if (binding < 0 && progDesc.mappings) {
+            var mapping = progDesc.mappings.attributes[name];
+            binding = this.gl.getAttribLocation(program, mapping);
+        }
+        if (binding >= 0) {
+            varMapping.attributes[name] = binding;
+        }
     }
-
+    
     // Load shader specific bindings
     // 
     for (var n in progDesc.params.uniforms) {
-	var binding = this.gl.getUniformLocation(program, n);
-	if (binding) {
-	    varMapping.uniforms[n] = binding;
-	}
+	    var binding = this.gl.getUniformLocation(program, n);
+	    if (binding) {
+	        varMapping.uniforms[n] = binding;
+	    }
     }
-
+    
     progDesc.bindings = varMapping;
-
+    
     return program;
 };
+
 
 Cube.core.TextureManager = function(attributes) {
     this.engine = attributes.engine;
@@ -1276,7 +1389,7 @@ Cube.core.TextureManager.prototype.loadTexture = function(texture) {
 	var minFilter = desc.quality == Cube.core.Renderer.prototype.textureQuality.POOR ? gl.NEAREST : (desc.quality == Cube.core.Renderer.prototype.textureQuality.GOOD ? gl.LINEAR : gl.LINEAR_MIPMAP_NEAREST);
 	var textureObject = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, textureObject);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, (desc.flip == true));
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
@@ -1342,6 +1455,61 @@ Cube.core.MaterialNode.prototype.accept = function (visitor) {
     visitor.visitMaterial(this);
     this.nodes.accept(visitor);
 };
+Cube.core.LightAmbiantNode = function(attributes) {
+    this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
+};
+
+Cube.core.LightAmbiantNode.prototype = new Cube.core.Node({});
+Cube.core.LightAmbiantNode.prototype.constructor = Cube.core.LightAmbiantNode;
+
+Cube.core.LightAmbiantNode.prototype.getColor = function() {
+    return this.color;
+};
+
+Cube.core.LightAmbiantNode.prototype.accept = function(visitor) {
+    visitor.visitLightAmbiant(this);
+};
+
+Cube.core.LightDirectionalNode = function(attributes) {
+    this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
+    this.direction = attributes.direction || [0.0, -1.0, 0.0];
+};
+
+Cube.core.LightDirectionalNode.prototype = new Cube.core.Node({});
+Cube.core.LightDirectionalNode.prototype.constructor = Cube.core.LightDirectionalNode;
+
+Cube.core.LightDirectionalNode.prototype.getColor = function() {
+    return this.color;
+};
+
+Cube.core.LightDirectionalNode.prototype.getDirection = function() {
+    return this.direction;
+};
+
+Cube.core.LightDirectionalNode.prototype.accept = function(visitor) {
+    visitor.visitLightDirectional(this);
+};
+
+Cube.core.LightPositionalNode = function(attributes) {
+    this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
+    this.position = attributes.position || [0.0, 1.0, 0.0];
+};
+
+Cube.core.LightPositionalNode.prototype = new Cube.core.Node({});
+Cube.core.LightPositionalNode.prototype.constructor = Cube.core.LightPositionalNode;
+
+Cube.core.LightPositionalNode.prototype.getColor = function() {
+    return this.color;
+};
+
+Cube.core.LightPositionalNode.prototype.getPosition = function() {
+    return this.position;
+};
+
+Cube.core.LightPositionalNode.prototype.accept = function(visitor) {
+    visitor.visitLightPositional(this);
+};
+
 Cube.core.CameraNode = function(attributes) {
     Cube.core.Node.call(this, attributes);
 
@@ -1353,38 +1521,83 @@ Cube.core.CameraNode = function(attributes) {
 Cube.core.CameraNode.prototype = new Cube.core.Node({});
 Cube.core.CameraNode.prototype.constructor = Cube.core.CameraNode;
 
+Cube.core.CameraNode.prototype.getTransform = function() {
+    return this.viewNode;
+};
+
 Cube.core.CameraNode.prototype.accept = function(visitor) {
     visitor.visitOptic(this.opticNode);
     visitor.visitView(this.viewNode);
 };
-Cube.core.Tree = function (attributes) {
 
-    checkRoot(attributes.root);
-
-    this.root = attributes.root;
-
+Cube.core.CameraNode.prototype.update = function() {
+    this.viewNode.update();
+};
+Cube.core.Object = function(attributes) {
     Cube.core.Node.call(this, attributes);
+
+    this.enlighter = new Cube.core.ObjectEnlighterNode({});
+    this.nodes = new Cube.core.ArrayNode({nodes: [attributes.material, this.enlighter, attributes.transformation, attributes.geometry]});
 };
 
-Cube.core.Tree.prototype = new Cube.core.Node({});
-Cube.core.Tree.prototype.constructor = Cube.core.Tree;
+Cube.core.Object.prototype = new Cube.core.Node({});
+Cube.core.Object.prototype.constructor = Cube.core.Object;
 
-Cube.core.Tree.prototype.checkRoot = function(root) {
-    checkReference(root);
-    checkType(root, Cube.core.Node, "root should be Cube.core.Node");
+Cube.core.Object.prototype.setScene = function(scene) {
+    this.enlighter.setScene(scene);
 };
 
+Cube.core.Object.prototype.accept = function(visitor) {
+    this.nodes.accept(visitor);
+};
+Cube.core.Scene = function (attributes) {
+    this.activeViewport = new Cube.core.ArrayNode({});
+    this.activeCamera = new Cube.core.ArrayNode({});
+    this.lights = new Cube.core.ArrayNode({});
+    this.objects = new Cube.core.ArrayNode({});
+    this.tree = new Cube.core.ArrayNode({nodes: [this.activeViewport, this.activeCamera, this.objects]});
+};
+
+Cube.core.Scene.prototype = {};
+Cube.core.Scene.prototype.constructor = Cube.core.Scene;
+
+Cube.core.Scene.prototype.setViewport = function(viewportNode) {
+    this.activeViewport.clear();
+    this.activeViewport.push(viewportNode);
+};
+
+Cube.core.Scene.prototype.setCamera = function(cameraNode) {
+    this.activeCamera.clear();
+    this.activeCamera.push(cameraNode);
+};
+
+Cube.core.Scene.prototype.addLight = function(lightNode) {
+    this.lights.push(lightNode);
+};
+
+Cube.core.Scene.prototype.addObject = function(objectNode) {
+    objectNode.setScene(this);
+    this.objects.push(objectNode);
+};
+
+Cube.core.Scene.prototype.getLights = function() {
+    return this.lights;
+};
+
+Cube.core.Scene.prototype.visit = function(visitor) {
+    this.tree.accept(visitor);
+};
 Cube.core.Engine = function(attributes) {
 
     var canvas = attributes.canvas;
     var gl = canvas.getContext('experimental-webgl',
-			       {
-				   alpha: true,
-				   antialias: true,
-				   stencil: true
-			       });
+			                   {
+				                   alpha: true,
+				                   antialias: true,
+				                   stencil: true
+			                   });
     if (!gl) {
-	throw "failed to created WebGL context"; // <== 
+	    throw "failed to created WebGL context"; // <== 
     }
     
     this.canvas = canvas;
@@ -1413,6 +1626,8 @@ Cube.core.Renderer = function(attributes) {
     this.viewTransfo = null;
     this.bufferFactoryFunc = null;
     this.nextTextureUnit = 0;
+    this.lightsUniforms = [];
+    this.nextLight = 0;
 
     this.setup();
 };
@@ -1430,18 +1645,25 @@ Cube.core.Renderer.prototype.textureQuality = {
     BEST: "best"
 };
 
+Cube.core.Renderer.prototype.shaderLightSubParameters = {
+    color:     "color",
+    direction: "direction",
+    position:  "position"
+};
+
 Cube.core.Renderer.prototype.shaderParameters = {
     uniforms: {
-	matrixProjection: "matrixProjection",
-	matrixModel:      "matrixModel",
-	matrixNormal:     "matrixNormal",
-	matrixView:       "matrixView"
+	    matrixProjection: "matrixProjection",
+	    matrixModel:      "matrixModel",
+	    matrixNormal:     "matrixNormal",
+	    matrixView:       "matrixView",
+        lightsCount:      "lightsCount"
     },
     attributes: {
-	vertex: "vertex",
-	normal: "normal",
-	color:  "color",
-	uv:     "uv"
+	    vertex: "vertex",
+	    normal: "normal",
+	    color:  "color",
+	    uv:     "uv"
     }
 };
 
@@ -1462,6 +1684,19 @@ Cube.core.Renderer.prototype.getBufferFactory = function() {
 };
 
 Cube.core.Renderer.prototype.setup = function() {
+    // [TODO : retreive the count of available lights]
+    var uniforms = this.shaderParameters.uniforms;
+    var i = 0;
+    for (i = 0; i < 2; ++i) {
+        var l = {};
+        this.lightsUniforms[i] = l;
+        for (pKey in this.shaderLightSubParameters) {
+            var pName = "lights[" + i +  "]." + this.shaderLightSubParameters[pKey];
+            uniforms[pName] = pName;
+            l[pKey] = pName;
+        }
+    }
+
     this.bufferFactoryFunc = (function (gl) {
 	return function (isIndex, data) {
 	    var buffer = gl.createBuffer();
@@ -1476,9 +1711,8 @@ Cube.core.Renderer.prototype.setup = function() {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
-    // this.gl.enable(this.gl.BLEND);
-    // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    // this.gl.frontFace(this.gl.CCW); // Default
+
+    this.clear();
 };
 
 Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
@@ -1488,28 +1722,34 @@ Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
 Cube.core.Renderer.prototype.clear = function(buffers) {
     var bits = 0;
     if (!!buffers) {
-	if (!!buffers.color) {
-	    bits |= this.gl.COLOR_BUFFER_BIT;
-	}
-	if (!!buffers.depth) {
-	    bits |= this.gl.DEPTH_BUFFER_BIT;
-	}
-	if (!!buffers.stencil) {
-	    bits |= this.gl.STENCIL_BUFFER_BIT;
-	}
+	    if (!!buffers.color) {
+	        bits |= this.gl.COLOR_BUFFER_BIT;
+	    }
+	    if (!!buffers.depth) {
+	        bits |= this.gl.DEPTH_BUFFER_BIT;
+	    }
+	    if (!!buffers.stencil) {
+	        bits |= this.gl.STENCIL_BUFFER_BIT;
+	    }
     }
     else {
-	bits = this.defaultClearFlags;
+        bits = this.defaultClearFlags;
     }
     this.gl.clear(bits);
+    this.deactivateAllTextureUnits();
+    this.deactivateAllLights();
+};
 
-    // [TODO : move this code somewhere else]
-    // 
+Cube.core.Renderer.prototype.deactivateAllTextureUnits = function() {
     for (var i = 0; i < this.nextTextureUnit; ++i) {
-	this.gl.activeTexture(this.gl.TEXTURE0 + i);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+	    this.gl.activeTexture(this.gl.TEXTURE0 + i);
+	    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
     this.nextTextureUnit = 0;
+};
+
+Cube.core.Renderer.prototype.deactivateAllLights = function() {
+    this.nextLight = 0;
 };
 
 Cube.core.Renderer.prototype.setViewport = function(x, y, w, h) {
@@ -1540,31 +1780,38 @@ Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
 };
 
 Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
+    this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.lightsCount], this.nextLight);
 
     if (!bufferSet.vertexBuffer) {
-	return; // <== 
+        return; // <== 
     }
 
     if (mode == this.ELEMENT && !bufferSet.indexBuffer) {
-	return; // <== 
+        return; // <== 
     }
 
     if (!!bufferSet.normalBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
+        if (this.mappings.attributes[this.shaderParameters.attributes.normal] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
+        }
     }
-
+    
     if (!!bufferSet.colorBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
+        if (this.mappings.attributes[this.shaderParameters.attributes.color] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
+        }
     }
 
     if (!!bufferSet.uvBuffer) {
-	this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
-	this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+        if (this.mappings.attributes[this.shaderParameters.attributes.uv] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+        }
     }
 
     this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
@@ -1572,29 +1819,29 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
 
     if (this.transparentMode) {
-	this.gl.enable(this.gl.BLEND);
-	this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-	this.gl.depthMask(false);
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        this.gl.depthMask(false);
     }
 
     if (this.transparentMode) {
-	this.gl.frontFace(this.gl.CW);
-	if (mode == this.mode.ELEMENT) {
-	    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-	    this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-	}
-	else {
-	    this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
-	}
-	this.gl.frontFace(this.gl.CCW);
+        this.gl.frontFace(this.gl.CW);
+	    if (mode == this.mode.ELEMENT) {
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+            this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+	    }
+	    else {
+            this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        }
+        this.gl.frontFace(this.gl.CCW);
     }
 
     if (mode == this.mode.ELEMENT) {
-	this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-	this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+        this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
     }
     else {
-	this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
     }
 
     this.gl.disable(this.gl.BLEND);
@@ -1609,35 +1856,64 @@ Cube.core.Renderer.prototype.useShader = function(shader) {
 
 Cube.core.Renderer.prototype.useTexture = function(texture) {
     if (this.mappings.uniforms[this.shaderParameters.uniforms.texture0]) {
-	this.gl.activeTexture(this.gl.TEXTURE0);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, texture.getTexture());
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture.getTexture());
     }
 };
 
 Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, value) {
     var param = this.mappings.uniforms[name];
     if (! param) {
-	return; // <== 
+        return; // <== 
     }
 
     if (type == this.shaderParameterTypes.FLOAT) {
-	this.gl.uniform1f(param, value);
+        this.gl.uniform1f(param, value);
     }
     else if (type == this.shaderParameterTypes.VEC4) {
-	this.gl.uniform4fv(param, value);
+        this.gl.uniform4fv(param, value);
     }
     else if (type == this.shaderParameterTypes.TEXTURE2D) {
-	this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
-	this.gl.uniform1i(param, this.nextTextureUnit);
-	this.nextTextureUnit = this.nextTextureUnit + 1;
+        this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
+        this.gl.uniform1i(param, this.nextTextureUnit);
+        this.nextTextureUnit = this.nextTextureUnit + 1;
     }
     else {
-	// unsupported data type :)
+        // unsupported data type :)
     }
 };
 
 Cube.core.Renderer.prototype.loadPerFrameData = function() {
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+};
+
+Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightAmbiantNode.getColor());
+    this.nextLight = this.nextLight + 1;
+};
+
+Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], lightDirectionalNode.getDirection());
+    this.nextLight = this.nextLight + 1;
+};
+
+Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], lightPositionalNode.getPosition());
+    this.nextLight = this.nextLight + 1;
 };

@@ -46,6 +46,7 @@ Cube.core.RenderVisitor.prototype.visitTexture = function(textureNode) {
 
 Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
     this.renderer.deactivateAllTextureUnits();
+    this.renderer.deactivateAllLights();
     this.renderer.setTransparentMode(materialNode.isTransparent());
 };
 
@@ -54,4 +55,16 @@ Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindin
     var paramType = materialBindingNode.getParameterType();
     var paramValue = materialBindingNode.getParameterValue();
     this.renderer.bindShaderParamWithValue(paramName, paramType, paramValue);
+};
+
+Cube.core.RenderVisitor.prototype.visitLightAmbiant = function(lightAmbiantNode) {
+    this.renderer.addAmbiantLight(lightAmbiantNode);
+};
+
+Cube.core.RenderVisitor.prototype.visitLightDirectional = function(lightDirectionalNode) {
+    this.renderer.addDirectionalLight(lightDirectionalNode);
+};
+
+Cube.core.RenderVisitor.prototype.visitLightPositional = function(lightPositionalNode) {
+    this.renderer.addPositionalLight(lightPositionalNode);
 };

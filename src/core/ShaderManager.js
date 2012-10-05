@@ -28,25 +28,25 @@ Cube.core.ShaderManager.prototype.getParamTypes = function(name) {
 Cube.core.ShaderManager.prototype.createShaders = function(shaderDescs) {
     var res = {};
     for (shaderName in shaderDescs) {
-	var desc = shaderDescs[shaderName];
-	var progDesc = {verts: [], frags: [], params: desc.params, mappings: desc.mappings};
-	this.programs[shaderName] = progDesc;
-	for (var i = 0; i < desc.src.length; ++i) {
-	    var subShadName = desc.src[i];
-	    if (subShadName.toLowerCase().indexOf("vertex") != -1) {
-		progDesc.verts.push(subShadName);
-	    }
-	    else if (subShadName.toLowerCase().indexOf("fragment") != -1) {
-		progDesc.frags.push(subShadName);
-	    }
-	    else {
-		// 
-	    }
-	}
-	res[shaderName] = new Cube.core.ShaderNode({manager: this, name: shaderName});
-	if (desc.preload) {
-	    res[shaderName].getProgram();
-	}
+        var desc = shaderDescs[shaderName];
+        var progDesc = {verts: [], frags: [], params: desc.params, mappings: desc.mappings};
+        this.programs[shaderName] = progDesc;
+        for (var i = 0; i < desc.src.length; ++i) {
+            var subShadName = desc.src[i];
+            if (subShadName.toLowerCase().indexOf("vertex") != -1) {
+                progDesc.verts.push(subShadName);
+            }
+            else if (subShadName.toLowerCase().indexOf("fragment") != -1) {
+                progDesc.frags.push(subShadName);
+            }
+            else {
+                // 
+            }
+        }
+        res[shaderName] = new Cube.core.ShaderNode({manager: this, name: shaderName});
+        if (desc.preload) {
+            res[shaderName].getProgram();
+        }
     }
     return res;
 };
@@ -66,8 +66,8 @@ Cube.core.ShaderManager.prototype.createShader = function(text, kind) {
     this.gl.shaderSource(shader, text);
     this.gl.compileShader(shader);
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-	var lastError = this.gl.getShaderInfoLog(shader);
-	this.gl.deleteShader(shader); // Don't know if we need this.
+	    var lastError = this.gl.getShaderInfoLog(shader);
+	    this.gl.deleteShader(shader); // Don't know if we need this.
         throw "Failed to compile shader [" + lastError + "]"; // <== 
     }
     return shader;
@@ -79,69 +79,69 @@ Cube.core.ShaderManager.prototype.createProgram = function(name) {
     var progDesc = this.programs[name];
     var program = this.gl.createProgram();
     for (var i = 0; i < progDesc.verts.length; ++i) {
-	var subShadName = progDesc.verts[i];
-	if (this.vertexs[subShadName] == null) {
-	    this.vertexs[subShadName] = this.createVertexShader(this.loader.getResource(subShadName));
-	}
-	this.gl.attachShader(program, this.vertexs[subShadName]);
+	    var subShadName = progDesc.verts[i];
+	    if (this.vertexs[subShadName] == null) {
+	        this.vertexs[subShadName] = this.createVertexShader(this.loader.getResource(subShadName));
+	    }
+	    this.gl.attachShader(program, this.vertexs[subShadName]);
     }
     for (var i = 0; i < progDesc.frags.length; ++i) {
-	var subShadName = progDesc.frags[i];
-	if (this.fragments[subShadName] == null) {
-	    this.fragments[subShadName] = this.createFragmentShader(this.loader.getResource(subShadName));
-	}
-	this.gl.attachShader(program, this.fragments[subShadName]);
+	    var subShadName = progDesc.frags[i];
+	    if (this.fragments[subShadName] == null) {
+	        this.fragments[subShadName] = this.createFragmentShader(this.loader.getResource(subShadName));
+	    }
+	    this.gl.attachShader(program, this.fragments[subShadName]);
     }
     this.gl.linkProgram(program);
     var linked = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
     if (!linked) {
-	var lastError = this.gl.getProgramInfoLog(program);
-	this.gl.deleteProgram(program);
-	throw "Error in program linking [" + lastError + "]"; // <==
+	    var lastError = this.gl.getProgramInfoLog(program);
+	    this.gl.deleteProgram(program);
+	    throw "Error in program linking [" + lastError + "]"; // <==
     }
     
     this.gl.useProgram(program);
-
+    
     // Load standard bindings 
     // 
     // Note : resolving an uniform or attrib can fail, even if it is declared. The shader compiler strips off unused 
     // symbols, and so one will be unable to resolve such objects.
     // 
     var varMapping = {uniforms: {},
-		      attributes: {}};
+		              attributes: {}};
     for (var name in this.engine.getRenderer().shaderParameters.uniforms) {
-	var binding = this.gl.getUniformLocation(program, name);
-	if (!binding && progDesc.mappings) {
-	    var mapping = progDesc.mappings.uniforms[name];
-	    binding = this.gl.getUniformLocation(program, mapping);
-	}
-	if (binding) {
-	    varMapping.uniforms[name] = binding;
-	}
+        var binding = this.gl.getUniformLocation(program, name);
+        if (!binding && progDesc.mappings) {
+            var mapping = progDesc.mappings.uniforms[name];
+            binding = this.gl.getUniformLocation(program, mapping);
+        }
+        if (binding) {
+            varMapping.uniforms[name] = binding;
+        }
     }
-
+    
     for (var name in this.engine.getRenderer().shaderParameters.attributes) {
-	var binding = this.gl.getAttribLocation(program, name);
-	if (binding < 0 && progDesc.mappings) {
-	    var mapping = progDesc.mappings.attributes[name];
-	    binding = this.gl.getAttribLocation(program, mapping);
-	}
-	if (binding >= 0) {
-	    varMapping.attributes[name] = binding;
-	}
+        var binding = this.gl.getAttribLocation(program, name);
+        if (binding < 0 && progDesc.mappings) {
+            var mapping = progDesc.mappings.attributes[name];
+            binding = this.gl.getAttribLocation(program, mapping);
+        }
+        if (binding >= 0) {
+            varMapping.attributes[name] = binding;
+        }
     }
-
+    
     // Load shader specific bindings
     // 
     for (var n in progDesc.params.uniforms) {
-	var binding = this.gl.getUniformLocation(program, n);
-	if (binding) {
-	    varMapping.uniforms[n] = binding;
-	}
+	    var binding = this.gl.getUniformLocation(program, n);
+	    if (binding) {
+	        varMapping.uniforms[n] = binding;
+	    }
     }
-
+    
     progDesc.bindings = varMapping;
-
+    
     return program;
 };
 

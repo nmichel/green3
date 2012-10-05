@@ -7,6 +7,8 @@ Cube.core.Renderer = function(attributes) {
     this.viewTransfo = null;
     this.bufferFactoryFunc = null;
     this.nextTextureUnit = 0;
+    this.lightsUniforms = [];
+    this.nextLight = 0;
 
     this.setup();
 };
@@ -24,18 +26,25 @@ Cube.core.Renderer.prototype.textureQuality = {
     BEST: "best"
 };
 
+Cube.core.Renderer.prototype.shaderLightSubParameters = {
+    color:     "color",
+    direction: "direction",
+    position:  "position"
+};
+
 Cube.core.Renderer.prototype.shaderParameters = {
     uniforms: {
-	matrixProjection: "matrixProjection",
-	matrixModel:      "matrixModel",
-	matrixNormal:     "matrixNormal",
-	matrixView:       "matrixView"
+        matrixProjection: "matrixProjection",
+        matrixModel:      "matrixModel",
+        matrixNormal:     "matrixNormal",
+        matrixView:       "matrixView",
+        lightsCount:      "lightsCount"
     },
     attributes: {
-	vertex: "vertex",
-	normal: "normal",
-	color:  "color",
-	uv:     "uv"
+        vertex: "vertex",
+        normal: "normal",
+        color:  "color",
+        uv:     "uv"
     }
 };
 
@@ -56,6 +65,19 @@ Cube.core.Renderer.prototype.getBufferFactory = function() {
 };
 
 Cube.core.Renderer.prototype.setup = function() {
+    // [TODO : retreive the count of available lights]
+    var uniforms = this.shaderParameters.uniforms;
+    var i = 0;
+    for (i = 0; i < 2; ++i) {
+        var l = {};
+        this.lightsUniforms[i] = l;
+        for (pKey in this.shaderLightSubParameters) {
+            var pName = "lights[" + i +  "]." + this.shaderLightSubParameters[pKey];
+            uniforms[pName] = pName;
+            l[pKey] = pName;
+        }
+    }
+
     this.bufferFactoryFunc = (function (gl) {
 	return function (isIndex, data) {
 	    var buffer = gl.createBuffer();
@@ -70,9 +92,8 @@ Cube.core.Renderer.prototype.setup = function() {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
-    // this.gl.enable(this.gl.BLEND);
-    // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    // this.gl.frontFace(this.gl.CCW); // Default
+
+    this.clear();
 };
 
 Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
@@ -82,29 +103,34 @@ Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
 Cube.core.Renderer.prototype.clear = function(buffers) {
     var bits = 0;
     if (!!buffers) {
-	if (!!buffers.color) {
-	    bits |= this.gl.COLOR_BUFFER_BIT;
-	}
-	if (!!buffers.depth) {
-	    bits |= this.gl.DEPTH_BUFFER_BIT;
-	}
-	if (!!buffers.stencil) {
-	    bits |= this.gl.STENCIL_BUFFER_BIT;
-	}
+	    if (!!buffers.color) {
+	        bits |= this.gl.COLOR_BUFFER_BIT;
+	    }
+	    if (!!buffers.depth) {
+	        bits |= this.gl.DEPTH_BUFFER_BIT;
+	    }
+	    if (!!buffers.stencil) {
+	        bits |= this.gl.STENCIL_BUFFER_BIT;
+	    }
     }
     else {
-	bits = this.defaultClearFlags;
+        bits = this.defaultClearFlags;
     }
     this.gl.clear(bits);
     this.deactivateAllTextureUnits();
+    this.deactivateAllLights();
 };
 
 Cube.core.Renderer.prototype.deactivateAllTextureUnits = function() {
     for (var i = 0; i < this.nextTextureUnit; ++i) {
-	this.gl.activeTexture(this.gl.TEXTURE0 + i);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+	    this.gl.activeTexture(this.gl.TEXTURE0 + i);
+	    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
     this.nextTextureUnit = 0;
+};
+
+Cube.core.Renderer.prototype.deactivateAllLights = function() {
+    this.nextLight = 0;
 };
 
 Cube.core.Renderer.prototype.setViewport = function(x, y, w, h) {
@@ -135,37 +161,38 @@ Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
 };
 
 Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
+    this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.lightsCount], this.nextLight);
 
     if (!bufferSet.vertexBuffer) {
-	return; // <== 
+        return; // <== 
     }
 
     if (mode == this.ELEMENT && !bufferSet.indexBuffer) {
-	return; // <== 
+        return; // <== 
     }
 
     if (!!bufferSet.normalBuffer) {
-	if (this.mappings.attributes[this.shaderParameters.attributes.normal] != undefined) {
-	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
+        if (this.mappings.attributes[this.shaderParameters.attributes.normal] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.normal]);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.normalBuffer.data);
-	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
-	}
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.normal], 3, this.gl.FLOAT, false, 0, 0);
+        }
     }
     
     if (!!bufferSet.colorBuffer) {
-	if (this.mappings.attributes[this.shaderParameters.attributes.color] != undefined) {
-	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
+        if (this.mappings.attributes[this.shaderParameters.attributes.color] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.color]);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.colorBuffer.data);
-	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
-	}
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.color], 4, this.gl.FLOAT, false, 0, 0);
+        }
     }
 
     if (!!bufferSet.uvBuffer) {
-	if (this.mappings.attributes[this.shaderParameters.attributes.uv] != undefined) {
-	    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
+        if (this.mappings.attributes[this.shaderParameters.attributes.uv] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
-	    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
-	}
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+        }
     }
 
     this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
@@ -173,29 +200,29 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
     this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
 
     if (this.transparentMode) {
-	this.gl.enable(this.gl.BLEND);
-	this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-	this.gl.depthMask(false);
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        this.gl.depthMask(false);
     }
 
     if (this.transparentMode) {
-	this.gl.frontFace(this.gl.CW);
-	if (mode == this.mode.ELEMENT) {
-	    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-	    this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-	}
-	else {
-	    this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
-	}
-	this.gl.frontFace(this.gl.CCW);
+        this.gl.frontFace(this.gl.CW);
+	    if (mode == this.mode.ELEMENT) {
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+            this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+	    }
+	    else {
+            this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        }
+        this.gl.frontFace(this.gl.CCW);
     }
 
     if (mode == this.mode.ELEMENT) {
-	this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-	this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+        this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
     }
     else {
-	this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
     }
 
     this.gl.disable(this.gl.BLEND);
@@ -210,35 +237,64 @@ Cube.core.Renderer.prototype.useShader = function(shader) {
 
 Cube.core.Renderer.prototype.useTexture = function(texture) {
     if (this.mappings.uniforms[this.shaderParameters.uniforms.texture0]) {
-	this.gl.activeTexture(this.gl.TEXTURE0);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, texture.getTexture());
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture.getTexture());
     }
 };
 
 Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, value) {
     var param = this.mappings.uniforms[name];
     if (! param) {
-	return; // <== 
+        return; // <== 
     }
 
     if (type == this.shaderParameterTypes.FLOAT) {
-	this.gl.uniform1f(param, value);
+        this.gl.uniform1f(param, value);
     }
     else if (type == this.shaderParameterTypes.VEC4) {
-	this.gl.uniform4fv(param, value);
+        this.gl.uniform4fv(param, value);
     }
     else if (type == this.shaderParameterTypes.TEXTURE2D) {
-	this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
-	this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
-	this.gl.uniform1i(param, this.nextTextureUnit);
-	this.nextTextureUnit = this.nextTextureUnit + 1;
+        this.gl.activeTexture(this.gl.TEXTURE0 + this.nextTextureUnit);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, value.getTexture());
+        this.gl.uniform1i(param, this.nextTextureUnit);
+        this.nextTextureUnit = this.nextTextureUnit + 1;
     }
     else {
-	// unsupported data type :)
+        // unsupported data type :)
     }
 };
 
 Cube.core.Renderer.prototype.loadPerFrameData = function() {
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+};
+
+Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightAmbiantNode.getColor());
+    this.nextLight = this.nextLight + 1;
+};
+
+Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], lightDirectionalNode.getDirection());
+    this.nextLight = this.nextLight + 1;
+};
+
+Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) {
+    var lightParams = this.lightsUniforms[this.nextLight];
+    if (!lightParams) {
+        return; // <== 
+    }
+    this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], lightPositionalNode.getPosition());
+    this.nextLight = this.nextLight + 1;
 };

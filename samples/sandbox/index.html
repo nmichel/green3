@@ -2,6 +2,9 @@
 	<head>
 		<title>Sandbox</title>
 		<meta charset="utf-8" />
+
+		<link href="sandbox.css" rel="stylesheet">
+
 		<script src="../common/webgl-debug.js"></script>
 		<script src="../common/RequestAnimationFrame.js"></script>
 
@@ -19,6 +22,7 @@
 		<script src="../../src/core/GeometryNode.js"></script>
 		<script src="../../src/core/MaterialNode.js"></script>
 		<script src="../../src/core/MeshNode.js"></script>
+		<script src="../../src/core/OrthographicOpticNode.js"></script>
 		<script src="../../src/core/OpticNode.js"></script>
 		<script src="../../src/core/TransformNode.js"></script>
 		<script src="../../src/core/RotationXYZNode.js"></script>
@@ -37,7 +41,11 @@
 		<script src="../../src/core/TextureManager.js"></script>
 		<script src="../../src/core/MaterialBindingNode.js"></script>
 		<script src="../../src/core/MaterialNode.js"></script>
+		<script src="../../src/core/LightAmbiantNode.js"></script>
+		<script src="../../src/core/LightDirectionalNode.js"></script>
+		<script src="../../src/core/LightPositionalNode.js"></script>
 		<script src="../../src/core/CameraNode.js"></script>
+		<script src="../../src/core/ObjectEnlighterNode.js"></script>
 		<script src="../../src/core/Object.js"></script>
 		<script src="../../src/core/Scene.js"></script>
 		<script src="../../src/core/Engine.js"></script>
@@ -115,7 +123,7 @@
 
 		  void main() {
 		    float ratio = dot(normalize(vec4(1, 0, 1, 0)), v_normal);
-		    gl_FragColor = vec4(v_color.r * ratio, v_color.g * ratio, v_color.b * ratio, v_color.a);
+		    gl_FragColor = vec4(ratio, v_color.g * ratio, v_color.b * ratio, v_color.a);
 		    // gl_FragColor = vec4(u_color.r * ratio, u_color.g * ratio, u_color.b * ratio, u_color.a);
 		  }
 		</script>
@@ -144,6 +152,9 @@
 	</head>
 
 	<body>
+	  <div id="title">
+	    <h1>- SANDBOX -</h1>
+	  </div>
 	  <script src="./sandbox.js"></script>
 	</body>
 </html>

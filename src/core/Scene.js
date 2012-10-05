@@ -3,7 +3,7 @@ Cube.core.Scene = function (attributes) {
     this.activeCamera = new Cube.core.ArrayNode({});
     this.lights = new Cube.core.ArrayNode({});
     this.objects = new Cube.core.ArrayNode({});
-    this.tree = new Cube.core.ArrayNode({nodes: [this.activeViewport, this.activeCamera, this.lights, this.objects]});
+    this.tree = new Cube.core.ArrayNode({nodes: [this.activeViewport, this.activeCamera, this.objects]});
 };
 
 Cube.core.Scene.prototype = {};
@@ -24,7 +24,12 @@ Cube.core.Scene.prototype.addLight = function(lightNode) {
 };
 
 Cube.core.Scene.prototype.addObject = function(objectNode) {
+    objectNode.setScene(this);
     this.objects.push(objectNode);
+};
+
+Cube.core.Scene.prototype.getLights = function() {
+    return this.lights;
 };
 
 Cube.core.Scene.prototype.visit = function(visitor) {

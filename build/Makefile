@@ -35,6 +35,9 @@ FILELIST = \
 	./core/TextureManager.js \
 	./core/MaterialBindingNode.js \
 	./core/MaterialNode.js \
+	./core/LightAmbiantNode.js \
+	./core/LightDirectionalNode.js \
+	./core/LightPositionalNode.js \
 	./core/CameraNode.js \
 	./core/Object.js \
 	./core/Scene.js \
@@ -60,7 +63,7 @@ concat:
 	done
 
 minify:
-	@echo "* Minifying"
+	@echo "* Minifying (YUI)"
 	@java -jar ./tools/yuicompressor-2.4.7.jar --charset UTF8 --line-break 4000 -v -o $(DEPLOYDIRJS)/green3.min.js $(DEPLOYDIRJS)/green3.js > /dev/null 2>&1 
 
 check-with-jslint:
@@ -76,3 +79,8 @@ check-with-yui:
 		echo "* processing " $$file; \
 		java -jar ./tools/yuicompressor-2.4.7.jar --charset UTF8 --line-break 4000 -v $(SRCDIR)/$$file; \
 	done
+
+minify-with-closure-copiler:
+	@echo "* Minifying (Google Closure Compiler)"
+	@java -jar ./tools/compiler.jar --js $(DEPLOYDIRJS)/green3.js --js_output_file $(DEPLOYDIRJS)/green3.min.js
+

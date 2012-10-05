@@ -9,55 +9,55 @@ container.appendChild(canvas);
 
 function mapFromPairList(pairs) {
     return pairs.reduce(function(state, pair) {
-	state[pair[0]] = pair[1];
-	return state;
+	    state[pair[0]] = pair[1];
+	    return state;
     }, {});
 }
 
 var engine = new Cube.core.Engine({canvas: canvas});
 var renderer = engine.getRenderer();
 var mappings = {uniforms: mapFromPairList([[renderer.shaderParameters.uniforms.matrixProjection, "u_projection"],
-					   [renderer.shaderParameters.uniforms.matrixView,       "u_view"],
-					   [renderer.shaderParameters.uniforms.matrixModel,      "u_matrix"],
-					   [renderer.shaderParameters.uniforms.matrixNormal,     "u_normalMatrix"]]),
-		attributes: mapFromPairList([[renderer.shaderParameters.attributes.vertex,       "aPosition"],
-					     [renderer.shaderParameters.attributes.normal,       "aNormal"],
-					     [renderer.shaderParameters.attributes.color,        "aColor"],
-					     [renderer.shaderParameters.attributes.uv,           "aUV"]])};
+					                       [renderer.shaderParameters.uniforms.matrixView,       "u_view"],
+					                       [renderer.shaderParameters.uniforms.matrixModel,      "u_matrix"],
+					                       [renderer.shaderParameters.uniforms.matrixNormal,     "u_normalMatrix"]]),
+		        attributes: mapFromPairList([[renderer.shaderParameters.attributes.vertex,       "aPosition"],
+					                         [renderer.shaderParameters.attributes.normal,       "aNormal"],
+					                         [renderer.shaderParameters.attributes.color,        "aColor"],
+					                         [renderer.shaderParameters.attributes.uv,           "aUV"]])};
 var shaderManager = new Cube.core.ShaderManager({engine: engine,
-						 loader: new Cube.core.ResourceLoader({}),
-						 shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
-									params: {
-									    uniforms: {
-										u_color: renderer.shaderParameterTypes.VEC4
-									    }},
-									mappings: mappings,
-									preload: true},
-							   flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
-								  params: {
-								      uniforms: {
-									  mixRatio: renderer.shaderParameterTypes.FLOAT,
-									  texture0: renderer.shaderParameterTypes.TEXTURE2D,
-									  texture1: renderer.shaderParameterTypes.TEXTURE2D,
-								      }},
-								  mappings: mappings,
-								  preload: true}}});
+						                         loader: new Cube.core.ResourceLoader({}),
+						                         shaders: {colorspace: {src: ["3d-vertex-shader", "3d-fragment-shader"],
+									                                    params: {
+									                                        uniforms: {
+										                                        u_color: renderer.shaderParameterTypes.VEC4
+									                                        }},
+									                                    mappings: mappings,
+									                                    preload: true},
+							                               flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
+								                                  params: {
+								                                      uniforms: {
+									                                      mixRatio: renderer.shaderParameterTypes.FLOAT,
+									                                      texture0: renderer.shaderParameterTypes.TEXTURE2D,
+									                                      texture1: renderer.shaderParameterTypes.TEXTURE2D,
+								                                      }},
+								                                  mappings: mappings,
+								                                  preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
-						   desc: {
-						       logo: {res: "../common/img/logo.png",
-							      quality: Cube.core.Renderer.prototype.textureQuality.BEST},
-						       caisse: {res: "../common/img/caisse.jpg",
-								quality: Cube.core.Renderer.prototype.textureQuality.GOOD},
-						       earth: {res: "../common/img/earth.jpg",
-							       quality: Cube.core.Renderer.prototype.textureQuality.BEST},
-						       earthbynight: {res: "../common/img/earth_night_1.jpg",
-								      quality: Cube.core.Renderer.prototype.textureQuality.BEST}}});
+						                           desc: {
+						                               logo: {res: "../common/img/logo.png",
+							                                  quality: Cube.core.Renderer.prototype.textureQuality.BEST},
+						                               caisse: {res: "../common/img/caisse.jpg",
+								                                quality: Cube.core.Renderer.prototype.textureQuality.GOOD},
+						                               earth: {res: "../common/img/earth.jpg",
+							                                   quality: Cube.core.Renderer.prototype.textureQuality.BEST},
+						                               earthbynight: {res: "../common/img/earth_night_1.jpg",
+								                                      quality: Cube.core.Renderer.prototype.textureQuality.BEST}}});
 
 var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.Scene({});
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
-				       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
+				                       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
 
 var aY = new Cube.core.math.Vector3(0, 0, 0);
 var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: aY});
