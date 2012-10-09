@@ -18,48 +18,48 @@ Cube.core.OutputToBufferSet.prototype.constructor = Cube.core.OutputToBufferSet;
 
 Cube.core.OutputToBufferSet.prototype.begin = function(vertexCount, indexCount) {
     if (!!this.hasVertex) {
-	this.vertex = [];
+	    this.vertex = [];
     }
 
     if (!!this.hasNormal) {
-	this.normal = [];
+	    this.normal = [];
     }
 
     if (!!this.hasColor) {
-	this.color = [];
+	    this.color = [];
     }
 
     if (!!this.hasUV) {
-	this.uv = [];
+	    this.uv = [];
     }
 
     if (!!this.hasIndex) {
-	this.index = [];
+	    this.index = [];
     }
 };
 
 Cube.core.OutputToBufferSet.prototype.end = function() {
     var bufferSetAttributes = {
-	factory: this.factory
+	    factory: this.factory
     };
 
     if (!!this.hasVertex) {
-	bufferSetAttributes.vertex = new Float32Array(this.vertex);
+	    bufferSetAttributes.vertex = new Float32Array(this.vertex);
     }
 
     if (!!this.hasNormal) {
-	bufferSetAttributes.normal = new Float32Array(this.normal);
+	    bufferSetAttributes.normal = new Float32Array(this.normal);
     }
     if (!!this.hasColor) {
-	bufferSetAttributes.color = new Float32Array(this.color);
+	    bufferSetAttributes.color = new Float32Array(this.color);
     }
 
     if (!!this.hasUV) {
-	bufferSetAttributes.uv = new Float32Array(this.uv);
+	    bufferSetAttributes.uv = new Float32Array(this.uv);
     }
 
     if (!!this.hasIndex) {
-	bufferSetAttributes.index = new Uint16Array(this.index);
+	    bufferSetAttributes.index = new Uint16Array(this.index);
     }
 
     return new Cube.core.BufferSetNode(bufferSetAttributes); // <== 
@@ -67,7 +67,7 @@ Cube.core.OutputToBufferSet.prototype.end = function() {
 
 Cube.core.OutputToBufferSet.prototype.addVertex = function(x, y, z) {
     if (!this.hasVertex) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.vertex.push(x);
@@ -77,7 +77,7 @@ Cube.core.OutputToBufferSet.prototype.addVertex = function(x, y, z) {
 
 Cube.core.OutputToBufferSet.prototype.addNormal = function(x, y, z) {
     if (!this.hasNormal) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.normal.push(x);
@@ -87,7 +87,7 @@ Cube.core.OutputToBufferSet.prototype.addNormal = function(x, y, z) {
 
 Cube.core.OutputToBufferSet.prototype.addColor = function(r, g, b, a) {
     if (!this.hasColor) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.color.push(r);
@@ -98,7 +98,7 @@ Cube.core.OutputToBufferSet.prototype.addColor = function(r, g, b, a) {
 
 Cube.core.OutputToBufferSet.prototype.addUV = function(u, v) {
     if (!this.hasUV) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.uv.push(u);
@@ -107,7 +107,7 @@ Cube.core.OutputToBufferSet.prototype.addUV = function(u, v) {
 
 Cube.core.OutputToBufferSet.prototype.addTriplet = function(p1, p2, p3) {
     if (!this.hasIndex) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.index.push(p1);

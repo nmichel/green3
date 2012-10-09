@@ -32,10 +32,10 @@ Cube.core.TransformNode.prototype.getNormal = function() {
 
 Cube.core.TransformNode.prototype.update = function() {
     if (this.parent) {
-	this.matrix = this.parent.getMatrix().multiply(this.localMatrix);
+	    this.matrix = this.parent.getMatrix().multiply(this.localMatrix);
     }
     else {
-	this.matrix = this.localMatrix.clone();
+	    this.matrix = this.localMatrix.clone();
     }
 
     this.invert = this.matrix.clone().invertToSelf();

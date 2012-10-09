@@ -48,6 +48,7 @@ Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
     this.renderer.deactivateAllTextureUnits();
     this.renderer.deactivateAllLights();
     this.renderer.setTransparentMode(materialNode.isTransparent());
+    this.renderer.setInsideOutMode(materialNode.isInsideOut());
 };
 
 Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindingNode) {

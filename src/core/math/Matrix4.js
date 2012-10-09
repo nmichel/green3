@@ -158,6 +158,17 @@ Cube.core.math.Matrix4.prototype = {
         td[3*4+3] = 1;
 
         return res;
+    },
+
+    setTranslation: function(x, y, z) {
+        var td = this.data;
+
+        td[3*4+0] = x;
+        td[3*4+1] = y;
+        td[3*4+2] = z;
+        td[3*4+3] = 1;
+
+        return this;        
     }
 };
 

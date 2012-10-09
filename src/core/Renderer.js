@@ -9,6 +9,8 @@ Cube.core.Renderer = function(attributes) {
     this.nextTextureUnit = 0;
     this.lightsUniforms = [];
     this.nextLight = 0;
+    this.transparentMode = false;
+    this.insideOutMode = false;
 
     this.setup();
 };
@@ -98,6 +100,10 @@ Cube.core.Renderer.prototype.setup = function() {
 
 Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
     this.transparentMode = !!toggle;
+};
+
+Cube.core.Renderer.prototype.setInsideOutMode = function(toggle) {
+    this.insideOutMode = !!toggle;
 };
 
 Cube.core.Renderer.prototype.clear = function(buffers) {
@@ -217,12 +223,14 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
         this.gl.frontFace(this.gl.CCW);
     }
 
-    if (mode == this.mode.ELEMENT) {
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-        this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-    }
-    else {
-        this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+    if (! this.insideOutMode) {
+        if (mode == this.mode.ELEMENT) {
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+            this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+        }
+        else {
+            this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        }
     }
 
     this.gl.disable(this.gl.BLEND);
