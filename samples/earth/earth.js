@@ -87,11 +87,9 @@ scene.push(viewport);
 var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
 var cameraTransform =
     new Cube.core.TransformStackNode({})
-//    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 3)}))
+//    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 3000)}))
     .push(cameraRotation)
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 0.5)}));
-cameraRotation.update();
-cameraTransform.update();
 
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.3, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
 				                       parent: cameraTransform});
@@ -101,7 +99,6 @@ scene.push(camera);
 // Earth
 
 var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
-
 var modelTransfoCommonBaseNode3 =
     (new Cube.core.TransformStackNode({}))
     .push(shaderedTransformationRotationNode);
@@ -157,7 +154,6 @@ for (var i = 0; i < 6; ++i) {
         (new Cube.core.TransformStackNode({parent: baseTransfoStarField}))
         .push(rotations[i])
         .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 1.0)}));
-    transfo.update();
     transfoStarfield.push(transfo);
 }
 
@@ -217,19 +213,13 @@ function render() {
     earthRot %= Math.PI * 2;
 
     cameraRotation.set(null, a, a*0.25);
-    cameraRotation.update();
-    cameraTransform.update();
     camera.update();
+
     shaderedTransformationRotationNode.set(null, earthRot, null);
     shaderedTransformationRotationNode.update();
-    modelTransfoCommonBaseNode3.update();
-    transfoHalo.update();
-    cameraCompensation.update();
-    baseTransfoStarField.update();
-    for (var i = 0; i < 6; ++i) {
-        transfoStarfield[i].update();
-    }
 
+    baseTransfoStarField.update(); // Should be called otherwise camera compensation won't be updated.
+    
     renderer.clear();
     scene.accept(visitor);
 }

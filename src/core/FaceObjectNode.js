@@ -7,7 +7,7 @@ Cube.core.FaceObjectNode = function(attributes) {
 Cube.core.FaceObjectNode.prototype = new Cube.core.TransformNode({});
 Cube.core.FaceObjectNode.prototype.constructor = Cube.core.FaceObjectNode;
 
-Cube.core.FaceObjectNode.prototype.update = function() {
-    this.localMatrix = this.reference.getInvert().cloneWithoutTranslation();
-    return Cube.core.TransformNode.prototype.update.call(this);
+Cube.core.FaceObjectNode.prototype.updateLocal = function() {
+    this.getLocalMatrix().setRotationFrom(this.reference.getInvert());
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };

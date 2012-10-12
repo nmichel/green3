@@ -8,37 +8,63 @@ Cube.core.TransformStackNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TransformStackNode.prototype.constructor = Cube.core.TransformStackNode;
 
 Cube.core.TransformStackNode.prototype.push = function(transfo) {
-    Cube.core.Utilities.checkReference(transfo, "transfo");
-    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
+//    Cube.core.Utilities.checkReference(transfo, "transfo");
+//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
 
-    this.transformations.push(transfo);
+    this.transformations.push(new Cube.core.TransformStackNode.BridgeNode({compound: this,
+                                                                           transfo: transfo}));
     return this;
 };
 
-Cube.core.TransformStackNode.prototype.update = function() {
+Cube.core.TransformStackNode.prototype.updateLocal = function() {
     this.transformations.nodes.reduce(
-	function(prev, current) {
-	    current.update();
-	    return prev.multiplyToSelf(current.getMatrix())
-	}, 
-	this.localMatrix.initToIdentity());
+        function(prev, current) {
+            current.getTransfo().updateLocal();
+            return prev.multiplyToSelf(current.getTransfo().getMatrix())
+        }, 
+        this.localMatrix.initToIdentity());
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 
 Cube.core.TransformStackNode.prototype.compact = function(fromIdx) {
     var compactedMatrix = this.transformations.nodes.reduce(
-	function(prev, current, idx) {
-	    if (idx < fromIdx) {
-		return prev; // <== 
-	    }
-	    return prev.multiplyToSelf(current.getMatrix())
-	}, 
-	(new Cube.core.math.Matrix4()).initToIdentity());
-
+        function(prev, current, idx) {
+            if (idx < fromIdx) {
+                return prev; // <== 
+            }
+            return prev.multiplyToSelf(current.getTranfo().getMatrix())
+        },
+        (new Cube.core.math.Matrix4()).initToIdentity());
+    
     this.transformations
-	.clear(fromIdx)
-	.push(new Cube.core.TransformNode({matrix: compactedMatrix}));
-
+        .clear(fromIdx)
+        .push(new Cube.core.TransformStackNode.BridgeNode({compound: this,
+                                                           transfo: (new Cube.core.TransformNode({matrix: compactedMatrix}))}));
+    
     return this;
+};
+
+Cube.core.TransformStackNode.BridgeNode = function(attributes) {
+//    Cube.core.Utilities.checkReference(compound, "compound");
+//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformStackNode, "compound should be Cube.core.TransformStackNode");
+//    Cube.core.Utilities.checkReference(transfo, "transfo");
+//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
+
+    this.compound = attributes.compound;
+    this.transfo = attributes.transfo;
+
+    this.transfo.orphan(); // In case of VERY bad programming.
+    this.transfo.parent = this; // uplink used to propagate local update on "tranfo" to compound update.
+};
+
+Cube.core.TransformStackNode.BridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TransformStackNode.BridgeNode.constructor = Cube.core.TransformStackNode.prototype.BridgeNode;
+
+Cube.core.TransformStackNode.BridgeNode.prototype.getTransfo = function() {
+    return this.transfo;
+};
+
+Cube.core.TransformStackNode.BridgeNode.prototype.updateUpStream = function() {
+    this.compound.update();
 };

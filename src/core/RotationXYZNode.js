@@ -11,17 +11,21 @@ Cube.core.RotationXYZNode.prototype.constructor = Cube.core.RotationXYZNode;
 
 Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
     if (!!x) {
-	this.vector.setX(x);
+	    this.vector.setX(x);
     }
     if (!!y) {
-	this.vector.setY(y);
+	    this.vector.setY(y);
     }
     if (!!z) {
-	this.vector.setZ(z);
+	    this.vector.setZ(z);
     }
+
+    this.setDirty();
+
+    return this;
 };
 
-Cube.core.RotationXYZNode.prototype.update = function() {
+Cube.core.RotationXYZNode.prototype.updateLocal = function() {
     // -----
     // "general rotation"
     // cf. http://en.wikipedia.org/wiki/Rotation_matrix
@@ -52,5 +56,5 @@ Cube.core.RotationXYZNode.prototype.update = function() {
     matrix.setElement(2, 1, cosX * sinY * sinZ + cosZsinX);
     matrix.setElement(2, 2, cosX * cosY);
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
