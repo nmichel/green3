@@ -212,14 +212,10 @@ function render() {
     earthRot += Math.PI / 200;
     earthRot %= Math.PI * 2;
 
-    cameraRotation.set(null, a, a*0.25);
-    camera.update();
-
     shaderedTransformationRotationNode.set(null, earthRot, null);
-    shaderedTransformationRotationNode.update();
+    cameraRotation.set(null, a, a*0.25);
+    camera.update(); // In this case, all nodes are transitively updated thanks to this one and only method call :)
 
-    baseTransfoStarField.update(); // Should be called otherwise camera compensation won't be updated.
-    
     renderer.clear();
     scene.accept(visitor);
 }

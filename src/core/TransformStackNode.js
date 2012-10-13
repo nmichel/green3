@@ -51,6 +51,8 @@ Cube.core.TransformStackNode.BridgeNode = function(attributes) {
 //    Cube.core.Utilities.checkReference(transfo, "transfo");
 //    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
 
+    Cube.core.TransformNode.call(this, attributes);
+
     this.compound = attributes.compound;
     this.transfo = attributes.transfo;
 
@@ -59,7 +61,7 @@ Cube.core.TransformStackNode.BridgeNode = function(attributes) {
 };
 
 Cube.core.TransformStackNode.BridgeNode.prototype = new Cube.core.TransformNode({});
-Cube.core.TransformStackNode.BridgeNode.constructor = Cube.core.TransformStackNode.prototype.BridgeNode;
+Cube.core.TransformStackNode.BridgeNode.prototype.constructor = Cube.core.TransformStackNode.BridgeNode;
 
 Cube.core.TransformStackNode.BridgeNode.prototype.getTransfo = function() {
     return this.transfo;
