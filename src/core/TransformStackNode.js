@@ -11,16 +11,23 @@ Cube.core.TransformStackNode.prototype.push = function(transfo) {
 //    Cube.core.Utilities.checkReference(transfo, "transfo");
 //    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
 
-    this.transformations.push(new Cube.core.TransformStackNode.BridgeNode({compound: this,
-                                                                           transfo: transfo}));
+    // Transfo and bridge have special relationships
+    // - transfo -parent-> bridge
+    // - bridge -parent-> transfo
+    //
+    var upBridge = new Cube.core.TransformStackNode.BridgeNode({parent: transfo,
+                                                                        target: this});
+    transfo.setParent(upBridge);
+
+    this.transformations.push(transfo);
     return this;
 };
 
 Cube.core.TransformStackNode.prototype.updateLocal = function() {
     this.transformations.nodes.reduce(
         function(prev, current) {
-            current.getTransfo().updateLocal();
-            return prev.multiplyToSelf(current.getTransfo().getMatrix())
+            current.updateLocal(); // Do *NOT* call update(). It will yield to an infinite recursion, because of the bridge.
+            return prev.multiplyToSelf(current.getMatrix())
         }, 
         this.localMatrix.initToIdentity());
 
@@ -33,40 +40,39 @@ Cube.core.TransformStackNode.prototype.compact = function(fromIdx) {
             if (idx < fromIdx) {
                 return prev; // <== 
             }
-            return prev.multiplyToSelf(current.getTranfo().getMatrix())
+            return prev.multiplyToSelf(current.getMatrix())
         },
         (new Cube.core.math.Matrix4()).initToIdentity());
     
     this.transformations
         .clear(fromIdx)
-        .push(new Cube.core.TransformStackNode.BridgeNode({compound: this,
-                                                           transfo: (new Cube.core.TransformNode({matrix: compactedMatrix}))}));
+        .push(new Cube.core.TransformNode({matrix: compactedMatrix}));
     
     return this;
 };
 
+// -----
+
 Cube.core.TransformStackNode.BridgeNode = function(attributes) {
-//    Cube.core.Utilities.checkReference(compound, "compound");
-//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformStackNode, "compound should be Cube.core.TransformStackNode");
-//    Cube.core.Utilities.checkReference(transfo, "transfo");
-//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
+//    Cube.core.Utilities.checkReference(target, "target");
+//    Cube.core.Utilities.checkType(target, Cube.core.TransformStackNode, "target should be Cube.core.TransformStackNode");
 
     Cube.core.TransformNode.call(this, attributes);
 
-    this.compound = attributes.compound;
-    this.transfo = attributes.transfo;
-
-    this.transfo.orphan(); // In case of VERY bad programming.
-    this.transfo.parent = this; // uplink used to propagate local update on "tranfo" to compound update.
+    this.target = attributes.target;
 };
 
 Cube.core.TransformStackNode.BridgeNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TransformStackNode.BridgeNode.prototype.constructor = Cube.core.TransformStackNode.BridgeNode;
 
-Cube.core.TransformStackNode.BridgeNode.prototype.getTransfo = function() {
-    return this.transfo;
+Cube.core.TransformStackNode.BridgeNode.prototype.isDirty = function() {
+    return true;
 };
 
-Cube.core.TransformStackNode.BridgeNode.prototype.updateUpStream = function() {
-    this.compound.update();
+Cube.core.TransformStackNode.BridgeNode.prototype.findUpdateRoot = function() {
+    return this.target.findUpdateRoot();
+};
+
+Cube.core.TransformStackNode.BridgeNode.prototype.setDirty = function() {
+    this.target.setDirty();
 };

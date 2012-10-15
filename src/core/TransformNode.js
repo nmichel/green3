@@ -23,6 +23,18 @@ Cube.core.TransformNode.prototype.accept = function(visitor) {
 
 Cube.core.TransformNode.prototype.setDirty = function() {
     this.dirty = true;
+    this.children.forEach(function(elt) {
+        elt.setDirty();
+    });
+};
+
+Cube.core.TransformNode.prototype.isDirty = function() {
+    return this.dirty;
+};
+
+Cube.core.TransformNode.prototype.setParent = function(parent) {
+    this.parent = parent;
+    return this;
 };
 
 Cube.core.TransformNode.prototype.addChild = function(child) {
@@ -73,25 +85,22 @@ Cube.core.TransformNode.prototype.updateLocal = function() {
     this.invert.transposeTo(this.normal);
 };
 
-Cube.core.TransformNode.prototype.updateUpStream = function() {
-    if (this.parent && this.parent.dirty) {
-        this.parent.updateUpStream();
+Cube.core.TransformNode.prototype.findUpdateRoot = function() {
+    if (this.parent && this.parent.isDirty()) {
+        return this.parent.findUpdateRoot();
     }
-    this.updateLocal();
+
+    return this;
 };
 
 Cube.core.TransformNode.prototype.updateDownStream = function() {
+    this.updateLocal();
     this.children.forEach(function(elt) {
-        elt.updateLocal();
         elt.updateDownStream();
     });
 };
 
 Cube.core.TransformNode.prototype.update = function(upstream) {
-    if (this.parent) {
-        this.parent.updateUpStream();
-    }
-    this.updateLocal();
-    this.updateDownStream();
+    this.findUpdateRoot().updateDownStream();
     return this;
 };
