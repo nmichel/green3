@@ -2,6 +2,8 @@ Cube.core.TransformStackNode = function (attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
     this.transformations = new Cube.core.ArrayNode({});
+    this.upStream = new Cube.core.TransformStackNode.UpStreamBridgeNode({target: this});
+    this.downStream = new Cube.core.TransformStackNode.DownStreamBridgeNode({target: this});
 };
 
 Cube.core.TransformStackNode.prototype = new Cube.core.TransformNode({});
@@ -11,13 +13,11 @@ Cube.core.TransformStackNode.prototype.push = function(transfo) {
 //    Cube.core.Utilities.checkReference(transfo, "transfo");
 //    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
 
-    // Transfo and bridge have special relationships
-    // - transfo -parent-> bridge
-    // - bridge -parent-> transfo
-    //
-    var upBridge = new Cube.core.TransformStackNode.BridgeNode({parent: transfo,
-                                                                        target: this});
-    transfo.setParent(upBridge);
+    // All nodes share upStream and downStream bridge nodes.
+    // Note that transfo does not belong to upStream children set, neither it is the parent of downStream.
+    // 
+    transfo.setParent(this.upStream);
+    transfo.addChild(this.downStream);
 
     this.transformations.push(transfo);
     return this;
@@ -53,7 +53,7 @@ Cube.core.TransformStackNode.prototype.compact = function(fromIdx) {
 
 // -----
 
-Cube.core.TransformStackNode.BridgeNode = function(attributes) {
+Cube.core.TransformStackNode.DownStreamBridgeNode = function(attributes) {
 //    Cube.core.Utilities.checkReference(target, "target");
 //    Cube.core.Utilities.checkType(target, Cube.core.TransformStackNode, "target should be Cube.core.TransformStackNode");
 
@@ -62,17 +62,31 @@ Cube.core.TransformStackNode.BridgeNode = function(attributes) {
     this.target = attributes.target;
 };
 
-Cube.core.TransformStackNode.BridgeNode.prototype = new Cube.core.TransformNode({});
-Cube.core.TransformStackNode.BridgeNode.prototype.constructor = Cube.core.TransformStackNode.BridgeNode;
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype.constructor = Cube.core.TransformStackNode.DownStreamBridgeNode;
 
-Cube.core.TransformStackNode.BridgeNode.prototype.isDirty = function() {
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype.setDirty = function() {
+    this.target.setDirty();
+};
+
+// -----
+
+Cube.core.TransformStackNode.UpStreamBridgeNode = function(attributes) {
+//    Cube.core.Utilities.checkReference(target, "target");
+//    Cube.core.Utilities.checkType(target, Cube.core.TransformStackNode, "target should be Cube.core.TransformStackNode");
+
+    Cube.core.TransformNode.call(this, attributes);
+
+    this.target = attributes.target;
+};
+
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.constructor = Cube.core.TransformStackNode.UpStreamBridgeNode;
+
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.isDirty = function() {
     return true;
 };
 
-Cube.core.TransformStackNode.BridgeNode.prototype.findUpdateRoot = function() {
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.findUpdateRoot = function() {
     return this.target.findUpdateRoot();
-};
-
-Cube.core.TransformStackNode.BridgeNode.prototype.setDirty = function() {
-    this.target.setDirty();
 };
