@@ -17,6 +17,10 @@ Cube.core.ArrayNode.prototype.accept = function(visitor) {
     visitor.visitArrayEnd();
 };
 
+Cube.core.ArrayNode.prototype.at = function(index) {
+    return this.nodes[index];
+};
+
 Cube.core.ArrayNode.prototype.push = function(node) {
     this.nodes.push(node);
 };

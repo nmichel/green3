@@ -23,6 +23,10 @@ Cube.core.TransformStackNode.prototype.push = function(transfo) {
     return this;
 };
 
+Cube.core.TransformStackNode.prototype.at = function(index) {
+    return this.transformations.at(index);
+};
+
 Cube.core.TransformStackNode.prototype.updateLocal = function() {
     this.transformations.nodes.reduce(
         function(prev, current) {
