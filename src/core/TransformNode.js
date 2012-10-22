@@ -22,6 +22,9 @@ Cube.core.TransformNode.prototype.accept = function(visitor) {
 };
 
 Cube.core.TransformNode.prototype.setDirty = function() {
+    if (this.dirty) {
+        return; // <== No need to propagate downstream if already dirty.
+    }
     this.dirty = true;
     this.children.forEach(function(elt) {
         elt.setDirty();
