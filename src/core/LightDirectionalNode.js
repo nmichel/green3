@@ -1,6 +1,6 @@
 Cube.core.LightDirectionalNode = function(attributes) {
     this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
-    this.direction = attributes.direction || [0.0, -1.0, 0.0];
+    this.direction = attributes.direction || [0.0, -1.0, 0.0, 0.0];
 };
 
 Cube.core.LightDirectionalNode.prototype = new Cube.core.Node({});

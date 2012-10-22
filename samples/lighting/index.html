@@ -76,7 +76,7 @@
 
 		  void main() {
             v_position = u_matrix * vec4(aPosition, 1.0);;
-		    gl_Position = u_projection * u_view * v_position;
+		    gl_Position = u_projection * v_position;
 		    gl_PointSize = 4.0;
 
 		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));

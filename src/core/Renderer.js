@@ -4,7 +4,10 @@ Cube.core.Renderer = function(attributes) {
     this.defaultClearFlags = 0;
     this.mappings = null;
     this.projectionTransfo = null;
-    this.viewTransfo = null;
+    this.viewTransfo = new Cube.core.math.Matrix4();
+    this.viewInvertTransposeTransfo = new Cube.core.math.Matrix4();
+    this.modelViewTransfo = new Cube.core.math.Matrix4();
+    this.modelViewInvertTransposeTransfo = new Cube.core.math.Matrix4();
     this.bufferFactoryFunc = null;
     this.nextTextureUnit = 0;
     this.lightsUniforms = [];
@@ -81,13 +84,13 @@ Cube.core.Renderer.prototype.setup = function() {
     }
 
     this.bufferFactoryFunc = (function (gl) {
-	return function (isIndex, data) {
-	    var buffer = gl.createBuffer();
-	    var type = isIndex ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
-	    gl.bindBuffer(type, buffer);
-	    gl.bufferData(type, data, gl.STATIC_DRAW);
-	    return buffer; // <== 
-	};
+    return function (isIndex, data) {
+        var buffer = gl.createBuffer();
+        var type = isIndex ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+        gl.bindBuffer(type, buffer);
+        gl.bufferData(type, data, gl.STATIC_DRAW);
+        return buffer; // <== 
+    };
     })(this.gl);
 
     this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT
@@ -109,15 +112,15 @@ Cube.core.Renderer.prototype.setInsideOutMode = function(toggle) {
 Cube.core.Renderer.prototype.clear = function(buffers) {
     var bits = 0;
     if (!!buffers) {
-	    if (!!buffers.color) {
-	        bits |= this.gl.COLOR_BUFFER_BIT;
-	    }
-	    if (!!buffers.depth) {
-	        bits |= this.gl.DEPTH_BUFFER_BIT;
-	    }
-	    if (!!buffers.stencil) {
-	        bits |= this.gl.STENCIL_BUFFER_BIT;
-	    }
+        if (!!buffers.color) {
+            bits |= this.gl.COLOR_BUFFER_BIT;
+        }
+        if (!!buffers.depth) {
+            bits |= this.gl.DEPTH_BUFFER_BIT;
+        }
+        if (!!buffers.stencil) {
+            bits |= this.gl.STENCIL_BUFFER_BIT;
+        }
     }
     else {
         bits = this.defaultClearFlags;
@@ -129,8 +132,8 @@ Cube.core.Renderer.prototype.clear = function(buffers) {
 
 Cube.core.Renderer.prototype.deactivateAllTextureUnits = function() {
     for (var i = 0; i < this.nextTextureUnit; ++i) {
-	    this.gl.activeTexture(this.gl.TEXTURE0 + i);
-	    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        this.gl.activeTexture(this.gl.TEXTURE0 + i);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
     this.nextTextureUnit = 0;
 };
@@ -153,16 +156,25 @@ Cube.core.Renderer.prototype.loadProjectionTransformation = function(transfo) {
 };
 
 Cube.core.Renderer.prototype.loadViewTransformation = function(transfo) {
-    this.viewTransfo = transfo;
+    transfo.copyTo(this.modelViewTransfo);
+    this.modelViewTransfo.invertTo(this.modelViewInvertTransposeTransfo);
+    this.modelViewInvertTransposeTransfo.transposeToSelf();
+
+    this.modelViewTransfo.copyTo(this.viewTransfo);
+    this.modelViewInvertTransposeTransfo.copyTo(this.viewInvertTransposeTransfo);
 };
 
 Cube.core.Renderer.prototype.loadNormalTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
+    this.viewInvertTransposeTransfo.copyTo(this.modelViewInvertTransposeTransfo);
+    this.modelViewInvertTransposeTransfo.multiplyToSelf(transfo);
+    var rawMatrix = this.modelViewInvertTransposeTransfo.getRawData();
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixNormal], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
+    this.viewTransfo.copyTo(this.modelViewTransfo);
+    this.modelViewTransfo.multiplyToSelf(transfo);
+    var rawMatrix = this.modelViewTransfo.getRawData();
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixModel], false, rawMatrix);
 };
 
@@ -213,11 +225,11 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
 
     if (this.transparentMode) {
         this.gl.frontFace(this.gl.CW);
-	    if (mode == this.mode.ELEMENT) {
+        if (mode == this.mode.ELEMENT) {
             this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
             this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-	    }
-	    else {
+        }
+        else {
             this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
         }
         this.gl.frontFace(this.gl.CCW);
@@ -275,7 +287,7 @@ Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, val
 
 Cube.core.Renderer.prototype.loadPerFrameData = function() {
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.modelViewTransfo.getRawData());
 };
 
 Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
@@ -293,7 +305,8 @@ Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode
         return; // <== 
     }
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], lightDirectionalNode.getDirection());
+    // Light direction are expresses in world coordinates. Transform it into eye coordimates.
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], this.viewInvertTransposeTransfo.transformRawVector4(lightDirectionalNode.getDirection()));
     this.nextLight = this.nextLight + 1;
 };
 
@@ -303,6 +316,7 @@ Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) 
         return; // <== 
     }
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], lightPositionalNode.getPosition());
+    // Light direction are expresses in world coordinates. Transform it into eye coordimates.
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.viewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
     this.nextLight = this.nextLight + 1;
 };

@@ -37,5 +37,5 @@ Cube.core.TranslationCompensatorNode.BridgeNode.prototype = new Cube.core.Transf
 Cube.core.TranslationCompensatorNode.BridgeNode.prototype.constructor = Cube.core.TranslationCompensatorNode.BridgeNode;
 
 Cube.core.TranslationCompensatorNode.BridgeNode.prototype.updateLocal = function() {
-    this.target.update();
+    this.target.updateLocal();
 };

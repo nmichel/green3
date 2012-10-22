@@ -202,6 +202,19 @@ Cube.core.math.Matrix4.prototype = {
         }
 
         return this;
+    },
+
+    transformRawVector4: function(vector) {
+        var res = [];
+        var td = this.data;
+        for (var i = 0; i < 3; ++i) {
+            res[i] =
+                vector[0] * td[0*4+i] +
+                vector[1] * td[1*4+i] +
+                vector[2] * td[2*4+i] +
+                vector[3] * td[3*4+i];
+        }
+        return res;
     }
 };
 

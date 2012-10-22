@@ -39,6 +39,7 @@ FILELIST = \
 	./core/LightDirectionalNode.js \
 	./core/LightPositionalNode.js \
 	./core/CameraNode.js \
+	./core/ObjectEnlighterNode.js \
 	./core/Object.js \
 	./core/Scene.js \
 	./core/Engine.js \

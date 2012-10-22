@@ -1,157 +1,212 @@
 <html lang="en">
-	<head>
-		<title>Earth</title>
-		<meta charset="utf-8" />
+    <head>
+        <title>Earth</title>
+        <meta charset="utf-8" />
 
-		<link href="earth.css" rel="stylesheet">
+        <link href="earth.css" rel="stylesheet">
 
-		<script src="../common/webgl-debug.js"></script>
-		<script src="../common/RequestAnimationFrame.js"></script>
+        <script src="../common/webgl-debug.js"></script>
+        <script src="../common/RequestAnimationFrame.js"></script>
 
-		<script src="../../src/cube.js"></script>
-		<script src="../../src/core/core.js"></script>
-		<script src="../../src/core/math/math.js"></script>
-		<script src="../../src/core/math/Vector3.js"></script>
-		<script src="../../src/core/math/Matrix4.js"></script>
-		<script src="../../src/core/Utilities.js"></script>
-		<script src="../../src/core/RenderVisitor.js"></script>
-		<script src="../../src/core/Node.js"></script>
-		<script src="../../src/core/ArrayNode.js"></script>
-		<script src="../../src/core/BufferSetNode.js"></script>
-		<script src="../../src/core/OutputToBufferSet.js"></script>
-		<script src="../../src/core/GeometryNode.js"></script>
-		<script src="../../src/core/MaterialNode.js"></script>
-		<script src="../../src/core/MeshNode.js"></script>
-		<script src="../../src/core/OpticNode.js"></script>
-		<script src="../../src/core/OrthographicOpticNode.js"></script>
-		<script src="../../src/core/TransformNode.js"></script>
-		<script src="../../src/core/RotationXYZNode.js"></script>
-		<script src="../../src/core/ScalingNode.js"></script>
-		<script src="../../src/core/TranslationNode.js"></script>
-		<script src="../../src/core/FaceCameraNode.js"></script>
-		<script src="../../src/core/FaceObjectNode.js"></script>
-		<script src="../../src/core/TranslationCompensatorNode.js"></script>
-		<script src="../../src/core/TransformStackNode.js"></script>
-		<script src="../../src/core/ViewNode.js"></script>
-		<script src="../../src/core/ViewportNode.js"></script>
-		<script src="../../src/core/GeometryHelpers.js"></script>
-		<script src="../../src/core/ShaderNode.js"></script>
-		<script src="../../src/core/TextureNode.js"></script>
-		<script src="../../src/core/ResourceLoader.js"></script>
-		<script src="../../src/core/ShaderManager.js"></script>
-		<script src="../../src/core/TextureManager.js"></script>
-		<script src="../../src/core/MaterialBindingNode.js"></script>
-		<script src="../../src/core/MaterialNode.js"></script>
-		<script src="../../src/core/CameraNode.js"></script>
-		<script src="../../src/core/Object.js"></script>
-		<script src="../../src/core/Scene.js"></script>
-		<script src="../../src/core/Engine.js"></script>
-		<script src="../../src/core/Renderer.js"></script>
+        <script src="../../src/cube.js"></script>
+        <script src="../../src/core/core.js"></script>
+        <script src="../../src/core/math/math.js"></script>
+        <script src="../../src/core/math/Vector3.js"></script>
+        <script src="../../src/core/math/Matrix4.js"></script>
+        <script src="../../src/core/Utilities.js"></script>
+        <script src="../../src/core/RenderVisitor.js"></script>
+        <script src="../../src/core/Node.js"></script>
+        <script src="../../src/core/ArrayNode.js"></script>
+        <script src="../../src/core/BufferSetNode.js"></script>
+        <script src="../../src/core/OutputToBufferSet.js"></script>
+        <script src="../../src/core/GeometryNode.js"></script>
+        <script src="../../src/core/MaterialNode.js"></script>
+        <script src="../../src/core/MeshNode.js"></script>
+        <script src="../../src/core/OpticNode.js"></script>
+        <script src="../../src/core/OrthographicOpticNode.js"></script>
+        <script src="../../src/core/TransformNode.js"></script>
+        <script src="../../src/core/RotationXYZNode.js"></script>
+        <script src="../../src/core/ScalingNode.js"></script>
+        <script src="../../src/core/TranslationNode.js"></script>
+        <script src="../../src/core/FaceCameraNode.js"></script>
+        <script src="../../src/core/FaceObjectNode.js"></script>
+        <script src="../../src/core/TranslationCompensatorNode.js"></script>
+        <script src="../../src/core/TransformStackNode.js"></script>
+        <script src="../../src/core/ViewNode.js"></script>
+        <script src="../../src/core/ViewportNode.js"></script>
+        <script src="../../src/core/GeometryHelpers.js"></script>
+        <script src="../../src/core/ShaderNode.js"></script>
+        <script src="../../src/core/TextureNode.js"></script>
+        <script src="../../src/core/ResourceLoader.js"></script>
+        <script src="../../src/core/ShaderManager.js"></script>
+        <script src="../../src/core/TextureManager.js"></script>
+        <script src="../../src/core/MaterialBindingNode.js"></script>
+        <script src="../../src/core/MaterialNode.js"></script>
+        <script src="../../src/core/LightDirectionalNode.js"></script>
+        <script src="../../src/core/CameraNode.js"></script>
+        <script src="../../src/core/Object.js"></script>
+        <script src="../../src/core/Scene.js"></script>
+        <script src="../../src/core/Engine.js"></script>
+        <script src="../../src/core/Renderer.js"></script>
 
-		<!--
+        <!--
                 <script src="../../deploy/js/green3.min.js"></script>
-		-->
-		<!--
+        -->
+        <!--
                 <script src="../../deploy/js/green3.js"></script>
-		-->
+        -->
 
-		<script id="flat-vertex-shader" type="x-shader/x-vertex">
-		  attribute vec3 aPosition;
-		  attribute vec4 aColor;
-		  attribute vec3 aNormal;
-		  attribute vec2 aUV;
+        <script id="shaded-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          attribute vec2 aUV;
 
-		  uniform mat4 u_normalMatrix;
-		  uniform mat4 u_matrix;
-		  uniform mat4 u_view;
-		  uniform mat4 u_projection;
-		  
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-		  varying vec2 v_TextureCoord;
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_projection;
+          
+          varying vec4 v_position;
+          varying vec4 v_color;
+          varying vec4 v_normal;
+          varying vec2 v_TextureCoord;
 
-		  void main() {
-		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
-		    gl_PointSize = 4.0;
+          void main() {
+            v_position = u_matrix * vec4(aPosition, 1.0);
+            v_normal = u_normalMatrix * vec4(aNormal, 0.0);
+            v_color = aColor;
+            v_TextureCoord = aUV;
 
-		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
-		    v_color = aColor;
-		    v_TextureCoord = aUV;
-		  }
-		</script>
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            // gl_PointSize = 4.0;
+          }
+        </script>
 
-		<script id="flat-fragment-shader" type="x-shader/x-fragment">
-		  precision mediump float;
-		  
-		  uniform sampler2D texture0;
-		  uniform sampler2D texture1;
+        <script id="shaded-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
+          
+          uniform sampler2D texture0;
+          uniform sampler2D texture1;
+          uniform sampler2D texture2;
 
-		  // Passed in from the vertex shader.
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-		  varying vec2 v_TextureCoord;
+          varying vec4 v_position;
+          varying vec4 v_normal;
+          varying vec4 v_color;
+          varying vec2 v_TextureCoord;
 
-		  void main() {
-		    vec4 f1 = texture2D(texture0, vec2(v_TextureCoord.s, v_TextureCoord.t));
-		    vec4 f2 = texture2D(texture1, vec2(v_TextureCoord.s, v_TextureCoord.t));
-		    float ratio = dot(normalize(vec4(1, 0.7, 0, 0)), v_normal);
-		    gl_FragColor = mix(f1, f2, ratio);
-		  }
-		</script>
+          struct Light {
+            int type;
+            vec4 color;
+            vec3 direction;
+            vec3 position;
+          };
+          uniform Light lights[4];
+          uniform int lightsCount;
+          
+          void main() {
+            vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-		<script id="halo-vertex-shader" type="x-shader/x-vertex">
-		  attribute vec3 aPosition;
-		  attribute vec4 aColor;
-		  attribute vec3 aNormal;
-		  attribute vec2 aUV;
+            vec3 N = normalize(v_normal.xyz);
+            vec3 E = normalize(-v_position.xyz); 
+            vec3 L = normalize(lights[0].direction);
+            vec3 R = normalize(reflect(-L, N));
 
-		  uniform mat4 u_normalMatrix;
-		  uniform mat4 u_matrix;
-		  uniform mat4 u_view;
-		  uniform mat4 u_projection;
-		  
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-		  varying vec2 v_TextureCoord;
+            float lambertTerm = max(dot(N, L), 0.0);
+            vec4 f1 = texture2D(texture0, v_TextureCoord.st);
+            if (lambertTerm > 0.0) {
+                vec4 f2 = texture2D(texture1, v_TextureCoord.st);
+                color += mix(f1, f2, lambertTerm);
 
-		  void main() {
-		    gl_Position = u_projection * u_view * u_matrix * vec4(aPosition, 1.0);
+                vec4 f3 = texture2D(texture2, v_TextureCoord.st);
+                float specularTerm = pow(max(dot(R, E), 0.0), 60.0);
+                color += vec4(specularTerm * f3.rgb, 1.0);
+            }
+            else {
+                color += f1;
+            }
 
-		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
-		    v_color = aColor;
-		    v_TextureCoord = aUV;
-		  }
-		</script>
+            gl_FragColor = color;
+          }
+        </script>
 
-		<script id="halo-fragment-shader" type="x-shader/x-fragment">
-		  precision mediump float;
+        <script id="halo-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          attribute vec2 aUV;
 
-		  float radius = 1.0;
-		  float halo = 2.0;
-		  float ratio = radius/halo;
-		  float complInvRatio = 1.0/(1.0 - ratio);
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_projection;
 
-		  varying vec4 v_color;
-		  varying vec4 v_normal;
-		  varying vec2 v_TextureCoord;
+          varying vec4 v_color;
+          varying vec2 v_TextureCoord;
 
-		  void main() {
-		    vec2 center = vec2(0.5, 0.5);
-		    float dist = distance(center, v_TextureCoord)/0.5;
-		    if (dist <= ratio) {
-                      discard; // drop fragment if hidden
-                    }
-                    dist = (dist - ratio) * complInvRatio;
-		    gl_FragColor = vec4(0.0, 0.1, 1.0, 1.0-dist);
-		  }
-		</script>
+          void main() {
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            v_color = aColor;
+            v_TextureCoord = aUV;
+          }
+        </script>
 
-	</head>
+        <script id="halo-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
 
-	<body>
-	  <div id="title">
-	    <h1>- EARTH -</h1>
-	  </div>
-	  <script src="./earth.js"></script>
-	</body>
+          float radius = 1.0;
+          float halo = 2.0;
+          float ratio = radius/halo;
+          float complInvRatio = 1.0/(1.0 - ratio);
+
+          varying vec4 v_color;
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            vec2 center = vec2(0.5, 0.5);
+            float dist = distance(center, v_TextureCoord)/0.5;
+            if (dist <= ratio) {
+              discard; // drop fragment if hidden
+            }
+            dist = (dist - ratio) * complInvRatio;
+            gl_FragColor = vec4(0.0, 0.1, 1.0, 1.0-dist);
+          }
+        </script>
+
+        <script id="flat-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          attribute vec2 aUV;
+
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_projection;
+
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            v_TextureCoord = aUV;
+          }
+        </script>
+
+        <script id="flat-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
+
+          uniform sampler2D texture0;
+
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            gl_FragColor = texture2D(texture0, v_TextureCoord.st);
+          }
+        </script>
+
+    </head>
+
+    <body>
+      <div id="title">
+        <h1>- EARTH -</h1>
+      </div>
+      <script src="./earth.js"></script>
+    </body>
 </html>
