@@ -1,6 +1,6 @@
 Cube.core.LightPositionalNode = function(attributes) {
     this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
-    this.position = attributes.position || [0.0, 1.0, 0.0];
+    this.position = attributes.position || [0.0, 1.0, 0.0, 1.0];
 };
 
 Cube.core.LightPositionalNode.prototype = new Cube.core.Node({});

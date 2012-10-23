@@ -107,8 +107,12 @@ scene.push(camera);
 
 // Light
 
+var pointLight = new Cube.core.LightPositionalNode({color: [0.5, 0.0, 0.0, 0.0],
+                                                    position: [0.2, 0.0, 0.0, 1.0]});
 var directionalLight = new Cube.core.LightDirectionalNode({color: [0.5, 0.0, 0.0, 0.0],
                                                            direction: [1.0, 0.0, 0.0, 0.0]});
+var light = pointLight;
+
 // Earth
 
 var earthRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
@@ -135,7 +139,7 @@ var earthGeom =
             factory: renderer.getBufferFactory()}));
 
 scene.push(earthMaterial);
-scene.push(directionalLight); // earth is enlighted
+scene.push(light); // earth is enlighted
 scene.push(earthTransfo);
 scene.push(earthGeom);
 

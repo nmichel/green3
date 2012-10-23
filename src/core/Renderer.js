@@ -32,6 +32,7 @@ Cube.core.Renderer.prototype.textureQuality = {
 };
 
 Cube.core.Renderer.prototype.shaderLightSubParameters = {
+    type:      "type",
     color:     "color",
     direction: "direction",
     position:  "position"
@@ -59,8 +60,11 @@ Cube.core.Renderer.prototype.shaderParameterTypes = {
     TEXTURE2D: "texture2D"
 };
 
-Cube.core.Renderer.prototype.shaderDefaultParameterTypes = {
-    texture0: Cube.core.Renderer.prototype.shaderParameterTypes.texture2D
+Cube.core.Renderer.prototype.lightTypes = {
+    AMBIANT: 1,
+    DIRECTIONAL: 2,
+    POINT: 3,
+    SPOT: 4
 };
 
 Cube.core.Renderer.prototype.constructor = Cube.core.Renderer;
@@ -295,6 +299,7 @@ Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.AMBIANT);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightAmbiantNode.getColor());
     this.nextLight = this.nextLight + 1;
 };
@@ -304,8 +309,9 @@ Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.DIRECTIONAL);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
-    // Light direction are expresses in world coordinates. Transform it into eye coordimates.
+    // Light direction is expressed in world coordinates. Transform it into eye coordimates.
     this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], this.viewInvertTransposeTransfo.transformRawVector4(lightDirectionalNode.getDirection()));
     this.nextLight = this.nextLight + 1;
 };
@@ -315,8 +321,9 @@ Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) 
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.POINT);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
-    // Light direction are expresses in world coordinates. Transform it into eye coordimates.
+    // Light position is expressed in world coordinates. Transform it into eye coordimates.
     this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.viewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
     this.nextLight = this.nextLight + 1;
 };
