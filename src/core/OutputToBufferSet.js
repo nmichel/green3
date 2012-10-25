@@ -3,6 +3,7 @@ Cube.core.OutputToBufferSet = function(attributes) {
     this.hasNormal = !!attributes.hasNormal;
     this.hasColor = !!attributes.hasColor;
     this.hasUV = !!attributes.hasUV;
+    this.hasTangent = !!attributes.hasTangent;
     this.hasIndex = !!attributes.hasIndex;
     this.factory = attributes.factory;
 
@@ -10,6 +11,7 @@ Cube.core.OutputToBufferSet = function(attributes) {
     this.normal = null;
     this.color = null;
     this.uv = null;
+    this.tangent = null;
     this.index = null;
 };
 
@@ -31,6 +33,10 @@ Cube.core.OutputToBufferSet.prototype.begin = function(vertexCount, indexCount) 
 
     if (!!this.hasUV) {
 	    this.uv = [];
+    }
+
+    if (!!this.hasTangent) {
+        this.tangent = [];
     }
 
     if (!!this.hasIndex) {
@@ -56,6 +62,10 @@ Cube.core.OutputToBufferSet.prototype.end = function() {
 
     if (!!this.hasUV) {
 	    bufferSetAttributes.uv = new Float32Array(this.uv);
+    }
+
+    if (!!this.hasTangent) {
+        bufferSetAttributes.tangent = new Float32Array(this.tangent);
     }
 
     if (!!this.hasIndex) {
@@ -103,6 +113,17 @@ Cube.core.OutputToBufferSet.prototype.addUV = function(u, v) {
 
     this.uv.push(u);
     this.uv.push(v);
+};
+
+Cube.core.OutputToBufferSet.prototype.addTangent = function(x, y, z, w) {
+    if (!this.hasTangent) {
+        return; // <== 
+    }
+
+    this.tangent.push(x);
+    this.tangent.push(y);
+    this.tangent.push(z);
+    this.tangent.push(w);
 };
 
 Cube.core.OutputToBufferSet.prototype.addTriplet = function(p1, p2, p3) {

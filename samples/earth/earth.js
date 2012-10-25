@@ -30,7 +30,8 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
                                                                         uniforms: {
                                                                             texture0: renderer.shaderParameterTypes.TEXTURE2D,
                                                                             texture1: renderer.shaderParameterTypes.TEXTURE2D,
-                                                                            texture2: renderer.shaderParameterTypes.TEXTURE2D
+                                                                            texture2: renderer.shaderParameterTypes.TEXTURE2D,
+                                                                            texture3: renderer.shaderParameterTypes.TEXTURE2D
                                                                         }},
                                                                     mappings: mappings,
                                                                     preload: true},
@@ -47,7 +48,7 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
                                                                   preload: true}}});
 var textureManager = new Cube.core.TextureManager({engine: engine,
                                                    desc: {
-                                                       earth: {res: "../common/img/earth.jpg",
+                                                       earth: {res: "../common/img/2_no_clouds_8k.jpg",
                                                                flip: false,
                                                                quality: Cube.core.Renderer.prototype.textureQuality.BEST},
                                                        earthviolet: {res: "../common/img/earth_night_1.jpg",
@@ -62,6 +63,9 @@ var textureManager = new Cube.core.TextureManager({engine: engine,
                                                        earthocean: {res: "../common/img/earth_ocean.jpg",
                                                                     flip: false,
                                                                     quality: Cube.core.Renderer.prototype.textureQuality.BEST},
+                                                       earthnormal: {res: "../common/img/earthNormalMap_2048.png",
+                                                                     flip: false,
+                                                                     quality: Cube.core.Renderer.prototype.textureQuality.BEST},
                                                        spacebox_right: {res: "../common/img/spacebox_right1.png",
                                                                         flip: true,
                                                                         quality: Cube.core.Renderer.prototype.textureQuality.BEST},
@@ -108,7 +112,7 @@ scene.push(camera);
 // Light
 
 var pointLight = new Cube.core.LightPositionalNode({color: [0.5, 0.0, 0.0, 0.0],
-                                                    position: [0.2, 0.0, 0.0, 1.0]});
+                                                    position: [5.0, 0.0, 5.0, 1.0]});
 var directionalLight = new Cube.core.LightDirectionalNode({color: [0.5, 0.0, 0.0, 0.0],
                                                            direction: [1.0, 0.0, 0.0, 0.0]});
 var light = pointLight;
@@ -125,7 +129,8 @@ var earthMaterial = new Cube.core.MaterialNode({shader: shaderManager.getShader(
                                                 bindings: {
                                                     texture0: textureManager.getTexture("earthbynight1"),
                                                     texture1: textureManager.getTexture("earth"),
-                                                    texture2: textureManager.getTexture("earthocean")}});
+                                                    texture2: textureManager.getTexture("earthocean"),
+                                                    texture3: textureManager.getTexture("earthnormal")}});
 
 var earthGeom =
     Cube.core.GeometryHelpers.buildSphere(
@@ -135,6 +140,7 @@ var earthGeom =
             hasNormal: true,
             hasColor: true,
             hasUV: true,
+            hasTangent: true,
             hasIndex: true,
             factory: renderer.getBufferFactory()}));
 
@@ -227,7 +233,7 @@ function render() {
     earthRot %= Math.PI * 2;
 
     earthRotation.set(null, earthRot, null);
-    cameraRotation.set(null, a, null);
+//    cameraRotation.set(null, a, null);
 
     camera.update();
     earthTransfo.update();

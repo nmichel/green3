@@ -47,10 +47,11 @@ Cube.core.Renderer.prototype.shaderParameters = {
         lightsCount:      "lightsCount"
     },
     attributes: {
-        vertex: "vertex",
-        normal: "normal",
-        color:  "color",
-        uv:     "uv"
+        vertex:  "vertex",
+        normal:  "normal",
+        color:   "color",
+        uv:      "uv",
+        tangent: "tangent"
     }
 };
 
@@ -214,6 +215,14 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
             this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.uv]);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.uvBuffer.data);
             this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.uv], 2, this.gl.FLOAT, false, 0, 0);
+        }
+    }
+
+    if (!!bufferSet.tangentBuffer) {
+        if (this.mappings.attributes[this.shaderParameters.attributes.tangent] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.tangent]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.tangentBuffer.data);
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.tangent], 4, this.gl.FLOAT, false, 0, 0);
         }
     }
 

@@ -5,6 +5,7 @@ Cube.core.BufferSetNode = function (attributes) {
     this.normalBuffer = null;
     this.colorBuffer = null;
     this.uvBuffer = null;
+    this.tangentBuffer = null;
     this.indexBuffer = null;
 
     var factory = this.factory;
@@ -23,6 +24,10 @@ Cube.core.BufferSetNode = function (attributes) {
 
     if (!!attributes.uv) {
 	    this.uvBuffer = this.buildBuffer(false, attributes.uv, factory);
+    }
+
+    if (!!attributes.tangent) {
+        this.tangentBuffer = this.buildBuffer(false, attributes.tangent, factory);
     }
 
     if (!!attributes.index) {

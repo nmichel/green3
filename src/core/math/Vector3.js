@@ -53,11 +53,25 @@ Cube.core.math.Vector3.prototype = {
         return this;
     },
 
+    add: function(other) {
+        return new Cube.core.math.Vector3(
+            this.x + other.x,
+            this.y + other.y,
+            this.z + other.z);
+    },
+
     subSelf: function(other) {
         this.x -= other.x;
         this.y -= other.y;
         this.z -= other.z;
         return this;
+    },
+
+    sub: function(other) {
+        return new Cube.core.math.Vector3(
+            this.x - other.x,
+            this.y - other.y,
+            this.z - other.z);
     },
 
     scaleSelf: function(factor) {
@@ -67,8 +81,30 @@ Cube.core.math.Vector3.prototype = {
         return this;
     },
 
+    scale: function(factor) {
+        return new Cube.core.math.Vector3(
+            factor * this.x,
+            factor * this.y,
+            factor * this.z);
+    },
+
+    cross: function(other) {
+        var tx = this.x;
+        var ty = this.y;
+        var tz = this.z;
+
+        var ox = other.x;
+        var oy = other.y;
+        var oz = other.z;
+
+        return new Cube.core.math.Vector3(
+            ty * oz - tz * oy,
+            tz * ox - tx * oz,
+            tx * oy - ty * ox);
+    },
+
     dot: function(other) {
-        return this.x * other.y + this.y * other.y + this.z * other.z;
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     },
     
     length: function() {
