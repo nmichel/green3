@@ -46,7 +46,8 @@
 		<script src="../../src/core/LightPositionalNode.js"></script>
 		<script src="../../src/core/CameraNode.js"></script>
 		<script src="../../src/core/ObjectEnlighterNode.js"></script>
-		<script src="../../src/core/Object.js"></script>
+		<script src="../../src/core/ObjectNode.js"></script>
+		<script src="../../src/core/LightSourceNode.js"></script>
 		<script src="../../src/core/Scene.js"></script>
 		<script src="../../src/core/Engine.js"></script>
 		<script src="../../src/core/Renderer.js"></script>
@@ -66,7 +67,6 @@
 
 		  uniform mat4 u_normalMatrix;
 		  uniform mat4 u_matrix;
-		  uniform mat4 u_view;
 		  uniform mat4 u_projection;
 		  
 		  varying vec4 v_position;
@@ -79,7 +79,7 @@
 		    gl_Position = u_projection * v_position;
 		    gl_PointSize = 4.0;
 
-		    v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+		    v_normal = u_normalMatrix * vec4(aNormal, 0.0);
 		    v_color = aColor;
 		    v_TextureCoord = aUV;
 		  }
@@ -110,8 +110,7 @@
 //		    float ratio = dot(lights[0].direction, vec3(v_normal));
 
             // Positional
-
-		    float ratio = max(dot(normalize(lights[0].position - v_position.xyz), vec3(v_normal)), 0.0);
+		    float ratio = clamp(dot(normalize(lights[0].position - v_position.xyz), vec3(normalize(v_normal))), 0.0, 1.0);
 		    gl_FragColor = lights[0].color * ratio;
 		  }
 		</script>

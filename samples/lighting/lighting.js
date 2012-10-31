@@ -50,7 +50,6 @@ var cameraTransform =
     new Cube.core.TransformStackNode({})
     .push(cameraRotation)
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2.5)}));
-cameraRotation.update();
 cameraTransform.update();
 
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
@@ -64,16 +63,19 @@ scene.setCamera(camera);
 //var directionalLight = new Cube.core.LightDirectionalNode({color: [0.5, 0.0, 0.0, 0.0],
 //                                                           direction: [1.0, 0.0, 0.0]});
 var positionalLight = new Cube.core.LightPositionalNode({color: [1.0, 0.0, 0.0, 0.0],
-                                                         position: [3.0, 3.0, 0.0]});
-scene.addLight(positionalLight);
+                                                         position: [0.0, 0.0, 0.0, 1.0]});
+var transfoLight =
+    new Cube.core.TransformStackNode({})
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, -Math.PI/5.0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(2, 0, 0)}));
+transfoLight.update();
+scene.addLight(new Cube.core.LightSourceNode({light: positionalLight, transform: transfoLight}));
 
 // Earth
 
-var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
-
 var modelTransfoCommonBaseNode3 =
     (new Cube.core.TransformStackNode({}))
-    .push(shaderedTransformationRotationNode);
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}));
 
 var materialNodeEarth3 = new Cube.core.MaterialNode({shader: shaderManager.getShader("lighting"),
 						                             bindings: {}});
@@ -103,14 +105,14 @@ function render() {
     earthRot += Math.PI / 300;
     earthRot %= Math.PI * 2;
 
-    cameraRotation.set(null, a, null);
-    cameraRotation.update();
-    cameraTransform.update();
-    camera.update();
-    shaderedTransformationRotationNode.set(null, earthRot, null);
-    shaderedTransformationRotationNode.update();
-    modelTransfoCommonBaseNode3.update();
+//    cameraRotation.set(null, a, null);
+//    cameraTransform.update();
+//    camera.update();
+//    modelTransfoCommonBaseNode3.at(0).set(null, earthRot, null);
+//    modelTransfoCommonBaseNode3.update();
 
+    transfoLight.at(0).set(null, a, null);
+    transfoLight.update();
     renderer.clear();
     scene.visit(visitor);
 }

@@ -321,7 +321,7 @@ Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode
     this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.DIRECTIONAL);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
     // Light direction is expressed in world coordinates. Transform it into eye coordimates.
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], this.viewInvertTransposeTransfo.transformRawVector4(lightDirectionalNode.getDirection()));
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], this.modelViewInvertTransposeTransfo.transformRawVector4(lightDirectionalNode.getDirection()));
     this.nextLight = this.nextLight + 1;
 };
 
@@ -333,6 +333,6 @@ Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) 
     this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.POINT);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
     // Light position is expressed in world coordinates. Transform it into eye coordimates.
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.viewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.modelViewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
     this.nextLight = this.nextLight + 1;
 };

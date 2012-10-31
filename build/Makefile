@@ -24,6 +24,7 @@ FILELIST = \
 	./core/TranslationNode.js \
 	./core/FaceCameraNode.js \
 	./core/FaceObjectNode.js \
+	./core/TranslationCompensatorNode.js \
 	./core/TransformStackNode.js \
 	./core/ViewNode.js \
 	./core/ViewportNode.js \
@@ -41,7 +42,8 @@ FILELIST = \
 	./core/LightPositionalNode.js \
 	./core/CameraNode.js \
 	./core/ObjectEnlighterNode.js \
-	./core/Object.js \
+	./core/ObjectNode.js \
+	./core/LightSourceNode.js \
 	./core/Scene.js \
 	./core/Engine.js \
 	./core/Renderer.js

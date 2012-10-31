@@ -9,7 +9,7 @@ Cube.core.TranslationNode = function(attributes) {
 Cube.core.TranslationNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TranslationNode.prototype.constructor = Cube.core.TranslationNode;
 
-Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
+Cube.core.TranslationNode.prototype.set = function(x, y, z) {
     if (!!x) {
 	    this.vector.setX(x);
     }

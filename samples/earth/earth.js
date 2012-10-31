@@ -147,6 +147,7 @@ var earthGeom =
             factory: renderer.getBufferFactory()}));
 
 scene.push(earthMaterial);
+scene.push((new Cube.core.TransformNode({})).update());
 scene.push(light); // earth is enlighted
 scene.push(earthTransfo);
 scene.push(earthGeom);
