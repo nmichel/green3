@@ -43,7 +43,6 @@ Cube.core.GeometryHelpers = {
             }
         }
 
-        var pInd = 0;
         var nbPointsPerLat = nbSlices * 2 + 1;
         for (var latitude = 0; latitude < nbSlices; ++latitude) {
             var base = latitude * nbPointsPerLat;
