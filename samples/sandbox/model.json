@@ -1,0 +1,33 @@
+{"model": {
+    "types": {
+        "vf3": ["FLOAT", 3],
+        "vf4": ["FLOAT", 4],
+        "vf2": ["FLOAT", 2]
+    },
+    "attributes": {
+        "position": "vf3",
+        "normal":   "vf3",
+        "color":    "vf4",
+        "uv":       "vf2",
+        "tangent":  "vf4"
+    },
+    "vertices": {
+        "count": N,
+        "data": {
+            "position": [p0x, p0y, p0z, ...],
+            "normal": [n0x, n0y, n0z, ...],
+            "color": [c0r, c0g, c0b, c0a, ...],
+            "uv": [u0u, u0v, ...],
+            "tangent": [t0x, t0y, t0z, t0w, ...]
+        }
+    },
+    "indices": {
+        "count": 1000,
+        "data": [
+            i11, i12, i13,
+            i21, i22, i23,
+            ...
+            iN1, iN2, iN3,
+        ]
+    }
+}
