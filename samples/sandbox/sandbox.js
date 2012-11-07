@@ -90,40 +90,39 @@ var modelTransfoCommonNode4 =
     .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
     .push(shaderedTransformationRotationNode);
 
-
 var geoBufferSet =
     Cube.core.GeometryHelpers.buildSphere(
-	0.5,
-	new Cube.core.OutputToBufferSet({
-	    hasVertex: true,
-	    hasNormal: true,
-	    hasColor: true,
-	    hasUV: true,
-	    hasIndex: true,
-	    factory: renderer.getBufferFactory()}));
+	    0.5,
+	    new Cube.core.OutputToBufferSet({
+	        hasVertex: true,
+	        hasNormal: true,
+	        hasColor: true,
+	        hasUV: true,
+	        hasIndex: true,
+	        factory: renderer.getBufferFactory()}));
 
 var cubeGeoBufferSet =
     Cube.core.GeometryHelpers.buildCube(
-	0.5,
-	new Cube.core.OutputToBufferSet({
-	    hasVertex: true,
-	    hasNormal: true,
-	    hasColor: true,
-	    hasUV: true,
-	    hasIndex: true,
-	    factory: renderer.getBufferFactory()}));
+	    0.5,
+	    new Cube.core.OutputToBufferSet({
+	        hasVertex: true,
+	        hasNormal: true,
+	        hasColor: true,
+	        hasUV: true,
+	        hasIndex: true,
+	        factory: renderer.getBufferFactory()}));
 
 var materialNodeColor = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						    bindings: {
-							u_color: [1.0, 0.5, 0.0, 1.0]}});
+    							u_color: [1.0, 0.5, 0.0, 1.0]}});
 
 var materialNodeColor2 = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						     bindings: {
-							 u_color: [0.0, 0.5, 1.0, 1.0]}});
+    							 u_color: [0.0, 0.5, 1.0, 1.0]}});
 
 var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
 						     bindings: {
-							 texture0: textureManager.getTexture("caisse")}});
+    							 texture0: textureManager.getTexture("caisse")}});
 
 var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
 						   transparent: true,
@@ -134,9 +133,9 @@ var materialNodeLogo = new Cube.core.MaterialNode({shader: shaderManager.getShad
 
 var materialNodeEarth = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
 						    bindings: {
-							mixRatio: 0.8,
-							texture0: textureManager.getTexture("earthbynight"),
-							texture1: textureManager.getTexture("earth")}});
+    							mixRatio: 0.8,
+    							texture0: textureManager.getTexture("earthbynight"),
+    							texture1: textureManager.getTexture("earth")}});
 
 scene.setViewport(viewport);
 scene.setCamera(camera);
@@ -168,3 +167,26 @@ function animate() {
     render();
 }
 
+// -----
+
+var httpRequest = new XMLHttpRequest();
+httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState == 4) {
+        if (httpRequest.status == 200) {
+            var obj =
+                (new Cube.core.MeshLoader()).build(
+                    httpRequest.responseText,
+                    new Cube.core.BufferSetNode({factory: renderer.getBufferFactory()}));
+            
+            scene.addObject(new Cube.core.Object({material: materialNodeColor,
+                                                  transformation: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 2, 0)}),
+                                                  geometry: obj}));
+        }
+        else {
+            console.log("Failed to load file from server.");
+        }
+    }
+}
+
+httpRequest.open("GET", "sphere.json", true); // Doesn't work with POST
+httpRequest.send();

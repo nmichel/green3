@@ -45,34 +45,32 @@ Cube.core.OutputToBufferSet.prototype.begin = function(vertexCount, indexCount) 
 };
 
 Cube.core.OutputToBufferSet.prototype.end = function() {
-    var bufferSetAttributes = {
-	    factory: this.factory
-    };
+    var bufferSetNode = new Cube.core.BufferSetNode({factory: this.factory});
 
     if (!!this.hasVertex) {
-	    bufferSetAttributes.vertex = new Float32Array(this.vertex);
+	    bufferSetNode.createAttributeBuffer("vertex", this.vertex);
     }
 
     if (!!this.hasNormal) {
-	    bufferSetAttributes.normal = new Float32Array(this.normal);
+	    bufferSetNode.createAttributeBuffer("normal", this.normal);
     }
     if (!!this.hasColor) {
-	    bufferSetAttributes.color = new Float32Array(this.color);
+	    bufferSetNode.createAttributeBuffer("color", this.color);
     }
 
     if (!!this.hasUV) {
-	    bufferSetAttributes.uv = new Float32Array(this.uv);
+	    bufferSetNode.createAttributeBuffer("uv", this.uv);
     }
 
     if (!!this.hasTangent) {
-        bufferSetAttributes.tangent = new Float32Array(this.tangent);
+	    bufferSetNode.createAttributeBuffer("tangent", this.tangent);
     }
 
     if (!!this.hasIndex) {
-	    bufferSetAttributes.index = new Uint16Array(this.index);
+	    bufferSetNode.createIndexBuffer("index", this.index);
     }
 
-    return new Cube.core.BufferSetNode(bufferSetAttributes); // <== 
+    return bufferSetNode; // <== 
 };
 
 Cube.core.OutputToBufferSet.prototype.addVertex = function(x, y, z) {

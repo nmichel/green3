@@ -2,7 +2,7 @@ Cube.core.GeometryHelpers = {
     buildSphere: function(radius, output) {
         var nbSlices = 30,
             nbPoints = (nbSlices+1)*(2*nbSlices+1),
-            nbFaces = nbSlices * 2 * nbSlices
+            nbFaces = nbSlices * 2 * nbSlices,
             nbTris = nbFaces * 2,
             nbIndices = nbTris * 3;
 
@@ -122,7 +122,6 @@ Cube.core.GeometryHelpers = {
                 t2 = new Cube.core.math.Vector3(rawT2[0], rawT2[1], rawT2[2]);
 
             var tangent = t.sub(n.scale(n.dot(t))).normalizeSelf(), // Gram-Schmidt orthogonalize.
-//          var tangent = t.normalizeSelf(),
                 w = (n.cross(t).dot(t2) < 0.0) ? -1.0 : 1.0; // Calculate handedness.
 
             output.addTangent(tangent.x, tangent.y, tangent.z, w);

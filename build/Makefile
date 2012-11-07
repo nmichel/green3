@@ -28,6 +28,7 @@ FILELIST = \
 	./core/ViewNode.js \
 	./core/ViewportNode.js \
 	./core/GeometryHelpers.js \
+	./core/MeshLoader.js \
 	./core/ShaderNode.js \
 	./core/TextureNode.js \
 	./core/ResourceLoader.js \
