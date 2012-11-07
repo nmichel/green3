@@ -1,6 +1,6 @@
 require "matrix.rb"
 
-radius = 1.0
+radius = 0.5
 nbSlices = 30
 
 nbPoints = (nbSlices+1)*(2*nbSlices+1)
@@ -84,9 +84,9 @@ tan2 = Array.new position.length * 3, 0.0
 
     add = lambda {
         |to, idx, what|
-        to[idx*3+0] += what[0];
-        to[idx*3+1] += what[1];
-        to[idx*3+2] += what[2];
+        to[idx*3+0] += what[0]
+        to[idx*3+1] += what[1]
+        to[idx*3+2] += what[2]
     }
 
     add.call tan1, i1, sdir

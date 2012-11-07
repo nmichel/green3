@@ -1,8 +1,8 @@
 {"model": {
     "types": {
+        "vf2": ["FLOAT", 2],
         "vf3": ["FLOAT", 3],
-        "vf4": ["FLOAT", 4],
-        "vf2": ["FLOAT", 2]
+        "vf4": ["FLOAT", 4]
     },
     "attributes": {
         "position": "vf3",
@@ -27,7 +27,7 @@
             i11, i12, i13,
             i21, i22, i23,
             ...
-            iN1, iN2, iN3,
+            iN1, iN2, iN3
         ]
     }
 }

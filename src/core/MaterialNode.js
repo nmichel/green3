@@ -7,10 +7,10 @@ Cube.core.MaterialNode = function (attributes) {
 
     this.nodes.push(attributes.shader);
     for (var name in attributes.bindings) {
-	var node = new Cube.core.MaterialBindingNode({name: name,
-						      type: attributes.shader.getParamTypes().uniforms[name],
-						      value: attributes.bindings[name]});
-	this.nodes.push(node);
+        var node = new Cube.core.MaterialBindingNode({name: name,
+                                                      type: attributes.shader.getParamTypes().uniforms[name],
+                                                      value: attributes.bindings[name]});
+    	this.nodes.push(node);
     }
 };
 
