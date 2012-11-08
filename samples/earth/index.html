@@ -145,7 +145,7 @@
               vec4 fJour = texture2D(texture1, v_TextureCoord.st);
               color += mix(fNuit, fJour, lambertTerm);
 
-              vec4 fSpecular = texture2D(texture2, v_TextureCoord.st);
+              vec4 fSpecular = texture2D(texture2, v_TextureCoord.st) * 0.5 + 0.3;
               float specularTerm = pow(clamp(dot(reflect(-L, N), E), 0.0, 1.0), 10.0);
               color += vec4(specularTerm * fSpecular.rgb, 1.0);
             }

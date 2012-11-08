@@ -97,15 +97,17 @@ scene.push(viewport);
 
 // Camera 
 
-var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, -Math.PI/3.5, 0)});
+var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
 var cameraTransform =
     new Cube.core.TransformStackNode({})
-//    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 3)}))
-    .push(cameraRotation)
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 0.3)}));
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-0.15, 0.04, 0.0)}))
+    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, -Math.PI/6.0, 0)}))
+    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 0.4)}));
 
-var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.3, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
+var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.15, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
                                        parent: cameraTransform});
+var cameraBack = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.3, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
+                                           parent: cameraRotation});
 
 scene.push(camera);
 
@@ -163,7 +165,7 @@ var rotations = [new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vecto
 var starfieldTransfo =
     (new Cube.core.TransformStackNode({}))
     .push(new Cube.core.TranslationCompensatorNode({reference: camera.getTransform()}))
-    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3(2.0, 2.0, 2.0)}));
+    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3(2000.0, 2000.0, 2000.0)}));
 
 var starfieldGeom =
     Cube.core.GeometryHelpers.buildPlane(
@@ -176,6 +178,7 @@ var starfieldGeom =
             hasIndex: true,
             factory: renderer.getBufferFactory()}));
 
+scene.push(cameraBack);
 for (var i = 0; i < 6; ++i) {
     var mat = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
                                           transparent: true,
@@ -216,6 +219,7 @@ var haloGeom =
             hasIndex: true,
             factory: renderer.getBufferFactory()}));
 
+scene.push(camera);
 scene.push(haloMaterial);
 scene.push(haloTransfo);
 scene.push(haloGeom);
@@ -233,9 +237,10 @@ function render() {
     earthRot %= Math.PI * 2;
 
     earthRotation.set(null, earthRot, null);
-//    cameraRotation.set(null, a, null);
+    cameraRotation.set(null, a, null);
 
     camera.update();
+    cameraBack.update();
     earthTransfo.update();
     haloTransfo.update();
     starfieldTransfo.update();
