@@ -1,0 +1,22 @@
+body {
+    background-color: black;
+}
+
+#title h1 {
+    text-align: center;
+    color: #FFFFFF;
+    font-family: "Oswald",Arial;
+    font-size: 40px;
+    font-weight: normal;
+    margin: 0px;
+    padding: 0px;
+    text-transform: uppercase;
+}
+
+#gl_content {
+    margin-left:auto;
+    margin-right:auto;
+    border: 1px solid #FFFFFF;
+    width: 70%;
+    height: 70%;
+}
