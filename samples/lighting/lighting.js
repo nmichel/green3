@@ -45,11 +45,11 @@ scene.setViewport(viewport);
 
 // Camera 
 
-var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
+var cameraRotation = new Cube.core.RotationXYZNode({});
 var cameraTransform =
     new Cube.core.TransformStackNode({})
     .push(cameraRotation)
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2.5)}));
+    .push(new Cube.core.TranslationNode({z: 2.5}));
 cameraTransform.update();
 
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
@@ -66,8 +66,8 @@ var positionalLight = new Cube.core.LightPositionalNode({color: [1.0, 0.0, 0.0, 
                                                          position: [0.0, 0.0, 0.0, 1.0]});
 var transfoLight =
     new Cube.core.TransformStackNode({})
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, -Math.PI/5.0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(2, 0, 0)}));
+    .push(new Cube.core.RotationXYZNode({y: -Math.PI/5.0}))
+    .push(new Cube.core.TranslationNode({x: 2}));
 transfoLight.update();
 scene.addLight(new Cube.core.LightSourceNode({light: positionalLight, transform: transfoLight}));
 
@@ -75,7 +75,7 @@ scene.addLight(new Cube.core.LightSourceNode({light: positionalLight, transform:
 
 var modelTransfoCommonBaseNode3 =
     (new Cube.core.TransformStackNode({}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}));
+    .push(new Cube.core.RotationXYZNode({}));
 
 var materialNodeEarth3 = new Cube.core.MaterialNode({shader: shaderManager.getShader("lighting"),
 						                             bindings: {}});

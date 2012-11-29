@@ -9,6 +9,10 @@ Cube.core.MaterialBindingNode = function (attributes) {
 Cube.core.MaterialBindingNode.prototype = new Cube.core.Node({});
 Cube.core.MaterialBindingNode.prototype.constructor = Cube.core.MaterialBindingNode;
 
+Cube.core.MaterialBindingNode.prototype.accept = function (visitor) {
+    visitor.visitMaterialBinding(this);
+};
+
 Cube.core.MaterialBindingNode.prototype.getParameterName = function() {
     return this.name;
 };
@@ -21,6 +25,7 @@ Cube.core.MaterialBindingNode.prototype.getParameterValue = function() {
     return this.value;
 };
 
-Cube.core.MaterialBindingNode.prototype.accept = function (visitor) {
-    visitor.visitMaterialBinding(this);
+Cube.core.MaterialBindingNode.prototype.setParameterValue = function(value) {
+    this.value = value;
+    return this;
 };

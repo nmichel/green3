@@ -97,12 +97,13 @@ scene.push(viewport);
 
 // Camera 
 
-var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
+var cameraRotation = new Cube.core.RotationXYZNode({x: 0, y: 0, z:0});
+//var cameraRotation = new Cube.core.RotationXYZNode({});
 var cameraTransform =
     new Cube.core.TransformStackNode({})
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(-0.15, 0.04, 0.0)}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, -Math.PI/6.0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 0.4)}));
+    .push(new Cube.core.TranslationNode({x: -0.15, y: 0.04}))
+    .push(new Cube.core.RotationXYZNode({y: -Math.PI/6.0}))
+    .push(new Cube.core.TranslationNode({z: 0.4}));
 
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.15, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
                                        parent: cameraTransform});
@@ -121,10 +122,10 @@ var light = pointLight;
 
 // Earth
 
-var earthRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
+var earthRotation = new Cube.core.RotationXYZNode({});
 var earthTransfo =
     (new Cube.core.TransformStackNode({}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0.704)}))
+    .push(new Cube.core.RotationXYZNode({z: 0.704}))
     .push(earthRotation);
 
 var earthMaterial = new Cube.core.MaterialNode({shader: shaderManager.getShader("shaded"),
@@ -156,17 +157,17 @@ scene.push(earthGeom);
 
 var rot = Math.PI/2.0;
 var textures = ["spacebox_front", "spacebox_right", "spacebox_left", "spacebox_back", "spacebox_top", "spacebox_bottom"];
-var rotations = [new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3( 0.0,  0.0, 0.0)}),    // Front
-                 new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3( 0.0,  rot, 0.0)}),    // Right
-                 new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3( 0.0, -rot, 0.0)}),    // Left
-                 new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3( 0.0, 2.0*rot, 0.0)}), // Back
-                 new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(-rot,  0.0, 0.0)}),    // Top
-                 new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(rot,  0.0, 0.0)})];    // Bottom
+var rotations = [new Cube.core.RotationXYZNode({}),           // Front
+                 new Cube.core.RotationXYZNode({y: rot}),     // Right
+                 new Cube.core.RotationXYZNode({y: -rot}),    // Left
+                 new Cube.core.RotationXYZNode({y: 2.0*rot}), // Back
+                 new Cube.core.RotationXYZNode({x: -rot}),    // Top
+                 new Cube.core.RotationXYZNode({x: rot})];    // Bottom
 
 var starfieldTransfo =
     (new Cube.core.TransformStackNode({}))
     .push(new Cube.core.TranslationCompensatorNode({reference: camera.getTransform()}))
-    .push(new Cube.core.ScalingNode({vector: new Cube.core.math.Vector3(2000.0, 2000.0, 2000.0)}));
+    .push(new Cube.core.ScalingNode({x: 2000.0, y: 2000.0, z: 2000.0}));
 
 var starfieldGeom =
     Cube.core.GeometryHelpers.buildPlane(
@@ -191,7 +192,7 @@ for (var i = 0; i < 6; ++i) {
     var transfo =
         (new Cube.core.TransformStackNode({parent: starfieldTransfo}))
         .push(rotations[i])
-        .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 1.0)}));
+        .push(new Cube.core.TranslationNode({z: 1.0}));
 
     scene.push(mat);
     scene.push(transfo);

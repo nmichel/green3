@@ -1,6 +1,6 @@
 var container = document.createElement('div');
 var canvas = document.createElement('canvas');
-document.body.appendChild(container);
+document.getElementById('container').appendChild(container);
 canvas.width =  window.innerWidth;
 canvas.height = window.innerHeight;
 container.appendChild(canvas);
@@ -30,6 +30,7 @@ var shaderManager = new Cube.core.ShaderManager({engine: engine,
                                                  shaders: {flat: {src: ["flat-vertex-shader", "flat-fragment-shader"],
                                                                   params: {
                                                                       uniforms: {
+                                                                          u_color: renderer.shaderParameterTypes.VEC4
                                                                       }},
                                                                   mappings: mappings,
                                                                   preload: true}}});
@@ -45,12 +46,12 @@ scene.push(viewport);
 
 // Camera 
 
-var cameraRotation = new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)});
+var cameraRotation = new Cube.core.RotationXYZNode({});
 var cameraTransform =
     new Cube.core.TransformStackNode({})
     .push(cameraRotation)
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(Math.PI/2.0, 0, 0.0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 50.0)}));
+    .push(new Cube.core.RotationXYZNode({x: -Math.PI/4.0}))
+    .push(new Cube.core.TranslationNode({z: 50.0}));
 
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.3, ratio: canvas.width/canvas.height, near: 0.1, far: 10000}),
                                        parent: cameraTransform});
@@ -72,7 +73,7 @@ var earthGeom =
 
 var transfos = [];
 
-var SUBDIV = 4;
+var SUBDIV = 7;
 var DELTA = 2.0 * Math.PI / SUBDIV;
 
 function buildCircles(parent, radius, depth) {
@@ -82,9 +83,10 @@ function buildCircles(parent, radius, depth) {
 
         var localNode = 
             (new Cube.core.TransformStackNode({parent: parent}))
-            .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}))
-            .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, a, 0)}))
-            .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, radius)}));
+            .push(new Cube.core.RotationXYZNode({}))
+            .push(new Cube.core.RotationXYZNode({y: a}))
+            .push(new Cube.core.TranslationNode({z: radius}))
+            .push(new Cube.core.TranslationNode({y: 1.2*depth}));
 
         transfos.push(localNode);
 
@@ -97,10 +99,11 @@ function buildCircles(parent, radius, depth) {
 }
 
 var root = new Cube.core.TransformNode({});
-buildCircles(root, 10, 4);
+buildCircles(root, 15, 4);
 
 var earthMaterial = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
-                                                bindings: {}});
+                                                bindings: {
+                                                    u_color: [1.0, 1.0, 0.0, 1.0]}});
 
 var earthGeom =
     Cube.core.GeometryHelpers.buildCube(
@@ -119,21 +122,134 @@ for (var i = 0; i < transfos.length; ++i) {
     scene.push(earthGeom);
 }
 
+// Aminator
+
+lerp = function(from, to, when) {
+    return from + (to-from)*when;
+};
+
+clamp = function(value, min, max) {
+    if (value < min) {
+        return min; // <== 
+    }
+    else if (value > max) {
+        return max; // <== 
+    }
+    return value;
+};
+
+lerpa = function(from, to, when) {
+    var res = [];
+    for (var i = 0; i < from.length; ++i) {
+        res[i] = lerp(from[i], to[i], when);
+    }
+    return res;
+};
+
+
+Range = function(from, to) {
+    this.rangeFunc = null;
+
+    if (typeof(from) != typeof(to)) {
+        throw "types differ" // <== 
+    }
+
+    if (typeof(from) == "number") {
+
+        this.rangeFunc = function(when) {
+            if (when < 0) {
+                return from; // <== 
+            }
+            else if (when > 1.0) {
+                return to; // <== 
+            }
+            return lerp(from, to, when); // <== 
+        }
+    }
+    else if (typeof(from) == "object"
+          && from instanceof Array
+          && from.length == to.length) {
+
+        this.rangeFunc = function(when) {
+            if (when < 0) {
+                return from.slice(0); // <== 
+            }
+            else if (when > 1.0) {
+                return to.slice(0); // <== 
+            }
+            return lerpa(from, to, when); // <== 
+        }
+    }
+    else {
+        throw "unsupported type" // <== 
+    }
+};
+
+Range.prototype = {};
+Range.prototype.constructor = Range;
+Range.prototype.at = function(when) {
+    return this.rangeFunc(when);
+};
+
+
+Animator = function(attributes) {
+    this.range = attributes.range;
+    this.delay = attributes.delay;
+    // attributes.ease = attributes.ease;
+    // this.repeat = attributes.repeat;
+    this.current = 0.0;
+    this.sinks = [];
+};
+
+Animator.prototype = {};
+Animator.prototype.constructor = Animator;
+Animator.prototype.animate = function(deltaT) {
+    this.current += deltaT;
+    this.current %= this.delay;
+    var val = this.range.at(this.current/this.delay);
+    this.sinks.forEach(function(sink) {
+        sink(val);
+    });
+    return val;
+};
+Animator.prototype.bind = function(what) {
+    this.sinks.push(what);
+    return this;
+};
+
+
+var a1 = (new Animator({range: new Range(0.0, Math.PI*2.0),
+                       delay: 10000/*, // millisec
+                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                       }))
+    .bind(function(val) {
+        for (var i = 0; i < transfos.length; ++i) {
+            var node = transfos[i].at(0);
+            node.set(val, null, val);
+        };
+    });
+
+var a2 = (new Animator({range: new Range(0.0, 1.0),
+                       delay: 5000/*, // millisec
+                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                       }))
+    .bind(function(val) {
+        earthMaterial.getBinding("u_color").setParameterValue([val, val, val, 1.0]);
+    });
+
 // Animate
 
-var a = 0;
+var delta = 1/60.0*1000; // 1/60th of second
+
 animate();
 
 function render() {
-    a += Math.PI / 300;
-    //a %= Math.PI * 2;
+    a1.animate(delta);
+//    a2.animate(delta);
 
-    for (var i = 0; i < transfos.length; ++i) {
-        var node = transfos[i].at(0);
-        node.set(null, a, null);
-    };
     root.update();
-//    cameraRotation.set(null, a, null);
     cameraTransform.update();
     camera.update();
 

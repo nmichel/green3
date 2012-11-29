@@ -57,10 +57,9 @@ var visitor = new Cube.core.RenderVisitor({renderer: renderer});
 var scene = new Cube.core.Scene({});
 var viewport = new Cube.core.ViewportNode({x: 0, y: 0, width: canvas.width, height: canvas.height});
 var camera = new Cube.core.CameraNode({optic: new Cube.core.OpticNode({fov: Math.PI*0.5, ratio: canvas.width/canvas.height, near: 1, far: 1000}),
-				                       parent: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 4)})});
+				                       parent: new Cube.core.TranslationNode({z: 4})});
 
-var aY = new Cube.core.math.Vector3(0, 0, 0);
-var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({vector: aY});
+var shaderedTransformationRotationNode = new Cube.core.RotationXYZNode({});
 
 var modelTransfoCommonBaseNode =
     (new Cube.core.TransformStackNode({}))
@@ -68,26 +67,26 @@ var modelTransfoCommonBaseNode =
     
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, Math.PI*2/4.0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
+    .push(new Cube.core.RotationXYZNode({y: Math.PI*2/5.0}))
+    .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 2*Math.PI*2/4.0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
+    .push(new Cube.core.RotationXYZNode({y: 2*Math.PI*2/5.0}))
+    .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode3 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
+    .push(new Cube.core.RotationXYZNode({}))
+    .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode4 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({vector: new Cube.core.math.Vector3(0, 3*Math.PI*2/4.0, 0)}))
-    .push(new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 0, 2)}))
+    .push(new Cube.core.RotationXYZNode({y: 3*Math.PI*2/5.0}))
+    .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var geoBufferSet =
@@ -178,8 +177,13 @@ httpRequest.onreadystatechange = function() {
                     httpRequest.responseText,
                     new Cube.core.BufferSetNode({factory: renderer.getBufferFactory()}));
             
+            var transfo = (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+                .push(new Cube.core.RotationXYZNode({y: 4*Math.PI*2/5.0}))
+                .push(new Cube.core.TranslationNode({z: 2}))
+                .push(shaderedTransformationRotationNode);
+
             scene.addObject(new Cube.core.Object({material: materialNodeColor,
-                                                  transformation: new Cube.core.TranslationNode({vector: new Cube.core.math.Vector3(0, 2, 0)}),
+                                                  transformation: transfo,
                                                   geometry: obj}));
         }
         else {
@@ -188,5 +192,5 @@ httpRequest.onreadystatechange = function() {
     }
 }
 
-httpRequest.open("GET", "sphere.json", true); // Doesn't work with POST
+httpRequest.open("GET", "icosphere.json", true); // Doesn't work with POST
 httpRequest.send();

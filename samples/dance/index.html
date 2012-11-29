@@ -83,13 +83,14 @@
           
           uniform sampler2D texture0;
           uniform sampler2D texture1;
+          uniform vec4 u_color;
 
           varying vec4 v_color;
           varying vec4 v_normal;
           varying vec2 v_TextureCoord;
 
           void main() {
-            gl_FragColor = v_color;
+            gl_FragColor = v_color * u_color;
           }
         </script>
     </head>
@@ -97,6 +98,8 @@
     <body>
       <div id="title">
         <h1>- DANCE -</h1>
+      </div>
+      <div id="container">
       </div>
       <script src="./dance.js"></script>
     </body>

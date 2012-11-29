@@ -1,7 +1,10 @@
 Cube.core.TranslationNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
-    this.vector = attributes.vector;
+    var x = attributes.x || 0.0;
+    var y = attributes.y || 0.0;
+    var z = attributes.z || 0.0;
+    this.vector = new Cube.core.math.Vector3(x, y, z);
     
     this.update();
 };
