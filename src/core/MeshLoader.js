@@ -14,4 +14,4 @@ Cube.core.MeshLoader.prototype.build = function(jsonData, bufferSetNode) {
         bufferSetNode.createIndexBuffer("index", rawMesh.model.indices.data);
     }
     return bufferSetNode;
-}
+};

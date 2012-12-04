@@ -1,4 +1,4 @@
-/* Generated on Fri, 05 Oct 2012 17:39:16 +0200
+/* Generated on Tue, 04 Dec 2012 15:22:47 +0100
 */ 
 var Cube = {};
 
@@ -59,11 +59,25 @@ Cube.core.math.Vector3.prototype = {
         return this;
     },
 
+    add: function(other) {
+        return new Cube.core.math.Vector3(
+            this.x + other.x,
+            this.y + other.y,
+            this.z + other.z);
+    },
+
     subSelf: function(other) {
         this.x -= other.x;
         this.y -= other.y;
         this.z -= other.z;
         return this;
+    },
+
+    sub: function(other) {
+        return new Cube.core.math.Vector3(
+            this.x - other.x,
+            this.y - other.y,
+            this.z - other.z);
     },
 
     scaleSelf: function(factor) {
@@ -73,8 +87,30 @@ Cube.core.math.Vector3.prototype = {
         return this;
     },
 
+    scale: function(factor) {
+        return new Cube.core.math.Vector3(
+            factor * this.x,
+            factor * this.y,
+            factor * this.z);
+    },
+
+    cross: function(other) {
+        var tx = this.x;
+        var ty = this.y;
+        var tz = this.z;
+
+        var ox = other.x;
+        var oy = other.y;
+        var oz = other.z;
+
+        return new Cube.core.math.Vector3(
+            ty * oz - tz * oy,
+            tz * ox - tx * oz,
+            tx * oy - ty * ox);
+    },
+
     dot: function(other) {
-        return this.x * other.y + this.y * other.y + this.z * other.z;
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     },
     
     length: function() {
@@ -97,8 +133,18 @@ Cube.core.math.Matrix4.prototype = {
         return (new Cube.core.math.Matrix4()).initFromRawData(this.data);
     },
 
+    copyTo: function(other) {
+        var td = this.data;
+        var od = other.data;
+
+        for (var i = 0; i < 16; ++i) {
+            od[i] = td[i];
+        }
+        return this;
+    },
+
     initToIdentity: function() {
-        return this.initFromRawData(this.rawdata_identity);
+        return this.initFromRawData(Cube.core.math.Matrix4.rawdata_identity);
     },
 
     initFromRawData: function(data) {
@@ -123,12 +169,13 @@ Cube.core.math.Matrix4.prototype = {
         return res.multiplyToSelf(other);
     },
 
-    invertToSelf: function() {
+    invertTo: function(other) {
         // -----
         // http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
         // -----
 
         var td = this.data;
+        var od = other.data;
 
         var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
         var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
@@ -137,27 +184,32 @@ Cube.core.math.Matrix4.prototype = {
         
         var det = this.determinant();
 
-        td[0*4+0] = m12*m23*m31 - m13*m22*m31 + m13*m21*m32 - m11*m23*m32 - m12*m21*m33 + m11*m22*m33;
-        td[1*4+0] = m03*m22*m31 - m02*m23*m31 - m03*m21*m32 + m01*m23*m32 + m02*m21*m33 - m01*m22*m33;
-        td[2*4+0] = m02*m13*m31 - m03*m12*m31 + m03*m11*m32 - m01*m13*m32 - m02*m11*m33 + m01*m12*m33;
-        td[3*4+0] = m03*m12*m21 - m02*m13*m21 - m03*m11*m22 + m01*m13*m22 + m02*m11*m23 - m01*m12*m23;
+        od[0*4+0] = m12*m23*m31 - m13*m22*m31 + m13*m21*m32 - m11*m23*m32 - m12*m21*m33 + m11*m22*m33;
+        od[1*4+0] = m03*m22*m31 - m02*m23*m31 - m03*m21*m32 + m01*m23*m32 + m02*m21*m33 - m01*m22*m33;
+        od[2*4+0] = m02*m13*m31 - m03*m12*m31 + m03*m11*m32 - m01*m13*m32 - m02*m11*m33 + m01*m12*m33;
+        od[3*4+0] = m03*m12*m21 - m02*m13*m21 - m03*m11*m22 + m01*m13*m22 + m02*m11*m23 - m01*m12*m23;
 
-        td[0*4+1] = m13*m22*m30 - m12*m23*m30 - m13*m20*m32 + m10*m23*m32 + m12*m20*m33 - m10*m22*m33;
-        td[1*4+1] = m02*m23*m30 - m03*m22*m30 + m03*m20*m32 - m00*m23*m32 - m02*m20*m33 + m00*m22*m33;
-        td[2*4+1] = m03*m12*m30 - m02*m13*m30 - m03*m10*m32 + m00*m13*m32 + m02*m10*m33 - m00*m12*m33;
-        td[3*4+1] = m02*m13*m20 - m03*m12*m20 + m03*m10*m22 - m00*m13*m22 - m02*m10*m23 + m00*m12*m23;
+        od[0*4+1] = m13*m22*m30 - m12*m23*m30 - m13*m20*m32 + m10*m23*m32 + m12*m20*m33 - m10*m22*m33;
+        od[1*4+1] = m02*m23*m30 - m03*m22*m30 + m03*m20*m32 - m00*m23*m32 - m02*m20*m33 + m00*m22*m33;
+        od[2*4+1] = m03*m12*m30 - m02*m13*m30 - m03*m10*m32 + m00*m13*m32 + m02*m10*m33 - m00*m12*m33;
+        od[3*4+1] = m02*m13*m20 - m03*m12*m20 + m03*m10*m22 - m00*m13*m22 - m02*m10*m23 + m00*m12*m23;
         
-        td[0*4+2] = m11*m23*m30 - m13*m21*m30 + m13*m20*m31 - m10*m23*m31 - m11*m20*m33 + m10*m21*m33;
-        td[1*4+2] = m03*m21*m30 - m01*m23*m30 - m03*m20*m31 + m00*m23*m31 + m01*m20*m33 - m00*m21*m33;
-        td[2*4+2] = m01*m13*m30 - m03*m11*m30 + m03*m10*m31 - m00*m13*m31 - m01*m10*m33 + m00*m11*m33;
-        td[3*4+2] = m03*m11*m20 - m01*m13*m20 - m03*m10*m21 + m00*m13*m21 + m01*m10*m23 - m00*m11*m23;
+        od[0*4+2] = m11*m23*m30 - m13*m21*m30 + m13*m20*m31 - m10*m23*m31 - m11*m20*m33 + m10*m21*m33;
+        od[1*4+2] = m03*m21*m30 - m01*m23*m30 - m03*m20*m31 + m00*m23*m31 + m01*m20*m33 - m00*m21*m33;
+        od[2*4+2] = m01*m13*m30 - m03*m11*m30 + m03*m10*m31 - m00*m13*m31 - m01*m10*m33 + m00*m11*m33;
+        od[3*4+2] = m03*m11*m20 - m01*m13*m20 - m03*m10*m21 + m00*m13*m21 + m01*m10*m23 - m00*m11*m23;
 
-        td[0*4+3] = m12*m21*m30 - m11*m22*m30 - m12*m20*m31 + m10*m22*m31 + m11*m20*m32 - m10*m21*m32;
-        td[1*4+3] = m01*m22*m30 - m02*m21*m30 + m02*m20*m31 - m00*m22*m31 - m01*m20*m32 + m00*m21*m32;
-        td[2*4+3] = m02*m11*m30 - m01*m12*m30 - m02*m10*m31 + m00*m12*m31 + m01*m10*m32 - m00*m11*m32;
-        td[3*4+3] = m01*m12*m20 - m02*m11*m20 + m02*m10*m21 - m00*m12*m21 - m01*m10*m22 + m00*m11*m22;
+        od[0*4+3] = m12*m21*m30 - m11*m22*m30 - m12*m20*m31 + m10*m22*m31 + m11*m20*m32 - m10*m21*m32;
+        od[1*4+3] = m01*m22*m30 - m02*m21*m30 + m02*m20*m31 - m00*m22*m31 - m01*m20*m32 + m00*m21*m32;
+        od[2*4+3] = m02*m11*m30 - m01*m12*m30 - m02*m10*m31 + m00*m12*m31 + m01*m10*m32 - m00*m11*m32;
+        od[3*4+3] = m01*m12*m20 - m02*m11*m20 + m02*m10*m21 - m00*m12*m21 - m01*m10*m22 + m00*m11*m22;
 
-        return this.scaleToSelf(1/det);
+        other.scaleToSelf(1/det);
+        return this;
+    },
+
+    invertToSelf: function() {
+        return this.invertTo(this);
     },
 
     determinant: function() {
@@ -176,9 +228,10 @@ Cube.core.math.Matrix4.prototype = {
         return value;
     },
     
-    multiplyToSelf: function(other) {
+    multiplyTo: function(other, target) {
         var td = this.data;
         var od = other.data;
+        var tgtd = target.data;
 
         var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
         var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
@@ -190,27 +243,31 @@ Cube.core.math.Matrix4.prototype = {
         var o20 = od[0*4+2], o21 = od[1*4+2], o22 = od[2*4+2], o23 = od[3*4+2];
         var o30 = od[0*4+3], o31 = od[1*4+3], o32 = od[2*4+3], o33 = od[3*4+3];
 
-        td[0*4+0] = m00 * o00 + m01 * o10 + m02 * o20 + m03 * o30;
-        td[1*4+0] = m00 * o01 + m01 * o11 + m02 * o21 + m03 * o31;
-        td[2*4+0] = m00 * o02 + m01 * o12 + m02 * o22 + m03 * o32;
-        td[3*4+0] = m00 * o03 + m01 * o13 + m02 * o23 + m03 * o33;
+        tgtd[0*4+0] = m00 * o00 + m01 * o10 + m02 * o20 + m03 * o30;
+        tgtd[1*4+0] = m00 * o01 + m01 * o11 + m02 * o21 + m03 * o31;
+        tgtd[2*4+0] = m00 * o02 + m01 * o12 + m02 * o22 + m03 * o32;
+        tgtd[3*4+0] = m00 * o03 + m01 * o13 + m02 * o23 + m03 * o33;
 
-        td[0*4+1] = m10 * o00 + m11 * o10 + m12 * o20 + m13 * o30;
-        td[1*4+1] = m10 * o01 + m11 * o11 + m12 * o21 + m13 * o31;
-        td[2*4+1] = m10 * o02 + m11 * o12 + m12 * o22 + m13 * o32;
-        td[3*4+1] = m10 * o03 + m11 * o13 + m12 * o23 + m13 * o33;
+        tgtd[0*4+1] = m10 * o00 + m11 * o10 + m12 * o20 + m13 * o30;
+        tgtd[1*4+1] = m10 * o01 + m11 * o11 + m12 * o21 + m13 * o31;
+        tgtd[2*4+1] = m10 * o02 + m11 * o12 + m12 * o22 + m13 * o32;
+        tgtd[3*4+1] = m10 * o03 + m11 * o13 + m12 * o23 + m13 * o33;
 
-        td[0*4+2] = m20 * o00 + m21 * o10 + m22 * o20 + m23 * o30;
-        td[1*4+2] = m20 * o01 + m21 * o11 + m22 * o21 + m23 * o31;
-        td[2*4+2] = m20 * o02 + m21 * o12 + m22 * o22 + m23 * o32;
-        td[3*4+2] = m20 * o03 + m21 * o13 + m22 * o23 + m23 * o33;
+        tgtd[0*4+2] = m20 * o00 + m21 * o10 + m22 * o20 + m23 * o30;
+        tgtd[1*4+2] = m20 * o01 + m21 * o11 + m22 * o21 + m23 * o31;
+        tgtd[2*4+2] = m20 * o02 + m21 * o12 + m22 * o22 + m23 * o32;
+        tgtd[3*4+2] = m20 * o03 + m21 * o13 + m22 * o23 + m23 * o33;
 
-        td[0*4+3] = m30 * o00 + m31 * o10 + m32 * o20 + m33 * o30;
-        td[1*4+3] = m30 * o01 + m31 * o11 + m32 * o21 + m33 * o31;
-        td[2*4+3] = m30 * o02 + m31 * o12 + m32 * o22 + m33 * o32;
-        td[3*4+3] = m30 * o03 + m31 * o13 + m32 * o23 + m33 * o33;
+        tgtd[0*4+3] = m30 * o00 + m31 * o10 + m32 * o20 + m33 * o30;
+        tgtd[1*4+3] = m30 * o01 + m31 * o11 + m32 * o21 + m33 * o31;
+        tgtd[2*4+3] = m30 * o02 + m31 * o12 + m32 * o22 + m33 * o32;
+        tgtd[3*4+3] = m30 * o03 + m31 * o13 + m32 * o23 + m33 * o33;
 
         return this;
+    },
+
+    multiplyToSelf: function(other) {
+        return this.multiplyTo(other, this);
     },
 
     scaleToSelf: function(factor) {
@@ -222,37 +279,75 @@ Cube.core.math.Matrix4.prototype = {
         return this;
     },
     
-    transposeToSelf: function() {
+    transposeTo: function(other) {
         var td = this.data;
-        var tmp;
+        var od = other.data;
 
-        tmp = td[ 1]; td[ 1] = td[ 4]; td[ 4] = tmp;
-        tmp = td[ 2]; td[ 2] = td[ 8]; td[ 8] = tmp;
-        tmp = td[ 6]; td[ 6] = td[ 9]; td[ 9] = tmp;
-        tmp = td[ 3]; td[ 3] = td[12]; td[12] = tmp;
-        tmp = td[ 7]; td[ 7] = td[13]; td[13] = tmp;
-        tmp = td[11]; td[11] = td[14]; td[14] = tmp;
+        var m00 = td[0*4+0], m01 = td[1*4+0], m02 = td[2*4+0], m03 = td[3*4+0];
+        var m10 = td[0*4+1], m11 = td[1*4+1], m12 = td[2*4+1], m13 = td[3*4+1];
+        var m20 = td[0*4+2], m21 = td[1*4+2], m22 = td[2*4+2], m23 = td[3*4+2];
+        var m30 = td[0*4+3], m31 = td[1*4+3], m32 = td[2*4+3], m33 = td[3*4+3];
+
+        od[0*4+0] = m00
+        od[1*4+1] = m11;
+        od[2*4+2] = m22;
+        od[3*4+3] = m33;
+        od[1*4+0] = m10; od[0*4+1] = m01;
+        od[2*4+0] = m20; od[0*4+2] = m02;
+        od[3*4+0] = m30; od[0*4+3] = m03;
+        od[2*4+1] = m21; od[1*4+2] = m12;
+        od[3*4+1] = m31; od[1*4+3] = m13;
+        od[3*4+2] = m32; od[2*4+3] = m23;
         
         return this;
     },
 
-    cloneWithoutTranslation: function() {
-        var res = this.clone(),
-            td = res.data;
+    transposeToSelf: function() {
+        return this.transposeTo(this);
+    },
 
-        td[3*4+0] = 0;
-        td[3*4+1] = 0;
-        td[3*4+2] = 0;
-        td[3*4+3] = 1;
+    setRotationFrom: function(other) {
+        var td = this.data;
+        var od = other.data;
 
+        for (var i = 0; i < 3*4+0; ++i) {
+            td[i] = od[i];
+        }
+
+        return this;
+    },
+
+    setTranslationFrom: function(other) {
+        var td = this.data;
+        var od = other.data;
+
+        for (var i = 3*4+0; i < 3*4+3; ++i) {
+            td[i] = od[i];
+        }
+
+        return this;
+    },
+
+    transformRawVector4: function(vector) {
+        var res = [];
+        var td = this.data;
+        for (var i = 0; i < 3; ++i) {
+            res[i] =
+                vector[0] * td[0*4+i] +
+                vector[1] * td[1*4+i] +
+                vector[2] * td[2*4+i] +
+                vector[3] * td[3*4+i];
+        }
         return res;
     }
 };
 
-Cube.core.math.Matrix4.prototype.rawdata_identity = [1, 0, 0, 0,
-                                                     0, 1, 0, 0,
-                                                     0, 0, 1, 0,
-                                                     0, 0, 0, 1];
+Cube.core.math.Matrix4.rawdata_identity = [1, 0, 0, 0,
+                                           0, 1, 0, 0,
+                                           0, 0, 1, 0,
+                                           0, 0, 0, 1];
+
+Cube.core.math.Matrix4.identity = (new Cube.core.math.Matrix4()).initToIdentity();
 Cube.core.Utilities = {
     buildName: (function() {
 	var id = 0;
@@ -323,6 +418,7 @@ Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
     this.renderer.deactivateAllTextureUnits();
     this.renderer.deactivateAllLights();
     this.renderer.setTransparentMode(materialNode.isTransparent());
+    this.renderer.setInsideOutMode(materialNode.isInsideOut());
 };
 
 Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindingNode) {
@@ -374,6 +470,10 @@ Cube.core.ArrayNode.prototype.accept = function(visitor) {
     visitor.visitArrayEnd();
 };
 
+Cube.core.ArrayNode.prototype.at = function(index) {
+    return this.nodes[index];
+};
+
 Cube.core.ArrayNode.prototype.push = function(node) {
     this.nodes.push(node);
 };
@@ -382,71 +482,42 @@ Cube.core.ArrayNode.prototype.clear = function(fromIdx) {
     this.nodes.splice(fromIdx);
     return this;
 };
-Cube.core.BufferSetNode = function (attributes) {
-
-//    this.checkFactory(attributes.factory);
-//    this.checkBuffer(attributes.vertex);
-//    this.checkBuffer(attributes.index);
+Cube.core.BufferSetNode = function(attributes) {
+    Cube.core.Node.call(this, attributes);
 
     this.factory = attributes.factory;
-    this.vertexBuffer = null;
-    this.normalBuffer = null;
-    this.colorBuffer = null;
-    this.uvBuffer = null;
-    this.indexBuffer = null;
-
-    var factory = this.factory;
-
-    if (!!attributes.vertex) {
-	this.vertexBuffer = this.buildBuffer(false, attributes.vertex, factory);
-    }
-
-    if (!!attributes.normal) {
-	this.normalBuffer = this.buildBuffer(false, attributes.normal, factory);
-    }
-
-    if (!!attributes.color) {
-	this.colorBuffer = this.buildBuffer(false, attributes.color, factory);
-    }
-
-    if (!!attributes.uv) {
-	this.uvBuffer = this.buildBuffer(false, attributes.uv, factory);
-    }
-
-    if (!!attributes.index) {
-	this.indexBuffer = this.buildBuffer(true, attributes.index, factory);
-    }
-
-    Cube.core.Node.call(this, attributes);
 };
 
 Cube.core.BufferSetNode.prototype = new Cube.core.Node({});
 Cube.core.BufferSetNode.prototype.constructor = Cube.core.BufferSetNode;
 
-Cube.core.BufferSetNode.prototype.accept = function (visitor) {
+Cube.core.BufferSetNode.prototype.createAttributeBuffer = function(name, data) {
+    return this.createBuffer(name, new Float32Array(data), false);
+};
+
+Cube.core.BufferSetNode.prototype.createIndexBuffer = function(name, data) {
+    return this.createBuffer(name, new Uint16Array(data), true);
+};
+
+Cube.core.BufferSetNode.prototype.createBuffer = function(name, data, flag) {
+    this[name+"Buffer"] = this.buildBuffer(flag, data, this.factory); // [FIXME : +"Buffer" to be compliant with current renderer]
+    return this;
+};
+
+Cube.core.BufferSetNode.prototype.accept = function(visitor) {
     visitor.visitBufferSet(this);
 };
 
-Cube.core.BufferSetNode.prototype.buildBuffer = function (isIndex, data, factory) {
+Cube.core.BufferSetNode.prototype.buildBuffer = function(isIndex, data, factory) {
     return {size: data.length,
-	    data: factory(isIndex, data)};
-    
+	        data: factory(isIndex, data)};
 };
-
-Cube.core.BufferSetNode.prototype.checkFactory = function (ref) {
-    Cube.core.Utilities.checkReference(ref);
-    return ref;
-};
-
-Cube.core.BufferSetNode.prototype.checkBuffer = function (buffer) {
-    Cube.core.Utilities.checkReference(buffer);
-    return buffer;
-}
 Cube.core.OutputToBufferSet = function(attributes) {
     this.hasVertex = !!attributes.hasVertex;
     this.hasNormal = !!attributes.hasNormal;
     this.hasColor = !!attributes.hasColor;
     this.hasUV = !!attributes.hasUV;
+    this.hasTangent = !!attributes.hasTangent;
     this.hasIndex = !!attributes.hasIndex;
     this.factory = attributes.factory;
 
@@ -454,6 +525,7 @@ Cube.core.OutputToBufferSet = function(attributes) {
     this.normal = null;
     this.color = null;
     this.uv = null;
+    this.tangent = null;
     this.index = null;
 };
 
@@ -462,56 +534,62 @@ Cube.core.OutputToBufferSet.prototype.constructor = Cube.core.OutputToBufferSet;
 
 Cube.core.OutputToBufferSet.prototype.begin = function(vertexCount, indexCount) {
     if (!!this.hasVertex) {
-	this.vertex = [];
+	    this.vertex = [];
     }
 
     if (!!this.hasNormal) {
-	this.normal = [];
+	    this.normal = [];
     }
 
     if (!!this.hasColor) {
-	this.color = [];
+	    this.color = [];
     }
 
     if (!!this.hasUV) {
-	this.uv = [];
+	    this.uv = [];
+    }
+
+    if (!!this.hasTangent) {
+        this.tangent = [];
     }
 
     if (!!this.hasIndex) {
-	this.index = [];
+	    this.index = [];
     }
 };
 
 Cube.core.OutputToBufferSet.prototype.end = function() {
-    var bufferSetAttributes = {
-	factory: this.factory
-    };
+    var bufferSetNode = new Cube.core.BufferSetNode({factory: this.factory});
 
     if (!!this.hasVertex) {
-	bufferSetAttributes.vertex = new Float32Array(this.vertex);
+	    bufferSetNode.createAttributeBuffer("vertex", this.vertex);
     }
 
     if (!!this.hasNormal) {
-	bufferSetAttributes.normal = new Float32Array(this.normal);
+	    bufferSetNode.createAttributeBuffer("normal", this.normal);
     }
     if (!!this.hasColor) {
-	bufferSetAttributes.color = new Float32Array(this.color);
+	    bufferSetNode.createAttributeBuffer("color", this.color);
     }
 
     if (!!this.hasUV) {
-	bufferSetAttributes.uv = new Float32Array(this.uv);
+	    bufferSetNode.createAttributeBuffer("uv", this.uv);
+    }
+
+    if (!!this.hasTangent) {
+	    bufferSetNode.createAttributeBuffer("tangent", this.tangent);
     }
 
     if (!!this.hasIndex) {
-	bufferSetAttributes.index = new Uint16Array(this.index);
+	    bufferSetNode.createIndexBuffer("index", this.index);
     }
 
-    return new Cube.core.BufferSetNode(bufferSetAttributes); // <== 
+    return bufferSetNode; // <== 
 };
 
 Cube.core.OutputToBufferSet.prototype.addVertex = function(x, y, z) {
     if (!this.hasVertex) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.vertex.push(x);
@@ -521,7 +599,7 @@ Cube.core.OutputToBufferSet.prototype.addVertex = function(x, y, z) {
 
 Cube.core.OutputToBufferSet.prototype.addNormal = function(x, y, z) {
     if (!this.hasNormal) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.normal.push(x);
@@ -531,7 +609,7 @@ Cube.core.OutputToBufferSet.prototype.addNormal = function(x, y, z) {
 
 Cube.core.OutputToBufferSet.prototype.addColor = function(r, g, b, a) {
     if (!this.hasColor) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.color.push(r);
@@ -542,16 +620,27 @@ Cube.core.OutputToBufferSet.prototype.addColor = function(r, g, b, a) {
 
 Cube.core.OutputToBufferSet.prototype.addUV = function(u, v) {
     if (!this.hasUV) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.uv.push(u);
     this.uv.push(v);
 };
 
+Cube.core.OutputToBufferSet.prototype.addTangent = function(x, y, z, w) {
+    if (!this.hasTangent) {
+        return; // <== 
+    }
+
+    this.tangent.push(x);
+    this.tangent.push(y);
+    this.tangent.push(z);
+    this.tangent.push(w);
+};
+
 Cube.core.OutputToBufferSet.prototype.addTriplet = function(p1, p2, p3) {
     if (!this.hasIndex) {
-	return; // <== 
+	    return; // <== 
     }
 
     this.index.push(p1);
@@ -721,10 +810,17 @@ Cube.core.OrthographicOpticNode.prototype.default_far = 1000.0;
 Cube.core.TransformNode = function (attributes) {
     Cube.core.Node.call(this, attributes);
 
+    this.children = [];
     this.localMatrix = attributes.matrix || (new Cube.core.math.Matrix4()).initToIdentity();
+    this.matrix = Cube.core.math.Matrix4.identity.clone();
+    this.invert = Cube.core.math.Matrix4.identity.clone();
+    this.normal = Cube.core.math.Matrix4.identity.clone();
     this.parent = attributes.parent || null;
+    this.dirty = true;
 
-    Cube.core.TransformNode.prototype.update.call(this);
+    if (this.parent) {
+        this.parent.addChild(this);
+    }
 };
 
 Cube.core.TransformNode.prototype = new Cube.core.Node({});
@@ -732,6 +828,43 @@ Cube.core.TransformNode.prototype.constructor = Cube.core.TransformNode;
 
 Cube.core.TransformNode.prototype.accept = function(visitor) {
     visitor.visitTransform(this);
+};
+
+Cube.core.TransformNode.prototype.setDirty = function() {
+    if (this.dirty) {
+        return; // <== No need to propagate downstream if already dirty.
+    }
+    this.dirty = true;
+    this.children.forEach(function(elt) {
+        elt.setDirty();
+    });
+};
+
+Cube.core.TransformNode.prototype.isDirty = function() {
+    return this.dirty;
+};
+
+Cube.core.TransformNode.prototype.setParent = function(parent) {
+    this.parent = parent;
+    return this;
+};
+
+Cube.core.TransformNode.prototype.addChild = function(child) {
+    this.children.push(child);
+    return this;
+};
+
+Cube.core.TransformNode.prototype.removeChild = function(child) {
+    this.children.filter(function(el) {return el != this});
+    return this;
+};
+
+Cube.core.TransformNode.prototype.orphan = function() {
+    if (this.parent) {
+        this.parent.removeChild(this);
+        this.parent = null;
+    }
+    return this;
 };
 
 Cube.core.TransformNode.prototype.getLocalMatrix = function() {
@@ -750,22 +883,46 @@ Cube.core.TransformNode.prototype.getNormal = function() {
     return this.normal;
 };
 
-Cube.core.TransformNode.prototype.update = function() {
+Cube.core.TransformNode.prototype.updateLocal = function() {
     if (this.parent) {
-	this.matrix = this.parent.getMatrix().multiply(this.localMatrix);
+        this.parent.getMatrix().multiplyTo(this.localMatrix, this.matrix);
     }
     else {
-	this.matrix = this.localMatrix.clone();
+        this.localMatrix.copyTo(this.matrix);
     }
 
-    this.invert = this.matrix.clone().invertToSelf();
-    this.normal = this.invert.clone().transposeToSelf();
+    this.dirty = false;
+
+    this.matrix.invertTo(this.invert);
+    this.invert.transposeTo(this.normal);
+};
+
+Cube.core.TransformNode.prototype.findUpdateRoot = function() {
+    if (this.parent && this.parent.isDirty()) {
+        return this.parent.findUpdateRoot();
+    }
+
+    return this;
+};
+
+Cube.core.TransformNode.prototype.updateDownStream = function() {
+    this.updateLocal();
+    this.children.forEach(function(elt) {
+        elt.updateDownStream();
+    });
+};
+
+Cube.core.TransformNode.prototype.update = function(upstream) {
+    this.findUpdateRoot().updateDownStream();
     return this;
 };
 Cube.core.RotationXYZNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
-    this.vector = attributes.vector;
+    var x = attributes.x || 0.0;
+    var y = attributes.y || 0.0;
+    var z = attributes.z || 0.0;
+    this.vector = new Cube.core.math.Vector3(x, y, z);
     
     this.update();
 };
@@ -775,17 +932,21 @@ Cube.core.RotationXYZNode.prototype.constructor = Cube.core.RotationXYZNode;
 
 Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
     if (!!x) {
-	this.vector.setX(x);
+	    this.vector.setX(x);
     }
     if (!!y) {
-	this.vector.setY(y);
+	    this.vector.setY(y);
     }
     if (!!z) {
-	this.vector.setZ(z);
+	    this.vector.setZ(z);
     }
+
+    this.setDirty();
+
+    return this;
 };
 
-Cube.core.RotationXYZNode.prototype.update = function() {
+Cube.core.RotationXYZNode.prototype.updateLocal = function() {
     // -----
     // "general rotation"
     // cf. http://en.wikipedia.org/wiki/Rotation_matrix
@@ -816,12 +977,15 @@ Cube.core.RotationXYZNode.prototype.update = function() {
     matrix.setElement(2, 1, cosX * sinY * sinZ + cosZsinX);
     matrix.setElement(2, 2, cosX * cosY);
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 Cube.core.ScalingNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
-    this.vector = attributes.vector;
+    var x = attributes.x || 0.0;
+    var y = attributes.y || 0.0;
+    var z = attributes.z || 0.0;
+    this.vector = new Cube.core.math.Vector3(x, y, z);
     
     this.update();
 };
@@ -831,17 +995,21 @@ Cube.core.ScalingNode.prototype.constructor = Cube.core.ScalingNode;
 
 Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
     if (!!x) {
-	this.vector.setX(x);
+	    this.vector.setX(x);
     }
     if (!!y) {
-	this.vector.setY(y);
+	    this.vector.setY(y);
     }
     if (!!z) {
-	this.vector.setZ(z);
+	    this.vector.setZ(z);
     }
+
+    this.setDirty();
+
+    return this;
 };
 
-Cube.core.ScalingNode.prototype.update = function() {
+Cube.core.ScalingNode.prototype.updateLocal = function() {
     var v = this.vector;
     var matrix = this.getLocalMatrix();
 
@@ -849,12 +1017,15 @@ Cube.core.ScalingNode.prototype.update = function() {
     matrix.setElement(1, 1, v.y);
     matrix.setElement(2, 2, v.z);
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 Cube.core.TranslationNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
-    this.vector = attributes.vector;
+    var x = attributes.x || 0.0;
+    var y = attributes.y || 0.0;
+    var z = attributes.z || 0.0;
+    this.vector = new Cube.core.math.Vector3(x, y, z);
     
     this.update();
 };
@@ -862,19 +1033,23 @@ Cube.core.TranslationNode = function(attributes) {
 Cube.core.TranslationNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TranslationNode.prototype.constructor = Cube.core.TranslationNode;
 
-Cube.core.RotationXYZNode.prototype.set = function(x, y, z) {
+Cube.core.TranslationNode.prototype.set = function(x, y, z) {
     if (!!x) {
-	this.vector.setX(x);
+	    this.vector.setX(x);
     }
     if (!!y) {
-	this.vector.setY(y);
+	    this.vector.setY(y);
     }
     if (!!z) {
-	this.vector.setZ(z);
+	    this.vector.setZ(z);
     }
+
+    this.setDirty();
+
+    return this;
 };
 
-Cube.core.TranslationNode.prototype.update = function() {
+Cube.core.TranslationNode.prototype.updateLocal = function() {
     var v = this.vector;
     var matrix = this.getLocalMatrix();
 
@@ -882,7 +1057,7 @@ Cube.core.TranslationNode.prototype.update = function() {
     matrix.setElement(1, 3, v.getY());
     matrix.setElement(2, 3, v.getZ());
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 Cube.core.FaceCameraNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
@@ -893,9 +1068,9 @@ Cube.core.FaceCameraNode = function(attributes) {
 Cube.core.FaceCameraNode.prototype = new Cube.core.TransformNode({});
 Cube.core.FaceCameraNode.prototype.constructor = Cube.core.FaceCameraNode;
 
-Cube.core.FaceCameraNode.prototype.update = function() {
-    this.localMatrix = this.reference.getMatrix().cloneWithoutTranslation();
-    return Cube.core.TransformNode.prototype.update.call(this);
+Cube.core.FaceCameraNode.prototype.updateLocal = function() {
+    this.getLocalMatrix().setRotationFrom(this.reference.getMatrix());
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 Cube.core.FaceObjectNode = function(attributes) {
     Cube.core.TransformNode.call(this, attributes);
@@ -906,53 +1081,146 @@ Cube.core.FaceObjectNode = function(attributes) {
 Cube.core.FaceObjectNode.prototype = new Cube.core.TransformNode({});
 Cube.core.FaceObjectNode.prototype.constructor = Cube.core.FaceObjectNode;
 
-Cube.core.FaceObjectNode.prototype.update = function() {
-    this.localMatrix = this.reference.getInvert().cloneWithoutTranslation();
-    return Cube.core.TransformNode.prototype.update.call(this);
+Cube.core.FaceObjectNode.prototype.updateLocal = function() {
+    this.getLocalMatrix().setRotationFrom(this.reference.getInvert());
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
+};
+Cube.core.TranslationCompensatorNode = function(attributes) {
+    Cube.core.TransformNode.call(this, attributes);
+
+    var bridge = new Cube.core.TranslationCompensatorNode.BridgeNode({parent: attributes.reference,
+                                                                      target: this});
+    this.reference = attributes.reference;
+    this.bridge = bridge;
+};
+
+Cube.core.TranslationCompensatorNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TranslationCompensatorNode.prototype.constructor = Cube.core.TranslationCompensatorNode;
+
+Cube.core.TranslationCompensatorNode.prototype.link = function(reference) {
+    var bridge = new Cube.core.TranslationCompensatorNode.BridgeNode({parent: reference,
+                                                                      target: this});
+    this.reference = reference;
+    this.bridge = bridge;
+};
+
+Cube.core.TranslationCompensatorNode.prototype.unlink = function() {
+    this.reference.removeChild(this.bridge);
+    this.bridge = null;
+    this.reference = null;
+};
+
+Cube.core.TranslationCompensatorNode.prototype.updateLocal = function() {
+    this.getLocalMatrix().setTranslationFrom(this.reference.getMatrix());
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
+};
+
+Cube.core.TranslationCompensatorNode.BridgeNode = function(attributes) {
+    Cube.core.TransformNode.call(this, attributes);
+    this.target = attributes.target;
+};
+
+Cube.core.TranslationCompensatorNode.BridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TranslationCompensatorNode.BridgeNode.prototype.constructor = Cube.core.TranslationCompensatorNode.BridgeNode;
+
+Cube.core.TranslationCompensatorNode.BridgeNode.prototype.updateLocal = function() {
+    this.target.updateLocal();
 };
 Cube.core.TransformStackNode = function (attributes) {
     Cube.core.TransformNode.call(this, attributes);
 
     this.transformations = new Cube.core.ArrayNode({});
+    this.upStream = new Cube.core.TransformStackNode.UpStreamBridgeNode({target: this});
+    this.downStream = new Cube.core.TransformStackNode.DownStreamBridgeNode({target: this});
 };
 
 Cube.core.TransformStackNode.prototype = new Cube.core.TransformNode({});
 Cube.core.TransformStackNode.prototype.constructor = Cube.core.TransformStackNode;
 
 Cube.core.TransformStackNode.prototype.push = function(transfo) {
-    Cube.core.Utilities.checkReference(transfo, "transfo");
-    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
+//    Cube.core.Utilities.checkReference(transfo, "transfo");
+//    Cube.core.Utilities.checkType(transfo, Cube.core.TransformNode, "transfo should be Cube.core.TransformNode");
+
+    // All nodes share upStream and downStream bridge nodes.
+    // Note that transfo does not belong to upStream children set, neither it is the parent of downStream.
+    // 
+    transfo.setParent(this.upStream);
+    transfo.addChild(this.downStream);
 
     this.transformations.push(transfo);
     return this;
 };
 
-Cube.core.TransformStackNode.prototype.update = function() {
-    this.transformations.nodes.reduce(
-	function(prev, current) {
-	    current.update();
-	    return prev.multiplyToSelf(current.getMatrix())
-	}, 
-	this.localMatrix.initToIdentity());
+Cube.core.TransformStackNode.prototype.at = function(index) {
+    return this.transformations.at(index);
+};
 
-    return Cube.core.TransformNode.prototype.update.call(this);
+Cube.core.TransformStackNode.prototype.updateLocal = function() {
+    this.transformations.nodes.reduce(
+        function(prev, current) {
+            current.updateLocal(); // Do *NOT* call update(). It will yield to an infinite recursion, because of the bridge.
+            return prev.multiplyToSelf(current.getMatrix())
+        }, 
+        this.localMatrix.initToIdentity());
+
+    return Cube.core.TransformNode.prototype.updateLocal.call(this);
 };
 
 Cube.core.TransformStackNode.prototype.compact = function(fromIdx) {
     var compactedMatrix = this.transformations.nodes.reduce(
-	function(prev, current, idx) {
-	    if (idx < fromIdx) {
-		return prev; // <== 
-	    }
-	    return prev.multiplyToSelf(current.getMatrix())
-	}, 
-	(new Cube.core.math.Matrix4()).initToIdentity());
-
+        function(prev, current, idx) {
+            if (idx < fromIdx) {
+                return prev; // <== 
+            }
+            return prev.multiplyToSelf(current.getMatrix())
+        },
+        (new Cube.core.math.Matrix4()).initToIdentity());
+    
     this.transformations
-	.clear(fromIdx)
-	.push(new Cube.core.TransformNode({matrix: compactedMatrix}));
-
+        .clear(fromIdx)
+        .push(new Cube.core.TransformNode({matrix: compactedMatrix}));
+    
     return this;
+};
+
+// -----
+
+Cube.core.TransformStackNode.DownStreamBridgeNode = function(attributes) {
+//    Cube.core.Utilities.checkReference(target, "target");
+//    Cube.core.Utilities.checkType(target, Cube.core.TransformStackNode, "target should be Cube.core.TransformStackNode");
+
+    Cube.core.TransformNode.call(this, attributes);
+
+    this.target = attributes.target;
+};
+
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype.constructor = Cube.core.TransformStackNode.DownStreamBridgeNode;
+
+Cube.core.TransformStackNode.DownStreamBridgeNode.prototype.setDirty = function() {
+    this.target.setDirty();
+};
+
+// -----
+
+Cube.core.TransformStackNode.UpStreamBridgeNode = function(attributes) {
+//    Cube.core.Utilities.checkReference(target, "target");
+//    Cube.core.Utilities.checkType(target, Cube.core.TransformStackNode, "target should be Cube.core.TransformStackNode");
+
+    Cube.core.TransformNode.call(this, attributes);
+
+    this.target = attributes.target;
+};
+
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype = new Cube.core.TransformNode({});
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.constructor = Cube.core.TransformStackNode.UpStreamBridgeNode;
+
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.isDirty = function() {
+    return true;
+};
+
+Cube.core.TransformStackNode.UpStreamBridgeNode.prototype.findUpdateRoot = function() {
+    return this.target.findUpdateRoot();
 };
 Cube.core.ViewNode = function (attributes) {
     Cube.core.TransformNode.call(this, attributes);
@@ -998,13 +1266,18 @@ Cube.core.ViewportNode.prototype.getHeight = function() {
 };
 Cube.core.GeometryHelpers = {
     buildSphere: function(radius, output) {
-        var nbSlices = 20,
-        nbPoints = (nbSlices+1)*(2*nbSlices+1),
-        nbFaces = nbSlices * 2 * nbSlices
-        nbTris = nbFaces * 2,
-        nbIndices = nbTris * 3;
-	
-	output.begin(nbPoints, nbIndices);
+        var nbSlices = 30,
+            nbPoints = (nbSlices+1)*(2*nbSlices+1),
+            nbFaces = nbSlices * 2 * nbSlices,
+            nbTris = nbFaces * 2,
+            nbIndices = nbTris * 3;
+
+        var normals = [],
+            vertices = [],
+            uvs = [],
+            indices = [];
+
+        output.begin(nbPoints, nbIndices);
 
         var startLatitudes = -Math.PI/2.0,
             stopLatitudes = Math.PI/2.0,
@@ -1013,135 +1286,220 @@ Cube.core.GeometryHelpers = {
             stopLongitudes = 2.0 * Math.PI,
             deltaLongitude = (stopLongitudes - startLongitudes) / (2 * nbSlices);
 
-	var iterLat;
-        for (iterLat = 0; iterLat <= nbSlices; ++iterLat) {
+        for (var iterLat = 0; iterLat <= nbSlices; ++iterLat) {
             var latitude = startLatitudes + iterLat * (stopLatitudes - startLatitudes) / nbSlices,
                 y = Math.sin(latitude),
                 rad = Math.cos(latitude),
                 v = (1.0 - iterLat / nbSlices);
 
-	    var iterLong;
-            for (iterLong = 0; iterLong <= 2*nbSlices; ++iterLong) {
+            for (var iterLong = 0; iterLong <= 2*nbSlices; ++iterLong) {
                 var longitude = startLongitudes + iterLong * (stopLongitudes - startLongitudes) / (2 * nbSlices),
                     x = Math.cos(longitude) * rad,
                     z = Math.sin(longitude) * rad,
                     u = (1.0 - iterLong / (nbSlices*2));
 
-		output.addVertex(x*radius, y*radius, z*radius);
-		output.addNormal(x, y, z);
-		output.addColor(x, y, z, 1.0);
-		output.addUV(u, v);
+                output.addVertex(x*radius, y*radius, z*radius);
+                output.addNormal(x, y, z);
+                output.addColor(x, y, z, 1.0);
+                output.addUV(u, v);
+
+                vertices.push([x*radius, y*radius, z*radius]);
+                normals.push([x, y, z]);
+                uvs.push([u, v]);
             }
         }
 
-	var pInd = 0;
-        var nbPointsPerLat = nbSlices * 2 + 1,
-	    latitude;
-        for (latitude = 0; latitude < nbSlices; ++latitude) {
-            var base = latitude * nbPointsPerLat,
-	        longitude;
-            for (longitude = 0; longitude < nbSlices*2; ++longitude) {
+        var nbPointsPerLat = nbSlices * 2 + 1;
+        for (var latitude = 0; latitude < nbSlices; ++latitude) {
+            var base = latitude * nbPointsPerLat;
+            for (var longitude = 0; longitude < nbSlices*2; ++longitude) {
                 var p1 = base + longitude,
                     p2 = base + longitude + 1,
                     p3 = base + nbPointsPerLat + longitude,
                     p4 = base + nbPointsPerLat + longitude + 1;
 
-		output.addTriplet(p1, p3, p2);
-		output.addTriplet(p2, p3, p4);
+                output.addTriplet(p1, p3, p2);
+                output.addTriplet(p2, p3, p4);
+
+                indices.push([p1, p3, p2]);
+                indices.push([p2, p3, p4]);
             }
         }
 
-	return output.end();
+        var tan1 = [],
+            tan2 = [];
+
+        for (var i = 0; i < vertices.length; ++i) {
+            tan1.push([0, 0, 0]);
+            tan2.push([0, 0, 0]);
+        }
+
+        for (var i = 0; i < indices.length; ++i) {
+            var triangle = indices[i],
+
+                i1 = triangle[0],
+                i2 = triangle[1],
+                i3 = triangle[2],
+
+                v1 = vertices[i1],
+                v2 = vertices[i2],
+                v3 = vertices[i3],
+
+                w1 = uvs[i1],
+                w2 = uvs[i2],
+                w3 = uvs[i3],
+
+                x1 = v2[0] - v1[0],
+                x2 = v3[0] - v1[0],
+                y1 = v2[1] - v1[1],
+                y2 = v3[1] - v1[1],
+                z1 = v2[2] - v1[2],
+                z2 = v3[2] - v1[2],
+                s1 = w2[0] - w1[0],
+                s2 = w3[0] - w1[0],
+                t1 = w2[1] - w1[1],
+                t2 = w3[1] - w1[1],
+                r = 1.0 / (s1 * t2 - s2 * t1);
+
+            var sdir = [(t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r];
+            var tdir = [(s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r];
+
+            var add = function(to, what) {
+                to[0] += what[0];
+                to[1] += what[1];
+                to[2] += what[2];
+            };
+
+            add(tan1[i1], sdir);
+            add(tan1[i2], sdir);
+            add(tan1[i3], sdir);
+
+            add(tan2[i1], tdir);
+            add(tan2[i2], tdir);
+            add(tan2[i3], tdir);
+        }
+
+        for (var a = 0; a < vertices.length; ++a) {
+            var rawN = normals[a],
+                rawT = tan1[a],
+                rawT2 = tan2[a],
+                n = new Cube.core.math.Vector3(rawN[0], rawN[1], rawN[2]),
+                t = new Cube.core.math.Vector3(rawT[0], rawT[1], rawT[2]),
+                t2 = new Cube.core.math.Vector3(rawT2[0], rawT2[1], rawT2[2]);
+
+            var tangent = t.sub(n.scale(n.dot(t))).normalizeSelf(), // Gram-Schmidt orthogonalize.
+                w = (n.cross(t).dot(t2) < 0.0) ? -1.0 : 1.0; // Calculate handedness.
+
+            output.addTangent(tangent.x, tangent.y, tangent.z, w);
+        }
+
+        return output.end();
     },
 
     buildPlane: function(halfSide, output) {
-	var verts = [  1, 1, 0,  -1, 1, 0,  -1,-1, 0,   1,-1, 0 ];
-	var uvs = [  1, 1,   0, 1,   0, 0,   1, 0 ];
-	var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1 ];
-	var colors = [ 1, 1, 1,   1, 1, 0,   1, 0, 0,   1, 0, 1 ];
-	var indices = [ 0, 1, 2,   2, 3, 0 ];
+        var verts = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0];
+        var uvs = [1, 1, 0, 1, 0, 0, 1, 0];
+        var normals = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
+        var colors = [1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1];
+        var indices = [0, 1, 2, 2, 3, 0 ];
 
-	output.begin(verts.length/3, indices.length);
+        output.begin(verts.length/3, indices.length);
 
-	var iterVert;
-	for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
-	    var offset = iterVert * 3;
-	    var uvOffset = iterVert * 2;
-	    output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
-	    output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
-	    output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
-	    output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
-	}
+        var iterVert;
+        for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
+            var offset = iterVert * 3;
+            var uvOffset = iterVert * 2;
+            output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
+            output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
+            output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
+            output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
+        }
 
-	for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {
-	    var offset = iterInd*6;
-	    output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
-	    output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
-	}
+        for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {
+            var offset = iterInd*6;
+            output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
+            output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
+        }
 
-	return output.end();
+        return output.end();
     },
 
     buildCube: function(halfSide, output) {
-	var verts = [  1, 1, 1,  -1, 1, 1,  -1,-1, 1,   1,-1, 1,   // v0,v1,v2,v3 (front)
-		       1, 1, 1,   1,-1, 1,   1,-1,-1,   1, 1,-1,   // v0,v3,v4,v5 (right)
-		       1, 1, 1,   1, 1,-1,  -1, 1,-1,  -1, 1, 1,   // v0,v5,v6,v1 (top)
-		      -1, 1, 1,  -1, 1,-1,  -1,-1,-1,  -1,-1, 1,   // v1,v6,v7,v2 (left)
-		      -1,-1,-1,   1,-1,-1,   1,-1, 1,  -1,-1, 1,   // v7,v4,v3,v2 (bottom)
-		       1,-1,-1,  -1,-1,-1,  -1, 1,-1,   1, 1,-1 ]; // v4,v7,v6,v5 (back)
+        var verts = [  1, 1, 1,  -1, 1, 1,  -1,-1, 1,   1,-1, 1,   // v0,v1,v2,v3 (front)
+                       1, 1, 1,   1,-1, 1,   1,-1,-1,   1, 1,-1,   // v0,v3,v4,v5 (right)
+                       1, 1, 1,   1, 1,-1,  -1, 1,-1,  -1, 1, 1,   // v0,v5,v6,v1 (top)
+                      -1, 1, 1,  -1, 1,-1,  -1,-1,-1,  -1,-1, 1,   // v1,v6,v7,v2 (left)
+                      -1,-1,-1,   1,-1,-1,   1,-1, 1,  -1,-1, 1,   // v7,v4,v3,v2 (bottom)
+                       1,-1,-1,  -1,-1,-1,  -1, 1,-1,   1, 1,-1 ]; // v4,v7,v6,v5 (back)
 
-	var uvs = [  1, 1,   0, 1,   0, 0,   1, 0,   // v0,v1,v2,v3 (front)
-		     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v3,v4,v5 (right)
-		     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v5,v6,v1 (top)
-		     1, 1,   0, 1,   0, 0,   1, 0,   // v1,v6,v7,v2 (left)
-		     1, 1,   0, 1,   0, 0,   1, 0,   // v7,v4,v3,v2 (bottom)
-		     1, 1,   0, 1,   0, 0,   1, 0 ]; // v4,v7,v6,v5 (back)
+        var uvs = [  1, 1,   0, 1,   0, 0,   1, 0,   // v0,v1,v2,v3 (front)
+                     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v3,v4,v5 (right)
+                     1, 1,   0, 1,   0, 0,   1, 0,   // v0,v5,v6,v1 (top)
+                     1, 1,   0, 1,   0, 0,   1, 0,   // v1,v6,v7,v2 (left)
+                     1, 1,   0, 1,   0, 0,   1, 0,   // v7,v4,v3,v2 (bottom)
+                     1, 1,   0, 1,   0, 0,   1, 0 ]; // v4,v7,v6,v5 (back)
 
-	var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1,   // v0,v1,v2,v3 (front)
-			 1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0,   // v0,v3,v4,v5 (right)
-			 0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   // v0,v5,v6,v1 (top)
-			-1, 0, 0,  -1, 0, 0,  -1, 0, 0,  -1, 0, 0,   // v1,v6,v7,v2 (left)
-			 0,-1, 0,   0,-1, 0,   0,-1, 0,   0,-1, 0,   // v7,v4,v3,v2 (bottom)
-			 0, 0,-1,   0, 0,-1,   0, 0,-1,   0, 0,-1 ]; // v4,v7,v6,v5 (back)
+        var normals = [  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1,   // v0,v1,v2,v3 (front)
+                         1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0,   // v0,v3,v4,v5 (right)
+                         0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0,   // v0,v5,v6,v1 (top)
+                        -1, 0, 0,  -1, 0, 0,  -1, 0, 0,  -1, 0, 0,   // v1,v6,v7,v2 (left)
+                         0,-1, 0,   0,-1, 0,   0,-1, 0,   0,-1, 0,   // v7,v4,v3,v2 (bottom)
+                         0, 0,-1,   0, 0,-1,   0, 0,-1,   0, 0,-1 ]; // v4,v7,v6,v5 (back)
 
-	var colors = [ 1, 1, 1,   1, 1, 0,   1, 0, 0,   1, 0, 1,   // v0,v1,v2,v3 (front)
-		       1, 1, 1,   1, 0, 1,   0, 0, 1,   0, 1, 1,   // v0,v3,v4,v5 (right)
-		       1, 1, 1,   0, 1, 1,   0, 1, 0,   1, 1, 0,   // v0,v5,v6,v1 (top)
-		       1, 1, 0,   0, 1, 0,   0, 0, 0,   1, 0, 0,   // v1,v6,v7,v2 (left)
-		       0, 0, 0,   0, 0, 1,   1, 0, 1,   1, 0, 0,   // v7,v4,v3,v2 (bottom)
-		       0, 0, 1,   0, 0, 0,   0, 1, 0,   0, 1, 1 ]; // v4,v7,v6,v5 (back)
+        var colors = [ 1, 1, 1,   1, 1, 0,   1, 0, 0,   1, 0, 1,   // v0,v1,v2,v3 (front)
+                       1, 1, 1,   1, 0, 1,   0, 0, 1,   0, 1, 1,   // v0,v3,v4,v5 (right)
+                       1, 1, 1,   0, 1, 1,   0, 1, 0,   1, 1, 0,   // v0,v5,v6,v1 (top)
+                       1, 1, 0,   0, 1, 0,   0, 0, 0,   1, 0, 0,   // v1,v6,v7,v2 (left)
+                       0, 0, 0,   0, 0, 1,   1, 0, 1,   1, 0, 0,   // v7,v4,v3,v2 (bottom)
+                       0, 0, 1,   0, 0, 0,   0, 1, 0,   0, 1, 1 ]; // v4,v7,v6,v5 (back)
 
-	var indices = [ 0, 1, 2,   2, 3, 0,      // front
-			4, 5, 6,   6, 7, 4,      // right
-			8, 9,10,  10,11, 8,      // top
-			12,13,14,  14,15,12,     // left
-			16,17,18,  18,19,16,     // bottom
-			20,21,22,  22,23,20 ];   // back
+        var indices = [ 0, 1, 2,   2, 3, 0,      // front
+                        4, 5, 6,   6, 7, 4,      // right
+                        8, 9,10,  10,11, 8,      // top
+                        12,13,14,  14,15,12,     // left
+                        16,17,18,  18,19,16,     // bottom
+                        20,21,22,  22,23,20 ];   // back
 
-	output.begin(verts.length/3, indices.length);
+        output.begin(verts.length/3, indices.length);
 
-	var iterVert;
-	for (iterVert = 0; iterVert < verts.length/3; ++iterVert) {
-	    var offset = iterVert * 3;
-	    var uvOffset = iterVert * 2;
-	    output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
-	    output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
-	    output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
-	    output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
-	}
+        for (var iterVert = 0; iterVert < verts.length/3; ++iterVert) {
+            var offset = iterVert * 3,
+                uvOffset = iterVert * 2;
+            output.addVertex(verts[offset]*halfSide, verts[offset+1]*halfSide, verts[offset+2]*halfSide);
+            output.addNormal(normals[offset], normals[offset+1], normals[offset+2]);
+            output.addColor(colors[offset], colors[offset+1], colors[offset+2], 1.0);
+            output.addUV(uvs[uvOffset], uvs[uvOffset+1]);
+        }
 
-	for (iterInd = 0; iterInd < indices.length/6; ++iterInd) {
-	    var offset = iterInd*6;
-	    output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
-	    output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
-	}
+        for (var iterInd = 0; iterInd < indices.length/6; ++iterInd) {
+            var offset = iterInd*6;
+            output.addTriplet(indices[offset], indices[offset+1], indices[offset+2]);
+            output.addTriplet(indices[offset+3], indices[offset+4], indices[offset+5]);
+        }
 
-	return output.end();
+        return output.end();
     }
+};
+Cube.core.MeshLoader = function() {
+};
+
+Cube.core.MeshLoader.prototype = {};
+Cube.core.MeshLoader.prototype.constructor = Cube.core.MeshLoader;
+
+Cube.core.MeshLoader.prototype.build = function(jsonData, bufferSetNode) {
+    var rawMesh = JSON.parse(jsonData);
+    for (b in rawMesh.model.vertices.data) {
+        var name = (b == "position" ? "vertex" : b);
+        bufferSetNode.createAttributeBuffer(name, rawMesh.model.vertices.data[b]);
+    }
+    if (rawMesh.model.indices) {
+        bufferSetNode.createIndexBuffer("index", rawMesh.model.indices.data);
+    }
+    return bufferSetNode;
 };
 Cube.core.ShaderNode = function(attributes) {
     Cube.core.Node.call(this, attributes);
-
+    
     this.manager = attributes.manager;
     this.name = attributes.name;
     this.program = null;
@@ -1152,14 +1510,14 @@ Cube.core.ShaderNode.prototype.constructor = Cube.core.ShaderNode;
 
 Cube.core.ShaderNode.prototype.getProgram = function() {
     if (this.program == null) {
-	this.program = this.manager.createProgram(this.name);
+	    this.program = this.manager.createProgram(this.name);
     }
     return this.program;
 };
 
 Cube.core.ShaderNode.prototype.getBindings = function() {
     if (this.program == null) {
-	this.program = this.manager.createProgram(this.name);
+	    this.program = this.manager.createProgram(this.name);
     }
     return this.manager.getBindings(this.name);
 };
@@ -1414,6 +1772,10 @@ Cube.core.MaterialBindingNode = function (attributes) {
 Cube.core.MaterialBindingNode.prototype = new Cube.core.Node({});
 Cube.core.MaterialBindingNode.prototype.constructor = Cube.core.MaterialBindingNode;
 
+Cube.core.MaterialBindingNode.prototype.accept = function (visitor) {
+    visitor.visitMaterialBinding(this);
+};
+
 Cube.core.MaterialBindingNode.prototype.getParameterName = function() {
     return this.name;
 };
@@ -1426,29 +1788,41 @@ Cube.core.MaterialBindingNode.prototype.getParameterValue = function() {
     return this.value;
 };
 
-Cube.core.MaterialBindingNode.prototype.accept = function (visitor) {
-    visitor.visitMaterialBinding(this);
+Cube.core.MaterialBindingNode.prototype.setParameterValue = function(value) {
+    this.value = value;
+    return this;
 };
 Cube.core.MaterialNode = function (attributes) {
     Cube.core.Node.call(this, attributes);
 
     this.transparent = attributes.transparent;
+    this.insideOut = attributes.insideOut;
     this.nodes = new Cube.core.ArrayNode({});
+    this.nodesByName = {};
 
     this.nodes.push(attributes.shader);
     for (var name in attributes.bindings) {
-	var node = new Cube.core.MaterialBindingNode({name: name,
-						      type: attributes.shader.getParamTypes().uniforms[name],
-						      value: attributes.bindings[name]});
-	this.nodes.push(node);
+        var node = new Cube.core.MaterialBindingNode({name: name,
+                                                      type: attributes.shader.getParamTypes().uniforms[name],
+                                                      value: attributes.bindings[name]});
+    	this.nodes.push(node);
+        this.nodesByName[name] = node;
     }
 };
 
 Cube.core.MaterialNode.prototype = new Cube.core.Node({});
 Cube.core.MaterialNode.prototype.constructor = Cube.core.MaterialNode;
 
+Cube.core.MaterialNode.prototype.getBinding = function(name) {
+    return this.nodesByName[name];
+};
+
 Cube.core.MaterialNode.prototype.isTransparent = function (visitor) {
     return this.transparent;
+};
+
+Cube.core.MaterialNode.prototype.isInsideOut = function (visitor) {
+    return this.insideOut;
 };
 
 Cube.core.MaterialNode.prototype.accept = function (visitor) {
@@ -1472,7 +1846,7 @@ Cube.core.LightAmbiantNode.prototype.accept = function(visitor) {
 
 Cube.core.LightDirectionalNode = function(attributes) {
     this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
-    this.direction = attributes.direction || [0.0, -1.0, 0.0];
+    this.direction = attributes.direction || [0.0, -1.0, 0.0, 0.0];
 };
 
 Cube.core.LightDirectionalNode.prototype = new Cube.core.Node({});
@@ -1492,7 +1866,7 @@ Cube.core.LightDirectionalNode.prototype.accept = function(visitor) {
 
 Cube.core.LightPositionalNode = function(attributes) {
     this.color = attributes.color || [0.0, 0.0, 0.0, 0.0];
-    this.position = attributes.position || [0.0, 1.0, 0.0];
+    this.position = attributes.position || [0.0, 1.0, 0.0, 1.0];
 };
 
 Cube.core.LightPositionalNode.prototype = new Cube.core.Node({});
@@ -1533,6 +1907,20 @@ Cube.core.CameraNode.prototype.accept = function(visitor) {
 Cube.core.CameraNode.prototype.update = function() {
     this.viewNode.update();
 };
+Cube.core.ObjectEnlighterNode = function(attributes) {
+    this.scene = attributes.scene || null;
+};
+
+Cube.core.ObjectEnlighterNode.prototype = new Cube.core.Node({});
+Cube.core.ObjectEnlighterNode.prototype.constructor = Cube.core.ObjectEnlighterNode;
+
+Cube.core.ObjectEnlighterNode.prototype.setScene = function(scene) {
+    this.scene = scene;
+};
+
+Cube.core.ObjectEnlighterNode.prototype.accept = function(visitor) {
+    this.scene.getLights().accept(visitor);
+};
 Cube.core.Object = function(attributes) {
     Cube.core.Node.call(this, attributes);
 
@@ -1550,6 +1938,19 @@ Cube.core.Object.prototype.setScene = function(scene) {
 Cube.core.Object.prototype.accept = function(visitor) {
     this.nodes.accept(visitor);
 };
+Cube.core.LightSourceNode = function(attributes) {
+    this.light = attributes.light;
+    this.transform = attributes.transform || (new Cube.core.TransformNode({})).update();
+};
+
+Cube.core.LightSourceNode.prototype = new Cube.core.Node({});
+Cube.core.LightSourceNode.prototype.constructor = Cube.core.LightSourceNode;
+
+Cube.core.LightSourceNode.prototype.accept = function(visitor) {
+    this.transform.accept(visitor);
+    this.light.accept(visitor);
+};
+
 Cube.core.Scene = function (attributes) {
     this.activeViewport = new Cube.core.ArrayNode({});
     this.activeCamera = new Cube.core.ArrayNode({});
@@ -1623,11 +2024,16 @@ Cube.core.Renderer = function(attributes) {
     this.defaultClearFlags = 0;
     this.mappings = null;
     this.projectionTransfo = null;
-    this.viewTransfo = null;
+    this.viewTransfo = new Cube.core.math.Matrix4();
+    this.viewInvertTransposeTransfo = new Cube.core.math.Matrix4();
+    this.modelViewTransfo = new Cube.core.math.Matrix4();
+    this.modelViewInvertTransposeTransfo = new Cube.core.math.Matrix4();
     this.bufferFactoryFunc = null;
     this.nextTextureUnit = 0;
     this.lightsUniforms = [];
     this.nextLight = 0;
+    this.transparentMode = false;
+    this.insideOutMode = false;
 
     this.setup();
 };
@@ -1646,6 +2052,7 @@ Cube.core.Renderer.prototype.textureQuality = {
 };
 
 Cube.core.Renderer.prototype.shaderLightSubParameters = {
+    type:      "type",
     color:     "color",
     direction: "direction",
     position:  "position"
@@ -1653,17 +2060,18 @@ Cube.core.Renderer.prototype.shaderLightSubParameters = {
 
 Cube.core.Renderer.prototype.shaderParameters = {
     uniforms: {
-	    matrixProjection: "matrixProjection",
-	    matrixModel:      "matrixModel",
-	    matrixNormal:     "matrixNormal",
-	    matrixView:       "matrixView",
+        matrixProjection: "matrixProjection",
+        matrixModel:      "matrixModel",
+        matrixNormal:     "matrixNormal",
+        matrixView:       "matrixView",
         lightsCount:      "lightsCount"
     },
     attributes: {
-	    vertex: "vertex",
-	    normal: "normal",
-	    color:  "color",
-	    uv:     "uv"
+        vertex:  "vertex",
+        normal:  "normal",
+        color:   "color",
+        uv:      "uv",
+        tangent: "tangent"
     }
 };
 
@@ -1673,8 +2081,11 @@ Cube.core.Renderer.prototype.shaderParameterTypes = {
     TEXTURE2D: "texture2D"
 };
 
-Cube.core.Renderer.prototype.shaderDefaultParameterTypes = {
-    texture0: Cube.core.Renderer.prototype.shaderParameterTypes.texture2D
+Cube.core.Renderer.prototype.lightTypes = {
+    AMBIANT: 1,
+    DIRECTIONAL: 2,
+    POINT: 3,
+    SPOT: 4
 };
 
 Cube.core.Renderer.prototype.constructor = Cube.core.Renderer;
@@ -1698,13 +2109,13 @@ Cube.core.Renderer.prototype.setup = function() {
     }
 
     this.bufferFactoryFunc = (function (gl) {
-	return function (isIndex, data) {
-	    var buffer = gl.createBuffer();
-	    var type = isIndex ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
-	    gl.bindBuffer(type, buffer);
-	    gl.bufferData(type, data, gl.STATIC_DRAW);
-	    return buffer; // <== 
-	};
+    return function (isIndex, data) {
+        var buffer = gl.createBuffer();
+        var type = isIndex ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+        gl.bindBuffer(type, buffer);
+        gl.bufferData(type, data, gl.STATIC_DRAW);
+        return buffer; // <== 
+    };
     })(this.gl);
 
     this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT
@@ -1719,18 +2130,22 @@ Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
     this.transparentMode = !!toggle;
 };
 
+Cube.core.Renderer.prototype.setInsideOutMode = function(toggle) {
+    this.insideOutMode = !!toggle;
+};
+
 Cube.core.Renderer.prototype.clear = function(buffers) {
     var bits = 0;
     if (!!buffers) {
-	    if (!!buffers.color) {
-	        bits |= this.gl.COLOR_BUFFER_BIT;
-	    }
-	    if (!!buffers.depth) {
-	        bits |= this.gl.DEPTH_BUFFER_BIT;
-	    }
-	    if (!!buffers.stencil) {
-	        bits |= this.gl.STENCIL_BUFFER_BIT;
-	    }
+        if (!!buffers.color) {
+            bits |= this.gl.COLOR_BUFFER_BIT;
+        }
+        if (!!buffers.depth) {
+            bits |= this.gl.DEPTH_BUFFER_BIT;
+        }
+        if (!!buffers.stencil) {
+            bits |= this.gl.STENCIL_BUFFER_BIT;
+        }
     }
     else {
         bits = this.defaultClearFlags;
@@ -1742,8 +2157,8 @@ Cube.core.Renderer.prototype.clear = function(buffers) {
 
 Cube.core.Renderer.prototype.deactivateAllTextureUnits = function() {
     for (var i = 0; i < this.nextTextureUnit; ++i) {
-	    this.gl.activeTexture(this.gl.TEXTURE0 + i);
-	    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        this.gl.activeTexture(this.gl.TEXTURE0 + i);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
     this.nextTextureUnit = 0;
 };
@@ -1766,16 +2181,25 @@ Cube.core.Renderer.prototype.loadProjectionTransformation = function(transfo) {
 };
 
 Cube.core.Renderer.prototype.loadViewTransformation = function(transfo) {
-    this.viewTransfo = transfo;
+    transfo.copyTo(this.modelViewTransfo);
+    this.modelViewTransfo.invertTo(this.modelViewInvertTransposeTransfo);
+    this.modelViewInvertTransposeTransfo.transposeToSelf();
+
+    this.modelViewTransfo.copyTo(this.viewTransfo);
+    this.modelViewInvertTransposeTransfo.copyTo(this.viewInvertTransposeTransfo);
 };
 
 Cube.core.Renderer.prototype.loadNormalTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
+    this.viewInvertTransposeTransfo.copyTo(this.modelViewInvertTransposeTransfo);
+    this.modelViewInvertTransposeTransfo.multiplyToSelf(transfo);
+    var rawMatrix = this.modelViewInvertTransposeTransfo.getRawData();
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixNormal], false, rawMatrix);
 };
 
 Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
-    var rawMatrix = transfo.getRawData();
+    this.viewTransfo.copyTo(this.modelViewTransfo);
+    this.modelViewTransfo.multiplyToSelf(transfo);
+    var rawMatrix = this.modelViewTransfo.getRawData();
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixModel], false, rawMatrix);
 };
 
@@ -1814,6 +2238,14 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
         }
     }
 
+    if (!!bufferSet.tangentBuffer) {
+        if (this.mappings.attributes[this.shaderParameters.attributes.tangent] != undefined) {
+            this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.tangent]);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.tangentBuffer.data);
+            this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.tangent], 4, this.gl.FLOAT, false, 0, 0);
+        }
+    }
+
     this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
     this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
@@ -1826,22 +2258,24 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
 
     if (this.transparentMode) {
         this.gl.frontFace(this.gl.CW);
-	    if (mode == this.mode.ELEMENT) {
+        if (mode == this.mode.ELEMENT) {
             this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
             this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-	    }
-	    else {
+        }
+        else {
             this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
         }
         this.gl.frontFace(this.gl.CCW);
     }
 
-    if (mode == this.mode.ELEMENT) {
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
-        this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
-    }
-    else {
-        this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+    if (! this.insideOutMode) {
+        if (mode == this.mode.ELEMENT) {
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, bufferSet.indexBuffer.data);
+            this.gl.drawElements(this.gl.TRIANGLES, bufferSet.indexBuffer.size, this.gl.UNSIGNED_SHORT, 0);
+        }
+        else {
+            this.gl.drawArrays(this.gl.POINTS, 0, bufferSet.vertexBuffer.size/3);
+        }
     }
 
     this.gl.disable(this.gl.BLEND);
@@ -1886,7 +2320,7 @@ Cube.core.Renderer.prototype.bindShaderParamWithValue = function(name, type, val
 
 Cube.core.Renderer.prototype.loadPerFrameData = function() {
     this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixProjection], false, this.projectionTransfo.getRawData());
-    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.viewTransfo.getRawData());
+    this.gl.uniformMatrix4fv(this.mappings.uniforms[this.shaderParameters.uniforms.matrixView], false, this.modelViewTransfo.getRawData());
 };
 
 Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
@@ -1894,6 +2328,7 @@ Cube.core.Renderer.prototype.addAmbiantLight = function(lightAmbiantNode) {
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.AMBIANT);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightAmbiantNode.getColor());
     this.nextLight = this.nextLight + 1;
 };
@@ -1903,8 +2338,10 @@ Cube.core.Renderer.prototype.addDirectionalLight = function(lightDirectionalNode
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.DIRECTIONAL);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightDirectionalNode.getColor());
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], lightDirectionalNode.getDirection());
+    // Light direction is expressed in world coordinates. Transform it into eye coordimates.
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.direction], this.modelViewInvertTransposeTransfo.transformRawVector4(lightDirectionalNode.getDirection()));
     this.nextLight = this.nextLight + 1;
 };
 
@@ -1913,7 +2350,9 @@ Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) 
     if (!lightParams) {
         return; // <== 
     }
+    this.gl.uniform1i(this.mappings.uniforms[lightParams.type], this.lightTypes.POINT);
     this.gl.uniform4fv(this.mappings.uniforms[lightParams.color], lightPositionalNode.getColor());
-    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], lightPositionalNode.getPosition());
+    // Light position is expressed in world coordinates. Transform it into eye coordimates.
+    this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.modelViewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
     this.nextLight = this.nextLight + 1;
 };

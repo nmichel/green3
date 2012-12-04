@@ -85,8 +85,7 @@ function buildCircles(parent, radius, depth) {
             (new Cube.core.TransformStackNode({parent: parent}))
             .push(new Cube.core.RotationXYZNode({}))
             .push(new Cube.core.RotationXYZNode({y: a}))
-            .push(new Cube.core.TranslationNode({z: radius}))
-            .push(new Cube.core.TranslationNode({y: 1.2*depth}));
+            .push(new Cube.core.TranslationNode({z: radius}));
 
         transfos.push(localNode);
 
@@ -192,6 +191,32 @@ Range.prototype.at = function(when) {
 };
 
 
+Scale = function(values) {
+    // if (values.length < 2) {
+    //     throw ...
+    // }
+
+    var rangeCount = values.length-1;
+    var rangeLength = 1.0/rangeCount;
+    
+    this.rangeLength = rangeLength;
+    this.rangeCount = rangeCount;
+    this.ranges = [];
+    for (var i = 0; i < rangeCount; ++i) {
+        var range = new Range(values[i], values[i+1]);
+        this.ranges.push(range);
+    }
+};
+
+Scale.prototype = {};
+Scale.prototype.constructor = Scale;
+Scale.prototype.at = function(when) {
+    var rangeId = Math.floor(when/this.rangeLength);
+    var whenInRange = (when*this.rangeCount)-rangeId; // scale up, then offset
+    return this.ranges[rangeId].at(whenInRange);
+};
+
+
 Animator = function(attributes) {
     this.range = attributes.range;
     this.delay = attributes.delay;
@@ -217,8 +242,7 @@ Animator.prototype.bind = function(what) {
     return this;
 };
 
-
-var a1 = (new Animator({range: new Range(0.0, Math.PI*2.0),
+var a1 = (new Animator({range: new Range(0, 2.0*Math.PI),
                        delay: 10000/*, // millisec
                        ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
                        repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
@@ -226,17 +250,29 @@ var a1 = (new Animator({range: new Range(0.0, Math.PI*2.0),
     .bind(function(val) {
         for (var i = 0; i < transfos.length; ++i) {
             var node = transfos[i].at(0);
-            node.set(val, null, val);
+            node.set(val, null, null);
         };
     });
 
-var a2 = (new Animator({range: new Range(0.0, 1.0),
+var a2 = (new Animator({range: new Scale([0.0, 1.0, 0.0]),
                        delay: 5000/*, // millisec
                        ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
                        repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
                        }))
     .bind(function(val) {
         earthMaterial.getBinding("u_color").setParameterValue([val, val, val, 1.0]);
+    });
+
+var a3 = (new Animator({range: new Scale([[0.0, 0.0, 0.0, 1.0],
+                                          [1.0, 0.0, 1.0, 1.0],
+                                          [0.0, 1.0, 1.0, 0.0],
+                                          [0.0, 0.0, 0.0, 1.0]]),
+                       delay: 5000/*, // millisec
+                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                       }))
+    .bind(function(val) {
+        earthMaterial.getBinding("u_color").setParameterValue(val);
     });
 
 // Animate
@@ -247,7 +283,7 @@ animate();
 
 function render() {
     a1.animate(delta);
-//    a2.animate(delta);
+    a3.animate(delta);
 
     root.update();
     cameraTransform.update();
