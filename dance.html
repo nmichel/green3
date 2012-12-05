@@ -1,0 +1,59 @@
+<html lang="en">
+    <head>
+        <title>Dance</title>
+        <meta charset="utf-8" />
+
+        <link href="dance.css" rel="stylesheet">
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="common/js/RequestAnimationFrame.js" type="text/javascript"></script>
+        <script src="common/js/green3.min.js" type="text/javascript"></script>
+        <script src="dance.js"></script>
+
+        <script id="flat-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          attribute vec2 aUV;
+
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_projection;
+          
+          varying vec4 v_color;
+          varying vec4 v_normal;
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            v_normal = u_normalMatrix * vec4(aNormal, 0.0);
+            v_color = aColor;
+            v_TextureCoord = aUV;
+          }
+        </script>
+
+        <script id="flat-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
+          
+          uniform sampler2D texture0;
+          uniform sampler2D texture1;
+          uniform vec4 u_color;
+
+          varying vec4 v_color;
+          varying vec4 v_normal;
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            gl_FragColor = v_color * u_color;
+          }
+        </script>
+    </head>
+
+    <body>
+      <div id="title">
+        <h1>- DANCE -</h1>
+      </div>
+      <div id="gl_content">
+      </div>
+    </body>
+</html>

@@ -1,6 +1,6 @@
 body {
 	background-color: #F0F0F0;
-    font-family: Arial,Tahoma,sans-serif;
+    font-family:Arial,Tahoma,sans-serif;
 	width: 750px;
     margin-left: auto;
     margin-right: auto;
@@ -11,6 +11,7 @@ body {
 	box-shadow: 1px 1px 0 #C4C4C4;
 
     text-align: center;
+    font-family: Arial,Tahoma,sans-serif;
     font-size: 40px;
     font-weight: normal;
     margin: 0px;
@@ -18,12 +19,19 @@ body {
     text-transform: uppercase;
 }
 
-#gl_content {
+#demos {
+    background: white;
+	box-shadow: 1px 1px 0 #C4C4C4;
+
     margin-left:auto;
     margin-right:auto;
-    border: 1px solid #FFFFFF;
-    width: 740px;
-    height: 555px;
+
+    padding: 20px;
+}
+
+.vignette {
+    width: 185px;
+    height: 100px;
 
 	border: 5px solid white;
 	box-shadow: 1px 1px 0 #C4C4C4;
