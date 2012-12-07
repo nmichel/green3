@@ -1,51 +1,137 @@
 import bpy
+import sys
+import functools
+import textwrap
 
-class ExplorePolygon():
-    def __init__(p_self, p_mesh, p_poly, p_data):
-        f_mat = p_mesh.materials[p_poly.material_index]
-        uf = None
-        uc = None
-        vertices = p_data['vertices']['data']
-        indices = p_data['indices']['data']
-        if p_mesh.uv_layers.active:
-            uf = p_mesh.uv_layers.active.data
-        if p_mesh.vertex_colors.active:
-            uc = p_mesh.vertex_colors.active.data
-        for loop_index in range(p_poly.loop_start, p_poly.loop_start + p_poly.loop_total):
-            p_data['vertices']['count'] += 1
-            co = p_mesh.vertices[p_mesh.loops[loop_index].vertex_index].co
-            vertices['position'].extend([co.x, co.y, co.z])
-            normal = p_mesh.vertices[p_mesh.loops[loop_index].vertex_index].normal
-            vertices['normal'].extend([normal.x, normal.y, normal.z])
-            if uf:
-                uv = uf[loop_index].uv
-                vertices['uv'].extend([uv.x, uv.y])
-            if uc:
-                color = uc[loop_index].color
-                vertices['color'].extend([color.r, color.g, color.b])
-            indices.append(len(indices))
+def expand(acc, t):
+    acc.extend(t)
+    return acc
 
-class ExploreMesh():
-    def __init__(p_self, p_mesh, p_data):
-        for poly in p_mesh.polygons:
-            ExplorePolygon(p_mesh, poly, p_data)
- 
-try:
-    mesh = bpy.data.meshes[1]
+# -----
+
+class BlenderMeshVisitor:
+    def __init__(self):
+        pass
     
-    print("opening output file")
-    output = open('C:/Users/nmichel/Desktop/myText.txt', 'w')
+    def enterMesh(self, mesh):
+        self._mesh = mesh
+    
+    def leaveMesh(self):
+        self._mesh = None
+    
+    def enterPolygon(self, poly):
+        pass
+    
+    def leavePolygon(self):
+        pass
+    
+    def visitPolygonVertex(self, vertex):
+        pass
 
-    print("exporting")
-    try:
-        data = {"vertices": {"count": 0,
-                             "data": {"position": [],
-                                      "normal": [],
-                                      "color": [],
-                                      "uv": []}},
-                "indices": {"count": 0,
-                            "data": []}}
-        ExploreMesh(mesh, data)
+# -----
+
+class SingleMeshBlenderMeshVisitor(BlenderMeshVisitor):
+    def __init__(self):
+        super().__init__()
+
+    def enterMesh(self, mesh):
+        super().enterMesh(mesh)
+        self._vertices =  []
+        self._indices =  []
+
+    def leaveMesh(self):
+        super().leaveMesh()
+
+    def visitPolygonVertex(self, vertex):
+        gen = (i for i,x in enumerate(self._vertices) if x == vertex)
+        try:
+            idx = next(gen)
+            self._indices.append(idx)
+        except StopIteration:
+            self._indices.append(len(self._vertices))
+            self._vertices.append(vertex)
+
+    def output(self, output):
+        rawpositions = functools.reduce(expand, [(v[0].x, v[0].y, v[0].z) for v in self._vertices], [])
+        rawnormals = functools.reduce(expand, [(v[1].x, v[1].y, v[1].z) for v in self._vertices], [])
+        rawuv = functools.reduce(expand, [(v[2].x, v[2].y) for v in self._vertices], [])
+        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in self._vertices], [])
+
+        output.write(
+            textwrap.dedent(
+            '''\
+            {"model": { \n\
+            \t"types": {\n\
+            \t\t"vf2": ["FLOAT", 2],\n\
+            \t\t"vf3": ["FLOAT", 3],\n\
+            \t\t"vf4": ["FLOAT", 4]\n\
+            \t},\n\
+            \t"attributes": {\n\
+            \t\t"position": "vf3",\n\
+            \t\t"normal":   "vf3",\n\
+            \t\t"color":    "vf4",\n\
+            \t\t"uv":       "vf2",\n\
+            \t\t"tangent":  "vf4"\n\
+            \t},\n\
+            '''))
+        output.write('\t"vertices": {\n' )
+        output.write('\t\t"count": {},\n'.format(len(self._vertices)))
+        output.write('\t\t"data": {\n')
+        output.write('\t\t\t"position": {},\n'.format(rawpositions))
+        output.write('\t\t\t"normal": {},\n'.format(rawnormals))
+        output.write('\t\t\t"color": {},\n'.format(rawcolors))
+        output.write('\t\t\t"uv": {}\n'.format(rawuv))
+        output.write('\t\t}\n')
+        output.write('\t},\n')
+        output.write('\t"indices": {\n')
+        output.write('\t\t"count": {},\n'.format(len(self._indices)))
+        output.write('\t\t"data": {}\n'.format(self._indices))
+        output.write('\t}')
+        output.write('}}\n')
+
+# -----
+
+class MultiMeshBlenderMeshVisitor(BlenderMeshVisitor):
+    def __init__(self):
+        super().__init__()
+
+    def enterMesh(self, mesh):
+        super().enterMesh(mesh)
+        self._meshes = {}
+
+    def leaveMesh(self):
+        super().leaveMesh()
+
+    def enterPolygon(self, poly):
+        mat = self._mesh.materials[poly.material_index].name
+        self._submesh = self._getMeshDesc(mat)
+    
+    def leavePolygon(self):
+        self._submesh = None
+    
+    def visitPolygonVertex(self, vertex):
+        gen = (i for i,x in enumerate(self._submesh['vertices']) if x == vertex)
+        try:
+            idx = next(gen)
+            self._submesh['indices'].append(idx)
+        except StopIteration:
+            self._submesh['indices'].append(len(self._submesh['vertices']))
+            self._submesh['vertices'].append(vertex)
+
+    def output(self, output):
+        vertices = []
+        submeshes = []
+        base = len(vertices)
+        for k, v in self._meshes.items():
+            vertices.extend(v['vertices'])
+            indices = [x + base for x in v['indices']]
+            base = base + len(v['vertices'])
+            submeshes.append([k, indices])
+
+        rawpositions = functools.reduce(expand, [(v[0].x, v[0].y, v[0].z) for v in vertices], [])
+        rawnormals = functools.reduce(expand, [(v[1].x, v[1].y, v[1].z) for v in vertices], [])
+        rawuv = functools.reduce(expand, [(v[2].x, v[2].y) for v in vertices], [])
+        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in vertices], [])
 
         output.write(
 '\
@@ -63,23 +149,97 @@ try:
 \t\t"tangent":  "vf4"\n\
 \t},\n\
 ')
-        output.write('"vertices":{\n' )
-        output.write('\t"count": {},\n'.format(data['vertices']['count']))
-        output.write('\t"data":{\n')
-        for k, v in data['vertices']['data'].items():
-            output.write('\t\t"{}": {}\n'.format(k, v))
-        output.write('}},\n')
-        output.write('"indices":{\n' )
-        output.write('\t"count": {},\n'.format(len(data['indices']['data'])))
-        output.write('\t"data": {}\n'.format(data['indices']['data']))
-        output.write('}}}\n')
+        output.write('\t"vertices": {\n' )
+        output.write('\t\t"count": {},\n'.format(len(vertices)))
+        output.write('\t\t"data": {\n')
+        output.write('\t\t\t"position": {},\n'.format(rawpositions))
+        output.write('\t\t\t"normal": {},\n'.format(rawnormals))
+        output.write('\t\t\t"color": {},\n'.format(rawcolors))
+        output.write('\t\t\t"uv": {}\n'.format(rawuv))
+        output.write('\t\t}\n')
+        output.write('\t},\n')
+        output.write('\t"submeshes": [\n')
+        count = 1
+        for [n, i] in submeshes:
+            output.write('\t\t{\n' )
+            output.write('\t\t\t"material": "{}",\n'.format(n))
+            output.write('\t\t\t"indices": {}\n'.format(i))
+            output.write('\t\t}')
+            if count < len(submeshes):
+                output.write(',\n')
+            else:
+                output.write('\n')
+            count = count + 1
+        output.write(']}}\n')
 
-#        for k, v in data.items():
-#            output.write("{}: {}\n".format(k, v))
-            
+    def _getMeshDesc(self, name):
+        mesh = None
+        if name not in self._meshes:
+            mesh = {'vertices': [],
+                    'indices': [],
+                    'material': name}
+            self._meshes[name] = mesh
+        else:
+            mesh = self._meshes[name]
+        return mesh
+
+# -----
+
+class MeshExplorer:
+    def __init__(self):
+        self._reset(None, None);
+
+    def exploreMesh(self, mesh, visitor):
+        self._reset(mesh, visitor)
+        visitor.enterMesh(mesh)
+        for poly in mesh.polygons:
+            self._explorePolygon(poly)
+        visitor.leaveMesh()
+    
+    def _reset(self, mesh, visitor):
+        self._mesh = mesh
+        self._visitor = visitor
+
+        self._uf = None
+        self._uc = None
+        if self._mesh:
+            if self._mesh.uv_layers.active:
+                self._uf = self._mesh.uv_layers.active.data
+            if self._mesh.vertex_colors.active:
+                self._uc = self._mesh.vertex_colors.active.data
+
+    def _explorePolygon(self, poly):
+        self._visitor.enterPolygon(poly)
+        for loop_index in range(poly.loop_start, poly.loop_start + poly.loop_total):
+            co = self._mesh.vertices[self._mesh.loops[loop_index].vertex_index].co
+            normal = self._mesh.vertices[self._mesh.loops[loop_index].vertex_index].normal
+            color = None
+            uv = None
+            if self._uf:
+                uv = self._uf[loop_index].uv
+            if self._uc:
+                color = self._uc[loop_index].color
+
+            vert = [co, normal, uv, color]
+            self._visitor.visitPolygonVertex(vert)
+        self._visitor.leavePolygon()
+
+try:
+    mesh = bpy.data.meshes[1]
+    
+    print("opening output file")    
+    output = open('C:/Users/nmichel/Desktop/myText.txt', 'w')
+
+    print("exporting")
+    try:
+        explorer = MeshExplorer()
+        #visitor = MultiMeshBlenderMeshVisitor()
+        visitor = SingleMeshBlenderMeshVisitor()
+        explorer.exploreMesh(mesh, visitor)
+        visitor.output(output)
     except:
-        print("Failed to export mesh data")
-        
+        print("Failed to export mesh data {}".format(sys.exc_info()[1]))
+
     print("closing file")
     output.close()
 except:
