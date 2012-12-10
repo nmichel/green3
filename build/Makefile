@@ -46,7 +46,11 @@ FILELIST = \
 	./core/LightSourceNode.js \
 	./core/Scene.js \
 	./core/Engine.js \
-	./core/Renderer.js
+	./core/Renderer.js \
+	./anim/anim.js \
+	./anim/Range.js \
+	./anim/Scale.js \
+	./anim/Animator.js
 
 all: clean concat minify
 

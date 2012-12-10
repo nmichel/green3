@@ -1,4 +1,4 @@
-/* Generated on Tue, 04 Dec 2012 15:22:47 +0100
+/* Generated on Mon, 10 Dec 2012 17:11:59 +0100
 */ 
 var Cube = {};
 
@@ -2356,3 +2356,120 @@ Cube.core.Renderer.prototype.addPositionalLight = function(lightPositionalNode) 
     this.gl.uniform3fv(this.mappings.uniforms[lightParams.position], this.modelViewTransfo.transformRawVector4(lightPositionalNode.getPosition()));
     this.nextLight = this.nextLight + 1;
 };
+Cube.anim = {}
+
+Cube.anim.lerp = function(from, to, when) {
+    return from + (to-from)*when;
+};
+
+Cube.anim.clamp = function(value, min, max) {
+    if (value < min) {
+        return min; // <== 
+    }
+    else if (value > max) {
+        return max; // <== 
+    }
+    return value;
+};
+
+Cube.anim.lerpa = function(from, to, when) {
+    var res = [];
+    for (var i = 0; i < from.length; ++i) {
+        res[i] = Cube.anim.lerp(from[i], to[i], when);
+    }
+    return res;
+};
+Cube.anim.Range = function(from, to) {
+    this.rangeFunc = null;
+
+    if (typeof(from) != typeof(to)) {
+        throw "types differ" // <== 
+    }
+
+    if (typeof(from) == "number") {
+
+        this.rangeFunc = function(when) {
+            if (when < 0) {
+                return from; // <== 
+            }
+            else if (when > 1.0) {
+                return to; // <== 
+            }
+            return Cube.anim.lerp(from, to, when); // <== 
+        }
+    }
+    else if (typeof(from) == "object"
+          && from instanceof Array
+          && from.length == to.length) {
+
+        this.rangeFunc = function(when) {
+            if (when < 0) {
+                return from.slice(0); // <== 
+            }
+            else if (when > 1.0) {
+                return to.slice(0); // <== 
+            }
+            return Cube.anim.lerpa(from, to, when); // <== 
+        }
+    }
+    else {
+        throw "unsupported type" // <== 
+    }
+};
+
+Cube.anim.Range.prototype = {};
+Cube.anim.Range.prototype.constructor = Cube.anim.Range;
+Cube.anim.Range.prototype.at = function(when) {
+    return this.rangeFunc(when);
+};
+Cube.anim.Scale = function(values) {
+    // if (values.length < 2) {
+    //     throw ...
+    // }
+
+    var rangeCount = values.length-1;
+    var rangeLength = 1.0/rangeCount;
+    
+    this.rangeLength = rangeLength;
+    this.rangeCount = rangeCount;
+    this.ranges = [];
+    for (var i = 0; i < rangeCount; ++i) {
+        var range = new Cube.anim.Range(values[i], values[i+1]);
+        this.ranges.push(range);
+    }
+};
+
+Cube.anim.Scale.prototype = {};
+Cube.anim.Scale.prototype.constructor = Cube.anim.Scale;
+Cube.anim.Scale.prototype.at = function(when) {
+    var rangeId = Math.floor(when/this.rangeLength);
+    var whenInRange = (when*this.rangeCount)-rangeId; // scale up, then offset
+    return this.ranges[rangeId].at(whenInRange);
+};
+
+
+Cube.anim.Animator = function(attributes) {
+    this.range = attributes.range;
+    this.delay = attributes.delay;
+    // attributes.ease = attributes.ease;
+    // this.repeat = attributes.repeat;
+    this.current = 0.0;
+    this.sinks = [];
+};
+
+Cube.anim.Animator.prototype = {};
+Cube.anim.Animator.prototype.constructor = Cube.anim.Animator;
+Cube.anim.Animator.prototype.animate = function(deltaT) {
+    this.current += deltaT;
+    this.current %= this.delay;
+    var val = this.range.at(this.current/this.delay);
+    this.sinks.forEach(function(sink) {
+        sink(val);
+    });
+    return val;
+};
+Cube.anim.Animator.prototype.bind = function(what) {
+    this.sinks.push(what);
+    return this;
+};
+

@@ -121,132 +121,11 @@ for (var i = 0; i < transfos.length; ++i) {
     scene.push(earthGeom);
 }
 
-// Aminator
-
-lerp = function(from, to, when) {
-    return from + (to-from)*when;
-};
-
-clamp = function(value, min, max) {
-    if (value < min) {
-        return min; // <== 
-    }
-    else if (value > max) {
-        return max; // <== 
-    }
-    return value;
-};
-
-lerpa = function(from, to, when) {
-    var res = [];
-    for (var i = 0; i < from.length; ++i) {
-        res[i] = lerp(from[i], to[i], when);
-    }
-    return res;
-};
-
-
-Range = function(from, to) {
-    this.rangeFunc = null;
-
-    if (typeof(from) != typeof(to)) {
-        throw "types differ" // <== 
-    }
-
-    if (typeof(from) == "number") {
-
-        this.rangeFunc = function(when) {
-            if (when < 0) {
-                return from; // <== 
-            }
-            else if (when > 1.0) {
-                return to; // <== 
-            }
-            return lerp(from, to, when); // <== 
-        }
-    }
-    else if (typeof(from) == "object"
-          && from instanceof Array
-          && from.length == to.length) {
-
-        this.rangeFunc = function(when) {
-            if (when < 0) {
-                return from.slice(0); // <== 
-            }
-            else if (when > 1.0) {
-                return to.slice(0); // <== 
-            }
-            return lerpa(from, to, when); // <== 
-        }
-    }
-    else {
-        throw "unsupported type" // <== 
-    }
-};
-
-Range.prototype = {};
-Range.prototype.constructor = Range;
-Range.prototype.at = function(when) {
-    return this.rangeFunc(when);
-};
-
-
-Scale = function(values) {
-    // if (values.length < 2) {
-    //     throw ...
-    // }
-
-    var rangeCount = values.length-1;
-    var rangeLength = 1.0/rangeCount;
-    
-    this.rangeLength = rangeLength;
-    this.rangeCount = rangeCount;
-    this.ranges = [];
-    for (var i = 0; i < rangeCount; ++i) {
-        var range = new Range(values[i], values[i+1]);
-        this.ranges.push(range);
-    }
-};
-
-Scale.prototype = {};
-Scale.prototype.constructor = Scale;
-Scale.prototype.at = function(when) {
-    var rangeId = Math.floor(when/this.rangeLength);
-    var whenInRange = (when*this.rangeCount)-rangeId; // scale up, then offset
-    return this.ranges[rangeId].at(whenInRange);
-};
-
-
-Animator = function(attributes) {
-    this.range = attributes.range;
-    this.delay = attributes.delay;
-    // attributes.ease = attributes.ease;
-    // this.repeat = attributes.repeat;
-    this.current = 0.0;
-    this.sinks = [];
-};
-
-Animator.prototype = {};
-Animator.prototype.constructor = Animator;
-Animator.prototype.animate = function(deltaT) {
-    this.current += deltaT;
-    this.current %= this.delay;
-    var val = this.range.at(this.current/this.delay);
-    this.sinks.forEach(function(sink) {
-        sink(val);
-    });
-    return val;
-};
-Animator.prototype.bind = function(what) {
-    this.sinks.push(what);
-    return this;
-};
-
-var a1 = (new Animator({range: new Range(0, 2.0*Math.PI),
-                       delay: 10000/*, // millisec
-                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
-                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
-                       }))
+var a1 = (new Cube.anim.Animator({range: new Cube.anim.Range(0, 2.0*Math.PI),
+                                  delay: 10000/*, // millisec
+                                                ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                                                repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                                 }))
     .bind(function(val) {
         for (var i = 0; i < transfos.length; ++i) {
             var node = transfos[i].at(0);
@@ -254,23 +133,23 @@ var a1 = (new Animator({range: new Range(0, 2.0*Math.PI),
         };
     });
 
-var a2 = (new Animator({range: new Scale([0.0, 1.0, 0.0]),
-                       delay: 5000/*, // millisec
-                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
-                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
-                       }))
+var a2 = (new Cube.anim.Animator({range: new Cube.anim.Scale([0.0, 1.0, 0.0]),
+                                  delay: 5000/*, // millisec
+                                               ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                                               repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                                 }))
     .bind(function(val) {
         earthMaterial.getBinding("u_color").setParameterValue([val, val, val, 1.0]);
     });
 
-var a3 = (new Animator({range: new Scale([[0.0, 0.0, 0.0, 1.0],
-                                          [1.0, 0.0, 1.0, 1.0],
-                                          [0.0, 1.0, 1.0, 0.0],
-                                          [0.0, 0.0, 0.0, 1.0]]),
-                       delay: 5000/*, // millisec
-                       ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
-                       repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
-                       }))
+var a3 = (new Cube.anim.Animator({range: new Cube.anim.Scale([[0.0, 0.0, 0.0, 1.0],
+                                                              [1.0, 0.0, 1.0, 1.0],
+                                                              [0.0, 1.0, 1.0, 0.0],
+                                                              [0.0, 0.0, 0.0, 1.0]]),
+                                  delay: 5000/*, // millisec
+                                               ease: Animator.Ease.LINEAR, // LINEAR_SMOOTH, SMOOTH_SMOOTH, SMOOTH_LINEAR
+                                               repeat: Animator.Reapeat.LOOP*/ // FORTH_AND_BACK, LOOP, NONE});
+                                 }))
     .bind(function(val) {
         earthMaterial.getBinding("u_color").setParameterValue(val);
     });
