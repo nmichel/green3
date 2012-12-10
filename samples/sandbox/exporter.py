@@ -2,6 +2,7 @@ import bpy
 import sys
 import functools
 import textwrap
+import mathutils
 
 def expand(acc, t):
     acc.extend(t)
@@ -13,12 +14,13 @@ class BlenderMeshVisitor:
     def __init__(self):
         pass
     
-    def enterMesh(self, mesh):
+    def enterMesh(self, mesh, hasFlat):
         self._mesh = mesh
+        self._hasFlat = hasFlat
     
     def leaveMesh(self):
-        self._mesh = None
-    
+        pass
+
     def enterPolygon(self, poly):
         pass
     
@@ -34,15 +36,25 @@ class SingleMeshBlenderMeshVisitor(BlenderMeshVisitor):
     def __init__(self):
         super().__init__()
 
-    def enterMesh(self, mesh):
-        super().enterMesh(mesh)
+    def enterMesh(self, mesh, hasFlat):
+        super().enterMesh(mesh, hasFlat)
         self._vertices =  []
         self._indices =  []
-
+        
     def leaveMesh(self):
         super().leaveMesh()
 
+    def enterPolygon(self, poly):
+        v = mathutils.Vector(poly.normal)
+        v.normalize()
+        self._faceNormal = v
+        self._smooth = poly.use_smooth
+        
     def visitPolygonVertex(self, vertex):
+        if self._hasFlat:
+            if not self._smooth:
+               vertex[1] = self._faceNormal
+    
         gen = (i for i,x in enumerate(self._vertices) if x == vertex)
         try:
             idx = next(gen)
@@ -56,7 +68,7 @@ class SingleMeshBlenderMeshVisitor(BlenderMeshVisitor):
         rawnormals = functools.reduce(expand, [(v[1].x, v[1].y, v[1].z) for v in self._vertices], [])
         rawuv = functools.reduce(expand, [(v[2].x, v[2].y) for v in self._vertices], [])
         rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in self._vertices], [])
-
+        
         output.write(
             textwrap.dedent(
             '''\
@@ -95,8 +107,8 @@ class MultiMeshBlenderMeshVisitor(BlenderMeshVisitor):
     def __init__(self):
         super().__init__()
 
-    def enterMesh(self, mesh):
-        super().enterMesh(mesh)
+    def enterMesh(self, mesh, hasFlat):
+        super().enterMesh(mesh, hasFlat)
         self._meshes = {}
 
     def leaveMesh(self):
@@ -105,11 +117,17 @@ class MultiMeshBlenderMeshVisitor(BlenderMeshVisitor):
     def enterPolygon(self, poly):
         mat = self._mesh.materials[poly.material_index].name
         self._submesh = self._getMeshDesc(mat)
-    
-    def leavePolygon(self):
-        self._submesh = None
+
+        v = mathutils.Vector(poly.normal)
+        v.normalize()
+        self._faceNormal = v
+        self._smooth = poly.use_smooth
     
     def visitPolygonVertex(self, vertex):
+        if self._hasFlat:
+            if not self._smooth:
+               vertex[1] = self._faceNormal
+    
         gen = (i for i,x in enumerate(self._submesh['vertices']) if x == vertex)
         try:
             idx = next(gen)
@@ -134,21 +152,22 @@ class MultiMeshBlenderMeshVisitor(BlenderMeshVisitor):
         rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in vertices], [])
 
         output.write(
-'\
-{"model": { \n\
-\t"types": {\n\
-\t\t"vf2": ["FLOAT", 2],\n\
-\t\t"vf3": ["FLOAT", 3],\n\
-\t\t"vf4": ["FLOAT", 4]\n\
-\t},\n\
-\t"attributes": {\n\
-\t\t"position": "vf3",\n\
-\t\t"normal":   "vf3",\n\
-\t\t"color":    "vf4",\n\
-\t\t"uv":       "vf2",\n\
-\t\t"tangent":  "vf4"\n\
-\t},\n\
-')
+            textwrap.dedent(
+            '''\
+           {"model": { \n\
+           \t"types": {\n\
+           \t\t"vf2": ["FLOAT", 2],\n\
+           \t\t"vf3": ["FLOAT", 3],\n\
+           \t\t"vf4": ["FLOAT", 4]\n\
+           \t},\n\
+           \t"attributes": {\n\
+           \t\t"position": "vf3",\n\
+           \t\t"normal":   "vf3",\n\
+           \t\t"color":    "vf4",\n\
+           \t\t"uv":       "vf2",\n\
+           \t\t"tangent":  "vf4"\n\
+           \t},\n\
+           '''))
         output.write('\t"vertices": {\n' )
         output.write('\t\t"count": {},\n'.format(len(vertices)))
         output.write('\t\t"data": {\n')
@@ -189,9 +208,9 @@ class MeshExplorer:
     def __init__(self):
         self._reset(None, None);
 
-    def exploreMesh(self, mesh, visitor):
+    def exploreMesh(self, mesh, visitor, hasFlat):
         self._reset(mesh, visitor)
-        visitor.enterMesh(mesh)
+        visitor.enterMesh(mesh, hasFlat)
         for poly in mesh.polygons:
             self._explorePolygon(poly)
         visitor.leaveMesh()
@@ -225,7 +244,7 @@ class MeshExplorer:
         self._visitor.leavePolygon()
 
 try:
-    mesh = bpy.data.meshes[1]
+    mesh = bpy.data.meshes[0]
     
     print("opening output file")    
     output = open('C:/Users/nmichel/Desktop/myText.txt', 'w')
@@ -235,7 +254,7 @@ try:
         explorer = MeshExplorer()
         #visitor = MultiMeshBlenderMeshVisitor()
         visitor = SingleMeshBlenderMeshVisitor()
-        explorer.exploreMesh(mesh, visitor)
+        explorer.exploreMesh(mesh, visitor, True)
         visitor.output(output)
     except:
         print("Failed to export mesh data {}".format(sys.exc_info()[1]))
