@@ -67,7 +67,7 @@ class SingleMeshBlenderMeshVisitor(BlenderMeshVisitor):
         rawpositions = functools.reduce(expand, [(v[0].x, v[0].y, v[0].z) for v in self._vertices], [])
         rawnormals = functools.reduce(expand, [(v[1].x, v[1].y, v[1].z) for v in self._vertices], [])
         rawuv = functools.reduce(expand, [(v[2].x, v[2].y) for v in self._vertices], [])
-        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in self._vertices], [])
+        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b, 1.0) for v in self._vertices], [])
         
         output.write(
             textwrap.dedent(
@@ -149,7 +149,7 @@ class MultiMeshBlenderMeshVisitor(BlenderMeshVisitor):
         rawpositions = functools.reduce(expand, [(v[0].x, v[0].y, v[0].z) for v in vertices], [])
         rawnormals = functools.reduce(expand, [(v[1].x, v[1].y, v[1].z) for v in vertices], [])
         rawuv = functools.reduce(expand, [(v[2].x, v[2].y) for v in vertices], [])
-        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b) for v in vertices], [])
+        rawcolors = functools.reduce(expand, [(v[3].r, v[3].g, v[3].b, 1.0) for v in vertices], [])
 
         output.write(
             textwrap.dedent(
@@ -244,16 +244,17 @@ class MeshExplorer:
         self._visitor.leavePolygon()
 
 try:
-    mesh = bpy.data.meshes[0]
+    mesh = bpy.data.meshes[1]
     
     print("opening output file")    
     output = open('C:/Users/nmichel/Desktop/myText.txt', 'w')
+#    output = open('C:/Users/nicolas/Desktop/myText.txt', 'w')
 
     print("exporting")
     try:
         explorer = MeshExplorer()
-        #visitor = MultiMeshBlenderMeshVisitor()
-        visitor = SingleMeshBlenderMeshVisitor()
+        visitor = MultiMeshBlenderMeshVisitor()
+#        visitor = SingleMeshBlenderMeshVisitor()
         explorer.exploreMesh(mesh, visitor, True)
         visitor.output(output)
     except:
