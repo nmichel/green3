@@ -95,11 +95,12 @@ class SingleMeshBlenderMeshVisitor(BlenderMeshVisitor):
         output.write('\t\t\t"uv": {}\n'.format(rawuv))
         output.write('\t\t}\n')
         output.write('\t},\n')
-        output.write('\t"indices": {\n')
-        output.write('\t\t"count": {},\n'.format(len(self._indices)))
-        output.write('\t\t"data": {}\n'.format(self._indices))
-        output.write('\t}')
-        output.write('}}\n')
+        output.write('\t"submeshes": [\n')
+        output.write('\t\t{\n' )
+        output.write('\t\t\t"material": "{}",\n'.format("material"))
+        output.write('\t\t\t"indices": {}\n'.format(self._indices))
+        output.write('\t\t}')
+        output.write(']}}\n')
 
 # -----
 
