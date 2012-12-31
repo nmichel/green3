@@ -67,13 +67,13 @@ var modelTransfoCommonBaseNode =
     
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: Math.PI*2/5.0}))
+    .push(new Cube.core.RotationXYZNode({y: Math.PI*2/4.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: 2*Math.PI*2/5.0}))
+    .push(new Cube.core.RotationXYZNode({y: 2*Math.PI*2/4.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
@@ -85,7 +85,7 @@ var modelTransfoCommonNode3 =
 
 var modelTransfoCommonNode4 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: 3*Math.PI*2/5.0}))
+    .push(new Cube.core.RotationXYZNode({y: 3*Math.PI*2/4.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
@@ -165,32 +165,3 @@ function animate() {
     requestAnimationFrame(animate);
     render();
 }
-
-// -----
-
-var httpRequest = new XMLHttpRequest();
-httpRequest.onreadystatechange = function() {
-    if (httpRequest.readyState == 4) {
-        if (httpRequest.status == 200) {
-            var obj =
-                (new Cube.core.MeshLoader()).build(
-                    httpRequest.responseText,
-                    new Cube.core.BufferSetNode({factory: renderer.getBufferFactory()}));
-            
-            var transfo = (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-                .push(new Cube.core.RotationXYZNode({y: 4*Math.PI*2/5.0}))
-                .push(new Cube.core.TranslationNode({z: 2}))
-                .push(shaderedTransformationRotationNode);
-
-            scene.addObject(new Cube.core.Object({material: materialNodeColor,
-                                                  transformation: transfo,
-                                                  geometry: obj}));
-        }
-        else {
-            console.log("Failed to load file from server.");
-        }
-    }
-}
-
-httpRequest.open("GET", "icosphere.json", true); // Doesn't work with POST
-httpRequest.send();

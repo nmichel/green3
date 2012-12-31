@@ -184,15 +184,7 @@ Cube.core.Renderer.prototype.loadModelTransformation = function(transfo) {
 };
 
 Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
-    this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.lightsCount], this.nextLight);
-
-    if (!bufferSet.vertexBuffer) {
-        return; // <== 
-    }
-
-    if (mode == this.ELEMENT && !bufferSet.indexBuffer) {
-        return; // <== 
-    }
+    this.gl.uniform1i(this.mappings.uniforms[this.shaderParameters.uniforms.lightsCount], this.nextLight); // [FIXME : awkward]
 
     if (!!bufferSet.normalBuffer) {
         if (this.mappings.attributes[this.shaderParameters.attributes.normal] != undefined) {
@@ -226,9 +218,15 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
         }
     }
 
-    this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
-    this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
+    if (!!bufferSet.vertexBuffer) {
+        this.gl.enableVertexAttribArray(this.mappings.attributes[this.shaderParameters.attributes.vertex]);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, bufferSet.vertexBuffer.data);
+        this.gl.vertexAttribPointer(this.mappings.attributes[this.shaderParameters.attributes.vertex], 3, this.gl.FLOAT, false, 0, 0);
+    }
+
+    if (!bufferSet.indexBuffer) {
+        return // <== 
+    }
 
     if (this.transparentMode) {
         this.gl.enable(this.gl.BLEND);

@@ -5,6 +5,8 @@
 
 		<link href="loading.css" rel="stylesheet">
 
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
 		<script src="../common/webgl-debug.js"></script>
 		<script src="../common/RequestAnimationFrame.js"></script>
 
@@ -60,15 +62,15 @@
                 <script src="../../deploy/js/green3.js"></script>
 		-->
 
-		<script id="vertex-shader" type="x-shader/x-vertex">
-		  attribute vec3 aPosition;
-		  attribute vec4 aColor;
-		  attribute vec3 aNormal;
-		  attribute vec2 aUV;
+		<script id="vertex-shader-2" type="x-shader/x-vertex">
+		  attribute vec3 vertex;
+		  attribute vec4 color;
+		  attribute vec3 normal;
+		  attribute vec2 uv;
 
-		  uniform mat4 u_normalMatrix;
-		  uniform mat4 u_matrix;
-		  uniform mat4 u_projection;
+		  uniform mat4 matrixNormal;
+		  uniform mat4 matrixModel;
+		  uniform mat4 matrixProjection;
 		  
 		  varying vec4 v_position;
 		  varying vec4 v_color;
@@ -76,21 +78,23 @@
 		  varying vec2 v_TextureCoord;
 
 		  void main() {
-            v_position = u_matrix * vec4(aPosition, 1.0);;
-		    gl_Position = u_projection * v_position;
+            v_position = matrixModel * vec4(vertex, 1.0);;
+		    gl_Position = matrixProjection * v_position;
 		    gl_PointSize = 4.0;
 
-		    v_normal = u_normalMatrix * vec4(aNormal, 0.0);
-		    v_color = aColor;
-		    v_TextureCoord = aUV;
+		    v_normal = matrixNormal * vec4(normal, 0.0);
+		    v_color = color;
+		    v_TextureCoord = uv;
 		  }
 		</script>
 
-		<script id="fragment-shader" type="x-shader/x-fragment">
+		<script id="fragment-shader-2" type="x-shader/x-fragment">
 		  precision mediump float;
 		  
 		  uniform sampler2D texture0;
 		  uniform sampler2D texture1;
+
+          uniform vec4 u_color;
 
 		  varying vec4 v_position;
 		  varying vec4 v_color;
@@ -112,16 +116,19 @@
 
             // Positional
 		    float ratio = clamp(dot(normalize(lights[0].position - v_position.xyz), vec3(normalize(v_normal))), 0.0, 1.0);
-//		    gl_FragColor = lights[0].color * ratio;
-		    gl_FragColor = v_color * ratio;
+//		    gl_FragColor = lights[0].color * ratio + vec4(0.0, 0.0, 0.0, 1.0);
+		    gl_FragColor = u_color * ratio;
 		  }
 		</script>
 	</head>
 
 	<body>
-	  <div id="title">
-	    <h1>- LOADING -</h1>
-	  </div>
 	  <script src="./loading.js"></script>
+      <div id="menu">
+	    <div id="title">
+	      <h1>- LOADING -</h1>
+	    </div>
+      </div>
+      <div id="content" />
 	</body>
 </html>
