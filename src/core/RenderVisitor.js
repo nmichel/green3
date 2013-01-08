@@ -69,3 +69,8 @@ Cube.core.RenderVisitor.prototype.visitLightDirectional = function(lightDirectio
 Cube.core.RenderVisitor.prototype.visitLightPositional = function(lightPositionalNode) {
     this.renderer.addPositionalLight(lightPositionalNode);
 };
+
+Cube.core.RenderVisitor.prototype.visitExperimental = function(experimentalNode) {
+    var gl = this.renderer.getRawGL();
+    experimentalNode.doRaw(gl);
+}

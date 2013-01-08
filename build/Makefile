@@ -47,6 +47,7 @@ FILELIST = \
 	./core/Scene.js \
 	./core/Engine.js \
 	./core/Renderer.js \
+	./core/ExperimentalNode.js \
 	./anim/anim.js \
 	./anim/Range.js \
 	./anim/Scale.js \

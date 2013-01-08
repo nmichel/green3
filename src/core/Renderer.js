@@ -70,10 +70,6 @@ Cube.core.Renderer.prototype.lightTypes = {
 
 Cube.core.Renderer.prototype.constructor = Cube.core.Renderer;
 
-Cube.core.Renderer.prototype.getBufferFactory = function() {
-    return this.bufferFactoryFunc;
-};
-
 Cube.core.Renderer.prototype.setup = function() {
     // [TODO : retreive the count of available lights]
     var uniforms = this.shaderParameters.uniforms;
@@ -98,12 +94,23 @@ Cube.core.Renderer.prototype.setup = function() {
     };
     })(this.gl);
 
-    this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT
-    this.gl.clearColor(0, 0, 0, 1);
+    this.defaultClearFlags = this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT;
+    this.gl.clearColor(0, 0, 0, 1); // [TODO : add a DEFAULT_CLEAR_COLOR and a API to setup the clear color]
+    this.gl.clearStencil(0x00); // [TODO : add a DEFAULT_CLEAR_STENCIL_VALUE and a API to setup the stencil clear value]
+    // this.gl.clearDepth(0.0); // [TODO : add a DEFAULT_CLEAR_DEPTH_VALUE and a API to setup the depth buffer clear value]
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
+    // this.gl.enable(this.gl.STENCIL_TEST);
 
     this.clear();
+};
+
+Cube.core.Renderer.prototype.getRawGL = function() {
+    return this.gl;
+};
+
+Cube.core.Renderer.prototype.getBufferFactory = function() {
+    return this.bufferFactoryFunc;
 };
 
 Cube.core.Renderer.prototype.setTransparentMode = function(toggle) {
@@ -256,8 +263,10 @@ Cube.core.Renderer.prototype.renderBufferSet = function(mode, bufferSet) {
         }
     }
 
-    this.gl.disable(this.gl.BLEND);
+	this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.depthMask(true);
+    this.gl.disable(this.gl.STENCIL_TEST);
+    this.gl.disable(this.gl.BLEND);
 };
 
 Cube.core.Renderer.prototype.useShader = function(shader) {

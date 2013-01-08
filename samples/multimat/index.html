@@ -1,0 +1,166 @@
+<html lang="en">
+    <head>
+        <title>Multimat</title>
+        <meta charset="utf-8" />
+
+        <link href="multimat.css" rel="stylesheet">
+
+        <script src="../common/webgl-debug.js"></script>
+        <script src="../common/RequestAnimationFrame.js"></script>
+
+        <script src="../../src/cube.js"></script>
+        <script src="../../src/core/core.js"></script>
+        <script src="../../src/core/math/math.js"></script>
+        <script src="../../src/core/math/Vector3.js"></script>
+        <script src="../../src/core/math/Matrix4.js"></script>
+        <script src="../../src/core/Utilities.js"></script>
+        <script src="../../src/core/RenderVisitor.js"></script>
+        <script src="../../src/core/Node.js"></script>
+        <script src="../../src/core/ArrayNode.js"></script>
+        <script src="../../src/core/BufferSetNode.js"></script>
+        <script src="../../src/core/OutputToBufferSet.js"></script>
+        <script src="../../src/core/GeometryNode.js"></script>
+        <script src="../../src/core/MaterialNode.js"></script>
+        <script src="../../src/core/MeshNode.js"></script>
+        <script src="../../src/core/OrthographicOpticNode.js"></script>
+        <script src="../../src/core/OpticNode.js"></script>
+        <script src="../../src/core/TransformNode.js"></script>
+        <script src="../../src/core/RotationXYZNode.js"></script>
+        <script src="../../src/core/ScalingNode.js"></script>
+        <script src="../../src/core/TranslationNode.js"></script>
+        <script src="../../src/core/FaceCameraNode.js"></script>
+        <script src="../../src/core/FaceObjectNode.js"></script>
+        <script src="../../src/core/TransformStackNode.js"></script>
+        <script src="../../src/core/ViewNode.js"></script>
+        <script src="../../src/core/ViewportNode.js"></script>
+        <script src="../../src/core/GeometryHelpers.js"></script>
+        <script src="../../src/core/MeshLoader.js"></script>
+        <script src="../../src/core/ShaderNode.js"></script>
+        <script src="../../src/core/TextureNode.js"></script>
+        <script src="../../src/core/ResourceLoader.js"></script>
+        <script src="../../src/core/ShaderManager.js"></script>
+        <script src="../../src/core/TextureManager.js"></script>
+        <script src="../../src/core/MaterialBindingNode.js"></script>
+        <script src="../../src/core/MaterialNode.js"></script>
+        <script src="../../src/core/LightAmbiantNode.js"></script>
+        <script src="../../src/core/LightDirectionalNode.js"></script>
+        <script src="../../src/core/LightPositionalNode.js"></script>
+        <script src="../../src/core/CameraNode.js"></script>
+        <script src="../../src/core/ObjectEnlighterNode.js"></script>
+        <script src="../../src/core/ObjectNode.js"></script>
+        <script src="../../src/core/Scene.js"></script>
+        <script src="../../src/core/Engine.js"></script>
+        <script src="../../src/core/Renderer.js"></script>
+        <script src="../../src/core/ExperimentalNode.js"></script>
+
+        <!--
+                <script src="../../deploy/js/green3.min.js"></script>
+        -->
+        <!--
+                <script src="../../deploy/js/green3.js"></script>
+        -->
+        <script id="color-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_view;
+          uniform mat4 u_projection;
+          uniform vec4 u_color;
+
+          varying vec4 v_color;
+          varying vec4 v_normal;
+
+          void main() {
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            v_normal = normalize(u_normalMatrix * vec4(aNormal, 0.0));
+            v_color = u_color;
+          }
+        </script>
+
+        <script id="flat-vertex-shader" type="x-shader/x-vertex">
+          attribute vec3 aPosition;
+          attribute vec4 aColor;
+          attribute vec3 aNormal;
+          attribute vec2 aUV;
+
+          uniform mat4 u_normalMatrix;
+          uniform mat4 u_matrix;
+          uniform mat4 u_view;
+          uniform mat4 u_projection;
+          
+          varying vec3 v_position;
+          varying vec4 v_color;
+          varying vec4 v_normal;
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            gl_Position = u_projection * u_matrix * vec4(aPosition, 1.0);
+            v_position = gl_Position.xyz;
+            gl_PointSize = 4.0;
+
+            v_normal = u_normalMatrix * vec4(aNormal, 0.0);
+            float ratio = max(dot(normalize(vec4(1, 0, 1, 0)), v_normal), 0.0);
+            vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
+            v_color = vec4(color.r * ratio, color.g * ratio, color.b * ratio, color.a);
+            v_TextureCoord = aUV;
+          }
+        </script>
+
+        <script id="color-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
+
+          uniform vec4 u_color;
+
+          varying vec4 v_color;
+          varying vec4 v_normal;
+
+          void main() {
+            float ratio = max(dot(normalize(vec4(0, 0, 2, 1.0)), normalize(v_normal)), 0.0);
+            gl_FragColor = vec4(v_color.r * ratio, v_color.g * ratio, v_color.b * ratio, v_color.a);
+          }
+        </script>
+
+        <script id="flat-fragment-shader" type="x-shader/x-fragment">
+          precision mediump float;
+          
+          uniform sampler2D texture0;
+          uniform float u_axis;
+          uniform float u_alpha;
+
+          varying vec3 v_position;
+          varying vec4 v_color;
+          varying vec4 v_normal;
+          varying vec2 v_TextureCoord;
+
+          void main() {
+            if (u_axis == 1.0) {
+              if (mod(v_position.x, 0.4) > 0.2) {
+                discard; // <== 
+              }
+            }
+            else if (u_axis == 2.0) {
+              if (mod(v_position.y, 0.4) > 0.2) {
+                discard; // <== 
+              }
+            }
+            else {
+              if (mod(v_position.z, 0.4) > 0.2) {
+                discard; // <== 
+              }
+            }
+            vec4 f1 = texture2D(texture0, v_TextureCoord.st);
+            gl_FragColor = vec4(f1.rgb, u_alpha);
+          }
+        </script>
+    </head>
+
+    <body>
+      <div id="title">
+        <h1>- MULTIMAT -</h1>
+      </div>
+      <script src="./multimat.js"></script>
+    </body>
+</html>
