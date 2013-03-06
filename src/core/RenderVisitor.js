@@ -51,6 +51,12 @@ Cube.core.RenderVisitor.prototype.visitMaterial = function(materialNode) {
     this.renderer.setInsideOutMode(materialNode.isInsideOut());
 };
 
+Cube.core.RenderVisitor.prototype.visitCompositeMaterialBegin = function(compositeMaterialNode) {
+};
+
+Cube.core.RenderVisitor.prototype.visitCompositeMaterialEnd = function(compositeMaterialNode) {
+};
+
 Cube.core.RenderVisitor.prototype.visitMaterialBinding = function(materialBindingNode) {
     var paramName = materialBindingNode.getParameterName();
     var paramType = materialBindingNode.getParameterType();

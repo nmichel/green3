@@ -1,94 +1,3 @@
-Cube.core.MaterialLayerNode = function (attributes) {
-    Cube.core.ExperimentalNode.call(this, attributes);
-
-    this.isFirst = !!attributes.isFirst | false;
-    this.isLast = !!attributes.isLast | false;
-};
-
-Cube.core.MaterialLayerNode.prototype = new Cube.core.ExperimentalNode({});
-Cube.core.MaterialLayerNode.prototype.constructor = Cube.core.MaterialLayerNode;
-
-Cube.core.MaterialLayerNode.prototype.doRaw = function(gl) {
-    if (this.isFirst && this.isLast) {
-        return; // <== do nothing.
-    }
-
-    gl.enable(gl.STENCIL_TEST);
-
-    if (this.isFirst) {
-        gl.stencilFunc(gl.ALWAYS, 0x01, 0xFF);
-        gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-        return; // <== 
-    }
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-    gl.depthMask(false);
-    gl.disable(gl.DEPTH_TEST);
-    gl.stencilFunc(gl.EQUAL, 0x01, 0xFF);
-
-    if (this.isLast) {
-        gl.stencilOp(gl.KEEP, gl.REPLACE, gl.KEEP);
-    }
-    else {
-        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-    }
-};
-
-// -----
-
-Cube.core.CompositeMaterialNode = function (attributes) {
-    Cube.core.Node.call(this, attributes);
-
-    this.nodes = new Cube.core.ArrayNode({});
-    this.isTransparent = !!attributes.isTransparent;
-    this.fn = (function(cb) {
-        var memoization = {};
-        return function(what) {
-            var cache = memoization[what];
-            if (cache) {
-                return cache; // <== 
-            }
-            memoization[what] = cache = cb(what);
-            return cache; // <== 
-        };
-    })(attributes.cb);
-    
-    for (var i = 0; i < attributes.layers.length; ++i) {
-        this.nodes.push(attributes.layers[i].material,
-                        new Cube.core.MaterialLayerNode({isFirst: (i == 0),
-                                                         isLast: (i == attributes.layers.length - 1)}),
-                        new Cube.core.CompositeMaterialNode.ContextCBNode({owner: this,
-                                                                           what: Cube.core.CompositeMaterialNode.NEED_TRANSFO}),
-                        new Cube.core.CompositeMaterialNode.ContextCBNode({owner: this,
-                                                                           what: Cube.core.CompositeMaterialNode.NEED_GEOM}));
-    }
-};
-
-Cube.core.CompositeMaterialNode.prototype = new Cube.core.Node({});
-Cube.core.CompositeMaterialNode.prototype.constructor = Cube.core.CompositeMaterialNode;
-Cube.core.CompositeMaterialNode.prototype.accept = function(visitor) {
-    this.nodes.accept(visitor);
-};
-
-Cube.core.CompositeMaterialNode.NEED_GEOM    = "geom";
-Cube.core.CompositeMaterialNode.NEED_TRANSFO = "transfo";
-
-Cube.core.CompositeMaterialNode.ContextCBNode = function(attributes) {
-    Cube.core.Node.call(this, attributes);
-    this.owner = attributes.owner;
-    this.what = attributes.what;
-};
-
-Cube.core.CompositeMaterialNode.ContextCBNode.prototype = new Cube.core.Node({});
-Cube.core.CompositeMaterialNode.ContextCBNode.prototype.constructor = Cube.core.CompositeMaterialNode.ContextCBNode;
-
-Cube.core.CompositeMaterialNode.ContextCBNode.prototype.accept = function(visitor) {
-    this.owner.fn(this.what).accept(visitor);
-};
-
-// -----
-
 var container = document.createElement('div');
 var canvas = document.createElement('canvas');
 document.body.appendChild(container);
@@ -193,15 +102,8 @@ var compositeMaterial = new Cube.core.CompositeMaterialNode({layers: [{material:
                                                                       {material: materialNodeCaisse},
                                                                       {material: materialNodeEarth}],
                                                              isTransparent: false,
-                                                             cb: function(what) {
-                                                                 if (what == Cube.core.CompositeMaterialNode.NEED_TRANSFO) {
-                                                                     return modelTransfoCommonBaseNode; // <== 
-                                                                 }
-                                                                 else if (what == Cube.core.CompositeMaterialNode.NEED_GEOM) {
-                                                                     return sphereGeoBufferSet; // <== 
-                                                                 }
-                                                             }});
-
+                                                            });
+compositeMaterial.setProxyNode(new Cube.core.ArrayNode({nodes: [modelTransfoCommonBaseNode, sphereGeoBufferSet]}));
 
 // -----
 

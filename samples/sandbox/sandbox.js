@@ -67,13 +67,13 @@ var modelTransfoCommonBaseNode =
     
 var modelTransfoCommonNode = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: Math.PI*2/4.0}))
+    .push(new Cube.core.RotationXYZNode({y: Math.PI*2/5.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
 var modelTransfoCommonNode2 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: 2*Math.PI*2/4.0}))
+    .push(new Cube.core.RotationXYZNode({y: 2*Math.PI*2/5.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
@@ -85,7 +85,13 @@ var modelTransfoCommonNode3 =
 
 var modelTransfoCommonNode4 = 
     (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
-    .push(new Cube.core.RotationXYZNode({y: 3*Math.PI*2/4.0}))
+    .push(new Cube.core.RotationXYZNode({y: 3*Math.PI*2/5.0}))
+    .push(new Cube.core.TranslationNode({z: 2}))
+    .push(shaderedTransformationRotationNode);
+
+var modelTransfoCommonNode5 = 
+    (new Cube.core.TransformStackNode({parent: modelTransfoCommonBaseNode}))
+    .push(new Cube.core.RotationXYZNode({y: 4*Math.PI*2/5.0}))
     .push(new Cube.core.TranslationNode({z: 2}))
     .push(shaderedTransformationRotationNode);
 
@@ -113,11 +119,11 @@ var cubeGeoBufferSet =
 
 var materialNodeColor = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						    bindings: {
-    							u_color: [1.0, 0.5, 0.0, 1.0]}});
+    							u_color: [1.0, 0.5, 0.0, 0.5]}});
 
 var materialNodeColor2 = new Cube.core.MaterialNode({shader: shaderManager.getShader("colorspace"),
 						     bindings: {
-    							 u_color: [0.0, 0.5, 1.0, 1.0]}});
+    							 u_color: [0.0, 0.5, 1.0, 0.5]}});
 
 var materialNodeCaisse = new Cube.core.MaterialNode({shader: shaderManager.getShader("flat"),
 						     bindings: {
@@ -136,11 +142,17 @@ var materialNodeEarth = new Cube.core.MaterialNode({shader: shaderManager.getSha
     							texture0: textureManager.getTexture("earthbynight"),
     							texture1: textureManager.getTexture("earth")}});
 
+var compositeMaterial = new Cube.core.CompositeMaterialNode({layers: [{material: materialNodeEarth},
+                                                                      {material: materialNodeColor},
+                                                                      {material: materialNodeColor2}],
+                                                             isTransparent: false});
+
 scene.setViewport(viewport);
 scene.setCamera(camera);
 scene.addObject(new Cube.core.Object({material: materialNodeEarth, transformation: modelTransfoCommonNode, geometry: geoBufferSet}));
 scene.addObject(new Cube.core.Object({material: materialNodeCaisse, transformation: modelTransfoCommonNode2, geometry: cubeGeoBufferSet}));
 scene.addObject(new Cube.core.Object({material: materialNodeColor2, transformation: modelTransfoCommonNode4, geometry: geoBufferSet}));
+scene.addObject(new Cube.core.Object({material: compositeMaterial, transformation: modelTransfoCommonNode5, geometry: cubeGeoBufferSet}));
 scene.addObject(new Cube.core.Object({material: materialNodeLogo, transformation: modelTransfoCommonNode3, geometry: cubeGeoBufferSet}));
 
 var a = 0;
@@ -151,11 +163,6 @@ function render() {
     a %= Math.PI * 2;
     shaderedTransformationRotationNode.set(null, a, null);
     shaderedTransformationRotationNode.update();
-    modelTransfoCommonBaseNode.update();
-    modelTransfoCommonNode.update();
-    modelTransfoCommonNode2.update();
-    modelTransfoCommonNode3.update();
-    modelTransfoCommonNode4.update();
 
     renderer.clear();
     scene.visit(visitor);

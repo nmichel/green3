@@ -11,6 +11,7 @@ FILELIST = \
 	./core/Utilities.js \
 	./core/RenderVisitor.js \
 	./core/Node.js \
+	./core/ExperimentalNode.js \
 	./core/ArrayNode.js \
 	./core/BufferSetNode.js \
 	./core/OutputToBufferSet.js \
@@ -37,6 +38,7 @@ FILELIST = \
 	./core/TextureManager.js \
 	./core/MaterialBindingNode.js \
 	./core/MaterialNode.js \
+	./core/CompositeMaterialNode.js \
 	./core/LightAmbiantNode.js \
 	./core/LightDirectionalNode.js \
 	./core/LightPositionalNode.js \
@@ -47,7 +49,6 @@ FILELIST = \
 	./core/Scene.js \
 	./core/Engine.js \
 	./core/Renderer.js \
-	./core/ExperimentalNode.js \
 	./anim/anim.js \
 	./anim/Range.js \
 	./anim/Scale.js \

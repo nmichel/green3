@@ -16,11 +16,11 @@
         <script src="../../src/core/Utilities.js"></script>
         <script src="../../src/core/RenderVisitor.js"></script>
         <script src="../../src/core/Node.js"></script>
+        <script src="../../src/core/ExperimentalNode.js"></script>
         <script src="../../src/core/ArrayNode.js"></script>
         <script src="../../src/core/BufferSetNode.js"></script>
         <script src="../../src/core/OutputToBufferSet.js"></script>
         <script src="../../src/core/GeometryNode.js"></script>
-        <script src="../../src/core/MaterialNode.js"></script>
         <script src="../../src/core/MeshNode.js"></script>
         <script src="../../src/core/OrthographicOpticNode.js"></script>
         <script src="../../src/core/OpticNode.js"></script>
@@ -42,6 +42,7 @@
         <script src="../../src/core/TextureManager.js"></script>
         <script src="../../src/core/MaterialBindingNode.js"></script>
         <script src="../../src/core/MaterialNode.js"></script>
+        <script src="../../src/core/CompositeMaterialNode.js"></script>
         <script src="../../src/core/LightAmbiantNode.js"></script>
         <script src="../../src/core/LightDirectionalNode.js"></script>
         <script src="../../src/core/LightPositionalNode.js"></script>
@@ -67,7 +68,9 @@
           uniform mat4 u_matrix;
           uniform mat4 u_view;
           uniform mat4 u_projection;
-          
+
+          uniform vec4 u_color;
+
           varying vec4 v_color;
           varying vec4 v_normal;
 
@@ -83,7 +86,7 @@
             v_color = vec4((aNormal.x + 1.0) * 0.5,
                            (aNormal.y + 1.0) * 0.5,
                            (aNormal.z + 1.0) * 0.5,
-                           1.0);
+                           u_color.a);
           }
         </script>
 
