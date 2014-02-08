@@ -58,6 +58,9 @@
         -->
 
         <script id="shaded-vertex-shader" type="x-shader/x-vertex">
+          precision highp int;
+          precision highp float;
+
           attribute vec3 aPosition;
           attribute vec4 aColor;
           attribute vec3 aNormal;
@@ -105,8 +108,9 @@
         </script>
 
         <script id="shaded-fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
-          
+          precision highp int;
+          precision highp float;
+
           uniform sampler2D texture0;
           uniform sampler2D texture1;
           uniform sampler2D texture2;
@@ -152,6 +156,9 @@
         </script>
 
         <script id="halo-vertex-shader" type="x-shader/x-vertex">
+          precision highp int;
+          precision highp float;
+
           attribute vec3 aPosition;
           attribute vec4 aColor;
           attribute vec3 aNormal;
@@ -172,7 +179,8 @@
         </script>
 
         <script id="halo-fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
+          precision highp int;
+          precision highp float;
 
           float radius = 1.0;
           float halo = 2.0;
@@ -194,6 +202,9 @@
         </script>
 
         <script id="flat-vertex-shader" type="x-shader/x-vertex">
+          precision highp int;
+          precision highp float;
+
           attribute vec3 aPosition;
           attribute vec4 aColor;
           attribute vec3 aNormal;
@@ -212,7 +223,8 @@
         </script>
 
         <script id="flat-fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
+          precision highp int;
+          precision highp float;
 
           uniform sampler2D texture0;
 
