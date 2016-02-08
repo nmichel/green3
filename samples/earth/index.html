@@ -3,7 +3,9 @@
         <title>Earth</title>
         <meta charset="utf-8" />
 
-        <link href="earth.css" rel="stylesheet">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="earth.css">
 
         <script src="../common/webgl-debug.js"></script>
         <script src="../common/RequestAnimationFrame.js"></script>
@@ -238,8 +240,16 @@
     </head>
 
     <body>
-      <div id="title">
-        <h1>- EARTH -</h1>
+      <div class="container" role="main">
+        <div class="panel panel-primary">
+          <div class="panel-heading" id="title">
+            <div class="panel-title">
+              <h3>- EARTH -</h3>
+            </div>
+          </div>
+          <div class="panel-body" id="render-container">
+          </div>
+        </div>
       </div>
       <script src="./earth.js"></script>
     </body>

@@ -1,5 +1,10 @@
-body {
-    background-color: black;
+div[role="main"] {
+    margin-top: 20px;
+}
+
+#render_surface {
+    height: 600px;
+    width: 1108px;
 }
 
 #title h1 {

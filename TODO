@@ -1,0 +1,19 @@
+* 2012-10: Transformation : add a dirty flag to control
+  . if a local matrix must be updated, or not;
+  . if a matrix should be update depending on the dirty flag of its parent.
+* 2012-10: Improve lights model. Write real shaders.
+* 2012-10: Add custom attributes.
+* 2012-10: Rename projection matrix nodes to more consistent names.
+* 2012-10: Rename FaceObjectNode, FaceCameraNode and TranslationCompensatorNode with more explicit names.
+* 2012-10: Create a high level Skybox object (based on what is done in earth sample)
+* 2012-10: New concept : SceneLayer !
+* 2012-10: Add a new loader which concatenate source chunks to produce shaders (allowing to share code, like lighting).
+* 2012-10: Add 2 phases rendering for transparent objects : CW faces then CCW faces.
+* 2012-10: Add parameters for blending mode for transparent material.
+* 2012-09: AJAX loader for shaders
+  . program descriptors in JSON format, even in text nodes of the HTML doc
+* 2012-09: Bindings autodetection
+* 2012-09: Geometry Loader from JSON data streams
+* 2012-09: Exporter Blender
+* 2012-09: Multi material meshes
+
