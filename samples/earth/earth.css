@@ -2,9 +2,28 @@ div[role="main"] {
     margin-top: 20px;
 }
 
+.panel, .panel * {
+    border-radius: 0;
+    border: none;
+}
+
+.panel-primary > .panel-heading {
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.75);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.panel-body {
+    margin: 0;
+    margin-top: 10px;
+    padding: 0;
+}
+
 #render_surface {
     height: 600px;
-    width: 1108px;
+    width: 1140px;
 }
 
 #title h1 {

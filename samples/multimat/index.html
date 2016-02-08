@@ -60,6 +60,9 @@
                 <script src="../../deploy/js/green3.js"></script>
         -->
         <script id="color-vertex-shader" type="x-shader/x-vertex">
+          precision highp int;
+          precision highp float;
+
           attribute vec3 aPosition;
           attribute vec4 aColor;
           attribute vec3 aNormal;
@@ -81,6 +84,9 @@
         </script>
 
         <script id="flat-vertex-shader" type="x-shader/x-vertex">
+          precision highp int;
+          precision highp float;
+
           attribute vec3 aPosition;
           attribute vec4 aColor;
           attribute vec3 aNormal;
@@ -110,7 +116,8 @@
         </script>
 
         <script id="color-fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
+          precision highp int;
+          precision highp float;
 
           uniform vec4 u_color;
 
@@ -124,7 +131,8 @@
         </script>
 
         <script id="flat-fragment-shader" type="x-shader/x-fragment">
-          precision mediump float;
+          precision highp int;
+          precision highp float;
           
           uniform sampler2D texture0;
           uniform float u_axis;
